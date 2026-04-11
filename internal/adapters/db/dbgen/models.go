@@ -8,6 +8,185 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ApiKey struct {
+	ID         pgtype.UUID
+	Label      string
+	KeyHash    string
+	Scopes     []string
+	Active     bool
+	LastUsedAt pgtype.Timestamptz
+	CreatedAt  pgtype.Timestamptz
+	ExpiresAt  pgtype.Timestamptz
+}
+
+type BankCertificate struct {
+	ID         pgtype.UUID
+	BankCode   string
+	Purpose    string
+	CertPemEnc []byte
+	KeyPemEnc  []byte
+	Nonce      []byte
+	ExpiresAt  pgtype.Timestamptz
+	CreatedAt  pgtype.Timestamptz
+}
+
+type Beneficiary struct {
+	ID                   pgtype.UUID
+	Kind                 string
+	LegalName            string
+	TradeName            pgtype.Text
+	DocumentType         string
+	DocumentNumber       string
+	Email                pgtype.Text
+	Phone                pgtype.Text
+	Tags                 []string
+	DefaultPaymentMethod pgtype.Text
+	Notes                pgtype.Text
+	Active               bool
+	CreatedAt            pgtype.Timestamptz
+	UpdatedAt            pgtype.Timestamptz
+}
+
+type BeneficiaryBankAccount struct {
+	ID            pgtype.UUID
+	BeneficiaryID pgtype.UUID
+	BankCode      string
+	Agency        string
+	AccountNumber string
+	AccountDigit  string
+	AccountType   string
+	Label         pgtype.Text
+	Active        bool
+	VerifiedAt    pgtype.Timestamptz
+	CreatedAt     pgtype.Timestamptz
+}
+
+type BeneficiaryPixKey struct {
+	ID            pgtype.UUID
+	BeneficiaryID pgtype.UUID
+	KeyType       string
+	KeyValue      string
+	Label         pgtype.Text
+	Active        bool
+	VerifiedAt    pgtype.Timestamptz
+	CreatedAt     pgtype.Timestamptz
+}
+
+type CnabFile struct {
+	ID             pgtype.UUID
+	RunID          pgtype.UUID
+	BankCode       string
+	LayoutVersion  string
+	SequenceNumber int32
+	Direction      string
+	FilePath       string
+	FileHash       string
+	Status         string
+	TotalItems     int32
+	GeneratedAt    pgtype.Timestamptz
+	UploadedAt     pgtype.Timestamptz
+	UploadAck      pgtype.Text
+	ReturnedAt     pgtype.Timestamptz
+	ProcessedAt    pgtype.Timestamptz
+}
+
+type IdempotencyKey struct {
+	Key              string
+	Scope            string
+	RequestHash      string
+	ResponseSnapshot []byte
+	StatusCode       int32
+	CreatedAt        pgtype.Timestamptz
+	ExpiresAt        pgtype.Timestamptz
+}
+
+type PayerAccount struct {
+	ID             pgtype.UUID
+	BankCode       string
+	Agency         string
+	AccountNumber  string
+	AccountDigit   string
+	CertificateID  pgtype.UUID
+	OauthClientID  string
+	OauthSecretRef string
+	SftpHost       pgtype.Text
+	SftpUser       pgtype.Text
+	SftpKeyRef     pgtype.Text
+	SftpRemessaDir pgtype.Text
+	SftpRetornoDir pgtype.Text
+	Label          string
+	Active         bool
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
+}
+
+type Payment struct {
+	ID                  pgtype.UUID
+	ExternalID          pgtype.Text
+	Type                string
+	Status              string
+	AmountCents         int64
+	Currency            string
+	PayerAccountID      pgtype.UUID
+	BeneficiaryID       pgtype.UUID
+	BeneficiarySnapshot []byte
+	PayeeMethod         string
+	Payee               []byte
+	Description         pgtype.Text
+	ScheduledFor        pgtype.Date
+	IdempotencyKey      string
+	BankReference       pgtype.Text
+	RejectionReason     pgtype.Text
+	CreatedAt           pgtype.Timestamptz
+	UpdatedAt           pgtype.Timestamptz
+}
+
+type PaymentEvent struct {
+	ID            pgtype.UUID
+	PaymentID     pgtype.UUID
+	At            pgtype.Timestamptz
+	FromStatus    pgtype.Text
+	ToStatus      string
+	Actor         string
+	Reason        pgtype.Text
+	Payload       []byte
+	CorrelationID pgtype.Text
+}
+
+type PaymentRun struct {
+	ID               pgtype.UUID
+	RunDate          pgtype.Date
+	Status           string
+	ApprovedAt       pgtype.Timestamptz
+	ApprovedBy       pgtype.Text
+	TotalItems       int32
+	TotalAmountCents int64
+	PixCount         int32
+	TedCount         int32
+	Summary          []byte
+	CreatedAt        pgtype.Timestamptz
+	ClosedAt         pgtype.Timestamptz
+}
+
+type PaymentRunItem struct {
+	RunID      pgtype.UUID
+	PaymentID  pgtype.UUID
+	Channel    string
+	ExecutedAt pgtype.Timestamptz
+	SettledAt  pgtype.Timestamptz
+}
+
+type PrevalidationResult struct {
+	ID          pgtype.UUID
+	PaymentID   pgtype.UUID
+	Provider    string
+	Request     []byte
+	Response    []byte
+	Verdict     string
+	Reason      pgtype.Text
+	ValidatedAt pgtype.Timestamptz
+}
+
 type SchemaMetadatum struct {
 	Key       string
 	Value     string
