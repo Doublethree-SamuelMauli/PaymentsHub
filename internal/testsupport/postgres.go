@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pressly/goose/v3"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
@@ -21,6 +22,15 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
+
+// OpenPool returns a pgxpool.Pool bound to the given DSN, with cleanup registered.
+func OpenPool(t *testing.T, dsn string) *pgxpool.Pool {
+	t.Helper()
+	pool, err := pgxpool.New(context.Background(), dsn)
+	require.NoError(t, err)
+	t.Cleanup(pool.Close)
+	return pool
+}
 
 // SpawnPostgres boots a postgres:16-alpine container, runs all migrations,
 // and returns the DSN. The container is terminated at test cleanup.

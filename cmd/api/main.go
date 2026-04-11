@@ -1,8 +1,8 @@
 // Command paymentshub-api is the HTTP ingress binary.
 //
-// It wires the configuration, logger, and chi router, then serves HTTP until
-// SIGTERM/SIGINT, at which point it drains in-flight requests within the
-// configured shutdown timeout.
+// It wires configuration, logger, Postgres pool, and the chi router, then
+// serves HTTP until SIGTERM/SIGINT, at which point it drains in-flight
+// requests within the configured shutdown timeout and closes the pool.
 package main
 
 import (
@@ -16,6 +16,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/db"
 	httpadapter "github.com/vanlink-ltda/paymentshub/internal/adapters/http"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/config"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/logging"
@@ -40,9 +43,24 @@ func run() error {
 		Service: "paymentshub-api",
 	})
 
+	poolCtx, cancelPool := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelPool()
+	pool, err := db.NewPool(poolCtx, db.PoolConfig{
+		DSN:             cfg.DatabaseURL,
+		MaxConns:        20,
+		MinConns:        2,
+		MaxConnLifetime: 30 * time.Minute,
+		MaxConnIdleTime: 5 * time.Minute,
+	})
+	if err != nil {
+		return fmt.Errorf("open db pool: %w", err)
+	}
+	defer pool.Close()
+
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{
-		Logger:         logger,
-		RequestTimeout: 30 * time.Second,
+		Logger:          logger,
+		ReadinessChecks: []httpadapter.ReadinessCheck{dbReadinessCheck(pool)},
+		RequestTimeout:  30 * time.Second,
 	})
 
 	server := &http.Server{
@@ -82,4 +100,13 @@ func run() error {
 
 	logger.Info("shutdown complete")
 	return nil
+}
+
+// dbReadinessCheck runs SELECT 1 against the pool with a short timeout.
+func dbReadinessCheck(pool *pgxpool.Pool) httpadapter.ReadinessCheck {
+	return func(r *http.Request) error {
+		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+		defer cancel()
+		return pool.Ping(ctx)
+	}
 }
