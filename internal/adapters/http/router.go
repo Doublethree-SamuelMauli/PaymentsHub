@@ -24,6 +24,8 @@ type RouterDeps struct {
 	// Handlers (nil means the route is not mounted — useful in HTTP-only tests
 	// that do not want to spin up DB-backed handlers).
 	Payments *handlers.PaymentsHandler
+	Runs     *handlers.RunsHandler
+	Admin    *handlers.AdminHandler
 }
 
 // NewRouter builds the chi router with the middleware stack and all routes.
@@ -48,6 +50,12 @@ func NewRouter(deps RouterDeps) http.Handler {
 		}
 		if deps.Payments != nil {
 			deps.Payments.Register(r)
+		}
+		if deps.Runs != nil {
+			deps.Runs.Register(r)
+		}
+		if deps.Admin != nil {
+			deps.Admin.Register(r)
 		}
 	})
 

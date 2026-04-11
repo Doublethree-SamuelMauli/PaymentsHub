@@ -66,12 +66,17 @@ func run() error {
 	idemRepo := repositories.NewIdempotencyRepository(pool)
 	apiKeyRepo := repositories.NewAPIKeyRepository(pool)
 	payerAcctRepo := repositories.NewPayerAccountRepository(pool)
+	beneficiaryRepo := repositories.NewBeneficiaryRepository(pool)
+	runRepo := repositories.NewRunRepository(pool)
 
 	// Application services
 	receivePayment := app.NewReceivePayment(paymentRepo, eventRepo, idemRepo, payerAcctRepo)
+	runService := app.NewRunService(runRepo, paymentRepo, eventRepo)
 
 	// HTTP handlers
 	paymentsHandler := handlers.NewPaymentsHandler(receivePayment, paymentRepo, eventRepo)
+	runsHandler := handlers.NewRunsHandler(runService)
+	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo)
 
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{
 		Logger:          logger,
@@ -79,6 +84,8 @@ func run() error {
 		RequestTimeout:  30 * time.Second,
 		APIKeys:         apiKeyRepo,
 		Payments:        paymentsHandler,
+		Runs:            runsHandler,
+		Admin:           adminHandler,
 	})
 
 	server := &http.Server{

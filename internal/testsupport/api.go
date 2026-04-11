@@ -20,15 +20,16 @@ import (
 // API bundles the httptest server with the repositories it wires, so tests can
 // both drive HTTP calls and seed/verify DB state.
 type API struct {
-	BaseURL        string
-	Pool           *pgxpool.Pool
-	Payments       *repositories.PaymentRepository
-	Events         *repositories.PaymentEventRepository
-	Idempotency    *repositories.IdempotencyRepository
-	APIKeys        *repositories.APIKeyRepository
-	Beneficiaries  *repositories.BeneficiaryRepository
-	PayerAccounts  *repositories.PayerAccountRepository
-	cleanup        func()
+	BaseURL       string
+	Pool          *pgxpool.Pool
+	Payments      *repositories.PaymentRepository
+	Events        *repositories.PaymentEventRepository
+	Idempotency   *repositories.IdempotencyRepository
+	APIKeys       *repositories.APIKeyRepository
+	Beneficiaries *repositories.BeneficiaryRepository
+	PayerAccounts *repositories.PayerAccountRepository
+	Runs          *repositories.RunRepository
+	cleanup       func()
 }
 
 // Close tears down the httptest server and underlying pool.
@@ -50,8 +51,10 @@ func SpawnAPIWithDB(t *testing.T) *API {
 	apiKeys := repositories.NewAPIKeyRepository(pool)
 	beneficiaries := repositories.NewBeneficiaryRepository(pool)
 	payerAccts := repositories.NewPayerAccountRepository(pool)
+	runsRepo := repositories.NewRunRepository(pool)
 
 	receive := app.NewReceivePayment(payments, events, idem, payerAccts)
+	runService := app.NewRunService(runsRepo, payments, events)
 
 	logger := logging.NewLogger(logging.Options{
 		Env: "test", Level: "error", Service: "paymentshub-api",
@@ -61,6 +64,8 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		Logger:         logger,
 		APIKeys:        apiKeys,
 		Payments:       handlers.NewPaymentsHandler(receive, payments, events),
+		Runs:           handlers.NewRunsHandler(runService),
+		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys),
 		RequestTimeout: 5 * time.Second,
 		ReadinessChecks: []httpadapter.ReadinessCheck{
 			func(r *nethttp.Request) error {
@@ -83,6 +88,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		APIKeys:       apiKeys,
 		Beneficiaries: beneficiaries,
 		PayerAccounts: payerAccts,
+		Runs:          runsRepo,
 		cleanup:       srv.Close,
 	}
 	require.NotEmpty(t, api.BaseURL)
