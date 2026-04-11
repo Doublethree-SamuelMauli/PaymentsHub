@@ -1,0 +1,34 @@
+run:
+  timeout: 5m
+  tests: true
+  go: "1.22"
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gosec
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - bodyclose
+    - contextcheck
+    - gocritic
+    - revive
+    - unconvert
+    - misspell
+
+linters-settings:
+  gosec:
+    excludes:
+      - G104
+
+issues:
+  exclude-dirs:
+    - internal/adapters/db/dbgen
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - errcheck
