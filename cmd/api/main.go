@@ -19,7 +19,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db"
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
 	httpadapter "github.com/vanlink-ltda/paymentshub/internal/adapters/http"
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/handlers"
+	"github.com/vanlink-ltda/paymentshub/internal/app"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/config"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/logging"
 )
@@ -57,10 +60,25 @@ func run() error {
 	}
 	defer pool.Close()
 
+	// Repositories
+	paymentRepo := repositories.NewPaymentRepository(pool)
+	eventRepo := repositories.NewPaymentEventRepository(pool)
+	idemRepo := repositories.NewIdempotencyRepository(pool)
+	apiKeyRepo := repositories.NewAPIKeyRepository(pool)
+	payerAcctRepo := repositories.NewPayerAccountRepository(pool)
+
+	// Application services
+	receivePayment := app.NewReceivePayment(paymentRepo, eventRepo, idemRepo, payerAcctRepo)
+
+	// HTTP handlers
+	paymentsHandler := handlers.NewPaymentsHandler(receivePayment, paymentRepo, eventRepo)
+
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{
 		Logger:          logger,
 		ReadinessChecks: []httpadapter.ReadinessCheck{dbReadinessCheck(pool)},
 		RequestTimeout:  30 * time.Second,
+		APIKeys:         apiKeyRepo,
+		Payments:        paymentsHandler,
 	})
 
 	server := &http.Server{
