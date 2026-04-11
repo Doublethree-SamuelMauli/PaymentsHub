@@ -1,0 +1,35 @@
+# Binaries
+/bin/
+/dist/
+paymentshub-api
+paymentshub-worker
+*.exe
+*.test
+*.out
+
+# Go build
+/vendor/
+
+# Coverage
+coverage.out
+coverage.html
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Docker volumes (local dev data)
+.docker-data/
+
+# testdata scratch
+testdata/_scratch/
