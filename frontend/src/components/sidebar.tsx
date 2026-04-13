@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
+import { Logo } from "@/components/logo";
 import {
   LayoutDashboard,
   CreditCard,
@@ -11,7 +12,6 @@ import {
   Users,
   Settings,
   LogOut,
-  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -34,10 +34,7 @@ export function Sidebar() {
   return (
     <aside className="w-56 bg-white border-r border-zinc-200 min-h-screen flex flex-col">
       <div className="px-4 py-5 border-b border-zinc-100">
-        <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-zinc-800" />
-          <span className="text-sm font-semibold text-zinc-800 tracking-tight">PaymentsHub</span>
-        </div>
+        <Logo size="small" />
       </div>
       <nav className="flex-1 px-2 py-3 space-y-0.5">
         {navItems.map((item) => {

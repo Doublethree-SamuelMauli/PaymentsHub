@@ -1,8 +1,8 @@
 -- name: InsertBeneficiary :one
 INSERT INTO beneficiaries (
     id, kind, legal_name, trade_name, document_type, document_number,
-    email, phone, tags, default_payment_method, notes, active
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    email, phone, tags, default_payment_method, notes, active, client_id
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
 
 -- name: GetBeneficiary :one

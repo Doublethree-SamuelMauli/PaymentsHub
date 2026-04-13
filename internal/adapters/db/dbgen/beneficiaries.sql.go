@@ -68,8 +68,8 @@ func (q *Queries) GetBeneficiaryByDocument(ctx context.Context, documentNumber s
 const insertBeneficiary = `-- name: InsertBeneficiary :one
 INSERT INTO beneficiaries (
     id, kind, legal_name, trade_name, document_type, document_number,
-    email, phone, tags, default_payment_method, notes, active
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    email, phone, tags, default_payment_method, notes, active, client_id
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at, client_id
 `
 
@@ -86,6 +86,7 @@ type InsertBeneficiaryParams struct {
 	DefaultPaymentMethod pgtype.Text
 	Notes                pgtype.Text
 	Active               bool
+	ClientID             pgtype.UUID
 }
 
 func (q *Queries) InsertBeneficiary(ctx context.Context, arg InsertBeneficiaryParams) (Beneficiary, error) {
@@ -102,6 +103,7 @@ func (q *Queries) InsertBeneficiary(ctx context.Context, arg InsertBeneficiaryPa
 		arg.DefaultPaymentMethod,
 		arg.Notes,
 		arg.Active,
+		arg.ClientID,
 	)
 	var i Beneficiary
 	err := row.Scan(

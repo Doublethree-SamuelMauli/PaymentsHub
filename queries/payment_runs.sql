@@ -1,6 +1,6 @@
 -- name: InsertPaymentRun :one
-INSERT INTO payment_runs (id, run_date, status)
-VALUES ($1, $2, $3)
+INSERT INTO payment_runs (id, run_date, status, client_id)
+VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetPaymentRun :one

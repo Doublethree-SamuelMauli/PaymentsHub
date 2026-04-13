@@ -101,19 +101,25 @@ func (q *Queries) GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (P
 }
 
 const insertPaymentRun = `-- name: InsertPaymentRun :one
-INSERT INTO payment_runs (id, run_date, status)
-VALUES ($1, $2, $3)
+INSERT INTO payment_runs (id, run_date, status, client_id)
+VALUES ($1, $2, $3, $4)
 RETURNING id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id
 `
 
 type InsertPaymentRunParams struct {
-	ID      pgtype.UUID
-	RunDate pgtype.Date
-	Status  string
+	ID       pgtype.UUID
+	RunDate  pgtype.Date
+	Status   string
+	ClientID pgtype.UUID
 }
 
 func (q *Queries) InsertPaymentRun(ctx context.Context, arg InsertPaymentRunParams) (PaymentRun, error) {
-	row := q.db.QueryRow(ctx, insertPaymentRun, arg.ID, arg.RunDate, arg.Status)
+	row := q.db.QueryRow(ctx, insertPaymentRun,
+		arg.ID,
+		arg.RunDate,
+		arg.Status,
+		arg.ClientID,
+	)
 	var i PaymentRun
 	err := row.Scan(
 		&i.ID,
