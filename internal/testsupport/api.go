@@ -31,6 +31,7 @@ type API struct {
 	Beneficiaries *repositories.BeneficiaryRepository
 	PayerAccounts *repositories.PayerAccountRepository
 	Runs          *repositories.RunRepository
+	Clients       *repositories.ClientRepository
 	cleanup       func()
 }
 
@@ -54,6 +55,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 	beneficiaries := repositories.NewBeneficiaryRepository(pool)
 	payerAccts := repositories.NewPayerAccountRepository(pool)
 	runsRepo := repositories.NewRunRepository(pool)
+	clients := repositories.NewClientRepository(pool)
 
 	receive := app.NewReceivePayment(payments, events, idem, payerAccts)
 	runService := app.NewRunService(runsRepo, payments, events)
@@ -67,7 +69,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		APIKeys:        apiKeys,
 		Payments:       handlers.NewPaymentsHandler(receive, payments, events),
 		Runs:           handlers.NewRunsHandler(runService),
-		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys),
+		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys, clients),
 		Webhooks:       handlers.NewWebhookHandler(payments, events, slog.New(logger.Handler())),
 		RequestTimeout: 5 * time.Second,
 		ReadinessChecks: []httpadapter.ReadinessCheck{
@@ -92,6 +94,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		Beneficiaries: beneficiaries,
 		PayerAccounts: payerAccts,
 		Runs:          runsRepo,
+		Clients:       clients,
 		cleanup:       srv.Close,
 	}
 	require.NotEmpty(t, api.BaseURL)

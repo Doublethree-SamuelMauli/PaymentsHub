@@ -51,7 +51,7 @@ func (q *Queries) DetachPaymentFromRun(ctx context.Context, arg DetachPaymentFro
 }
 
 const getPaymentRun = `-- name: GetPaymentRun :one
-SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at FROM payment_runs WHERE id = $1
+SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id FROM payment_runs WHERE id = $1
 `
 
 func (q *Queries) GetPaymentRun(ctx context.Context, id pgtype.UUID) (PaymentRun, error) {
@@ -70,12 +70,13 @@ func (q *Queries) GetPaymentRun(ctx context.Context, id pgtype.UUID) (PaymentRun
 		&i.Summary,
 		&i.CreatedAt,
 		&i.ClosedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const getPaymentRunForUpdate = `-- name: GetPaymentRunForUpdate :one
-SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at FROM payment_runs WHERE id = $1 FOR UPDATE
+SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id FROM payment_runs WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (PaymentRun, error) {
@@ -94,6 +95,7 @@ func (q *Queries) GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (P
 		&i.Summary,
 		&i.CreatedAt,
 		&i.ClosedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
@@ -101,7 +103,7 @@ func (q *Queries) GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (P
 const insertPaymentRun = `-- name: InsertPaymentRun :one
 INSERT INTO payment_runs (id, run_date, status)
 VALUES ($1, $2, $3)
-RETURNING id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at
+RETURNING id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id
 `
 
 type InsertPaymentRunParams struct {
@@ -126,12 +128,13 @@ func (q *Queries) InsertPaymentRun(ctx context.Context, arg InsertPaymentRunPara
 		&i.Summary,
 		&i.CreatedAt,
 		&i.ClosedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const listPaymentRunsByDate = `-- name: ListPaymentRunsByDate :many
-SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at FROM payment_runs
+SELECT id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id FROM payment_runs
 WHERE run_date BETWEEN $1 AND $2
 ORDER BY run_date DESC, created_at DESC
 `
@@ -163,6 +166,7 @@ func (q *Queries) ListPaymentRunsByDate(ctx context.Context, arg ListPaymentRuns
 			&i.Summary,
 			&i.CreatedAt,
 			&i.ClosedAt,
+			&i.ClientID,
 		); err != nil {
 			return nil, err
 		}
@@ -267,7 +271,7 @@ SET status = $2,
     approved_by = $4,
     closed_at = $5
 WHERE id = $1
-RETURNING id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at
+RETURNING id, run_date, status, approved_at, approved_by, total_items, total_amount_cents, pix_count, ted_count, summary, created_at, closed_at, client_id
 `
 
 type UpdatePaymentRunStatusParams struct {
@@ -300,6 +304,7 @@ func (q *Queries) UpdatePaymentRunStatus(ctx context.Context, arg UpdatePaymentR
 		&i.Summary,
 		&i.CreatedAt,
 		&i.ClosedAt,
+		&i.ClientID,
 	)
 	return i, err
 }

@@ -17,6 +17,7 @@ type ApiKey struct {
 	LastUsedAt pgtype.Timestamptz
 	CreatedAt  pgtype.Timestamptz
 	ExpiresAt  pgtype.Timestamptz
+	ClientID   pgtype.UUID
 }
 
 type BankCertificate struct {
@@ -45,6 +46,7 @@ type Beneficiary struct {
 	Active               bool
 	CreatedAt            pgtype.Timestamptz
 	UpdatedAt            pgtype.Timestamptz
+	ClientID             pgtype.UUID
 }
 
 type BeneficiaryBankAccount struct {
@@ -70,6 +72,18 @@ type BeneficiaryPixKey struct {
 	Active        bool
 	VerifiedAt    pgtype.Timestamptz
 	CreatedAt     pgtype.Timestamptz
+}
+
+type Client struct {
+	ID             pgtype.UUID
+	Name           string
+	DocumentType   string
+	DocumentNumber string
+	Active         bool
+	WebhookUrl     pgtype.Text
+	WebhookSecret  pgtype.Text
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
 }
 
 type CnabFile struct {
@@ -118,6 +132,7 @@ type PayerAccount struct {
 	Active         bool
 	CreatedAt      pgtype.Timestamptz
 	UpdatedAt      pgtype.Timestamptz
+	ClientID       pgtype.UUID
 }
 
 type Payment struct {
@@ -139,6 +154,7 @@ type Payment struct {
 	RejectionReason     pgtype.Text
 	CreatedAt           pgtype.Timestamptz
 	UpdatedAt           pgtype.Timestamptz
+	ClientID            pgtype.UUID
 }
 
 type PaymentEvent struct {
@@ -166,6 +182,7 @@ type PaymentRun struct {
 	Summary          []byte
 	CreatedAt        pgtype.Timestamptz
 	ClosedAt         pgtype.Timestamptz
+	ClientID         pgtype.UUID
 }
 
 type PaymentRunItem struct {
@@ -191,4 +208,18 @@ type SchemaMetadatum struct {
 	Key       string
 	Value     string
 	UpdatedAt pgtype.Timestamptz
+}
+
+type WebhookDelivery struct {
+	ID             pgtype.UUID
+	ClientID       pgtype.UUID
+	PaymentID      pgtype.UUID
+	EventType      string
+	Payload        []byte
+	Status         string
+	ResponseStatus pgtype.Int4
+	ResponseBody   pgtype.Text
+	Attempts       int32
+	LastAttemptAt  pgtype.Timestamptz
+	CreatedAt      pgtype.Timestamptz
 }

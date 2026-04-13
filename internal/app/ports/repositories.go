@@ -70,6 +70,7 @@ type APIKeyRepository interface {
 
 type APIKey struct {
 	ID         uuid.UUID
+	ClientID   *uuid.UUID
 	Label      string
 	KeyHash    string
 	Scopes     []string

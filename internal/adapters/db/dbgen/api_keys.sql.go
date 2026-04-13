@@ -12,7 +12,7 @@ import (
 )
 
 const getApiKeyByHash = `-- name: GetApiKeyByHash :one
-SELECT id, label, key_hash, scopes, active, last_used_at, created_at, expires_at FROM api_keys WHERE key_hash = $1 AND active = TRUE
+SELECT id, label, key_hash, scopes, active, last_used_at, created_at, expires_at, client_id FROM api_keys WHERE key_hash = $1 AND active = TRUE
 `
 
 func (q *Queries) GetApiKeyByHash(ctx context.Context, keyHash string) (ApiKey, error) {
@@ -27,14 +27,15 @@ func (q *Queries) GetApiKeyByHash(ctx context.Context, keyHash string) (ApiKey, 
 		&i.LastUsedAt,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const insertApiKey = `-- name: InsertApiKey :one
-INSERT INTO api_keys (id, label, key_hash, scopes, active, expires_at)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, label, key_hash, scopes, active, last_used_at, created_at, expires_at
+INSERT INTO api_keys (id, label, key_hash, scopes, active, expires_at, client_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, label, key_hash, scopes, active, last_used_at, created_at, expires_at, client_id
 `
 
 type InsertApiKeyParams struct {
@@ -44,6 +45,7 @@ type InsertApiKeyParams struct {
 	Scopes    []string
 	Active    bool
 	ExpiresAt pgtype.Timestamptz
+	ClientID  pgtype.UUID
 }
 
 func (q *Queries) InsertApiKey(ctx context.Context, arg InsertApiKeyParams) (ApiKey, error) {
@@ -54,6 +56,7 @@ func (q *Queries) InsertApiKey(ctx context.Context, arg InsertApiKeyParams) (Api
 		arg.Scopes,
 		arg.Active,
 		arg.ExpiresAt,
+		arg.ClientID,
 	)
 	var i ApiKey
 	err := row.Scan(
@@ -65,12 +68,13 @@ func (q *Queries) InsertApiKey(ctx context.Context, arg InsertApiKeyParams) (Api
 		&i.LastUsedAt,
 		&i.CreatedAt,
 		&i.ExpiresAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const listApiKeys = `-- name: ListApiKeys :many
-SELECT id, label, key_hash, scopes, active, last_used_at, created_at, expires_at FROM api_keys ORDER BY created_at DESC
+SELECT id, label, key_hash, scopes, active, last_used_at, created_at, expires_at, client_id FROM api_keys ORDER BY created_at DESC
 `
 
 func (q *Queries) ListApiKeys(ctx context.Context) ([]ApiKey, error) {
@@ -91,6 +95,41 @@ func (q *Queries) ListApiKeys(ctx context.Context) ([]ApiKey, error) {
 			&i.LastUsedAt,
 			&i.CreatedAt,
 			&i.ExpiresAt,
+			&i.ClientID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listApiKeysByClient = `-- name: ListApiKeysByClient :many
+SELECT id, label, key_hash, scopes, active, last_used_at, created_at, expires_at, client_id FROM api_keys WHERE client_id = $1 ORDER BY created_at DESC
+`
+
+func (q *Queries) ListApiKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ApiKey, error) {
+	rows, err := q.db.Query(ctx, listApiKeysByClient, clientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ApiKey{}
+	for rows.Next() {
+		var i ApiKey
+		if err := rows.Scan(
+			&i.ID,
+			&i.Label,
+			&i.KeyHash,
+			&i.Scopes,
+			&i.Active,
+			&i.LastUsedAt,
+			&i.CreatedAt,
+			&i.ExpiresAt,
+			&i.ClientID,
 		); err != nil {
 			return nil, err
 		}

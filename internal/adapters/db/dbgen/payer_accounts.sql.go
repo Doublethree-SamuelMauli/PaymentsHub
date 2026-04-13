@@ -12,7 +12,7 @@ import (
 )
 
 const getPayerAccount = `-- name: GetPayerAccount :one
-SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at FROM payer_accounts WHERE id = $1
+SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at, client_id FROM payer_accounts WHERE id = $1
 `
 
 func (q *Queries) GetPayerAccount(ctx context.Context, id pgtype.UUID) (PayerAccount, error) {
@@ -36,12 +36,13 @@ func (q *Queries) GetPayerAccount(ctx context.Context, id pgtype.UUID) (PayerAcc
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const getPayerAccountByLabel = `-- name: GetPayerAccountByLabel :one
-SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at FROM payer_accounts WHERE label = $1
+SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at, client_id FROM payer_accounts WHERE label = $1
 `
 
 func (q *Queries) GetPayerAccountByLabel(ctx context.Context, label string) (PayerAccount, error) {
@@ -65,6 +66,7 @@ func (q *Queries) GetPayerAccountByLabel(ctx context.Context, label string) (Pay
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
@@ -76,7 +78,7 @@ INSERT INTO payer_accounts (
     sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir,
     label, active
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-RETURNING id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at
+RETURNING id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at, client_id
 `
 
 type InsertPayerAccountParams struct {
@@ -134,12 +136,13 @@ func (q *Queries) InsertPayerAccount(ctx context.Context, arg InsertPayerAccount
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const listPayerAccounts = `-- name: ListPayerAccounts :many
-SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at FROM payer_accounts ORDER BY label
+SELECT id, bank_code, agency, account_number, account_digit, certificate_id, oauth_client_id, oauth_secret_ref, sftp_host, sftp_user, sftp_key_ref, sftp_remessa_dir, sftp_retorno_dir, label, active, created_at, updated_at, client_id FROM payer_accounts ORDER BY label
 `
 
 func (q *Queries) ListPayerAccounts(ctx context.Context) ([]PayerAccount, error) {
@@ -169,6 +172,7 @@ func (q *Queries) ListPayerAccounts(ctx context.Context) ([]PayerAccount, error)
 			&i.Active,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ClientID,
 		); err != nil {
 			return nil, err
 		}

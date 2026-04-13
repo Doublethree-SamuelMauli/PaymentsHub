@@ -38,6 +38,7 @@ func (r *APIKeyRepository) Insert(ctx context.Context, rec ports.APIKey) error {
 		Scopes:    rec.Scopes,
 		Active:    rec.Active,
 		ExpiresAt: expiresAt,
+		ClientID:  uuidPtrToPg(rec.ClientID),
 	})
 	if err != nil {
 		return fmt.Errorf("insert api key: %w", err)
@@ -60,6 +61,10 @@ func (r *APIKeyRepository) GetByHash(ctx context.Context, hash string) (*ports.A
 		Scopes:    row.Scopes,
 		Active:    row.Active,
 		CreatedAt: row.CreatedAt.Time,
+	}
+	if row.ClientID.Valid {
+		cid := pgToUUID(row.ClientID)
+		k.ClientID = &cid
 	}
 	if row.LastUsedAt.Valid {
 		t := row.LastUsedAt.Time

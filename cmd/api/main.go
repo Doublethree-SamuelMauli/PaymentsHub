@@ -67,6 +67,7 @@ func run() error {
 	apiKeyRepo := repositories.NewAPIKeyRepository(pool)
 	payerAcctRepo := repositories.NewPayerAccountRepository(pool)
 	beneficiaryRepo := repositories.NewBeneficiaryRepository(pool)
+	clientRepo := repositories.NewClientRepository(pool)
 	runRepo := repositories.NewRunRepository(pool)
 
 	// Application services
@@ -76,7 +77,7 @@ func run() error {
 	// HTTP handlers
 	paymentsHandler := handlers.NewPaymentsHandler(receivePayment, paymentRepo, eventRepo)
 	runsHandler := handlers.NewRunsHandler(runService)
-	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo)
+	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo, clientRepo)
 	webhookHandler := handlers.NewWebhookHandler(paymentRepo, eventRepo, logger)
 
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{

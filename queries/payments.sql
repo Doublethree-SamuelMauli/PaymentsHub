@@ -2,9 +2,10 @@
 INSERT INTO payments (
     id, external_id, type, status, amount_cents, currency,
     payer_account_id, beneficiary_id, beneficiary_snapshot,
-    payee_method, payee, description, scheduled_for, idempotency_key
+    payee_method, payee, description, scheduled_for, idempotency_key,
+    client_id
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
 )
 RETURNING *;
 
@@ -29,6 +30,12 @@ SELECT * FROM payments
 WHERE status = $1
 ORDER BY created_at DESC
 LIMIT $2 OFFSET $3;
+
+-- name: ListPaymentsByClientAndStatus :many
+SELECT * FROM payments
+WHERE client_id = $1 AND status = $2
+ORDER BY created_at DESC
+LIMIT $3 OFFSET $4;
 
 -- name: CountPaymentsByStatus :one
 SELECT count(*) FROM payments WHERE status = $1;

@@ -58,6 +58,9 @@ func APIKeyAuth(keys APIKeyLookup) func(http.Handler) http.Handler {
 			ctx := context.WithValue(r.Context(), ctxKeyAPIKeyID, key.ID)
 			ctx = context.WithValue(ctx, ctxKeyAPIKeyScopes, key.Scopes)
 			ctx = context.WithValue(ctx, ctxKeyAPIKeyLabel, key.Label)
+			if key.ClientID != nil {
+				ctx = WithTenant(ctx, *key.ClientID)
+			}
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

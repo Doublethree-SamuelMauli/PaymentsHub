@@ -11,32 +11,39 @@ import (
 	"github.com/google/uuid"
 
 	mw "github.com/vanlink-ltda/paymentshub/internal/adapters/http/middleware"
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
 	"github.com/vanlink-ltda/paymentshub/internal/app/ports"
 	"github.com/vanlink-ltda/paymentshub/internal/domain/beneficiary"
+	"github.com/vanlink-ltda/paymentshub/internal/domain/client"
 )
 
-// AdminHandler exposes admin CRUD for payer accounts, beneficiaries, api keys.
+// AdminHandler exposes admin CRUD for payer accounts, beneficiaries, api keys, clients.
 type AdminHandler struct {
 	payerAccts    ports.PayerAccountRepository
 	beneficiaries ports.BeneficiaryRepository
 	apiKeys       ports.APIKeyRepository
+	clients       *repositories.ClientRepository
 }
 
 func NewAdminHandler(
 	payerAccts ports.PayerAccountRepository,
 	beneficiaries ports.BeneficiaryRepository,
 	apiKeys ports.APIKeyRepository,
+	clients *repositories.ClientRepository,
 ) *AdminHandler {
 	return &AdminHandler{
 		payerAccts:    payerAccts,
 		beneficiaries: beneficiaries,
 		apiKeys:       apiKeys,
+		clients:       clients,
 	}
 }
 
 func (h *AdminHandler) Register(r chi.Router) {
 	r.Route("/v1/admin", func(r chi.Router) {
 		r.Use(mw.RequireScope("admin"))
+		r.Post("/clients", h.CreateClient)
+		r.Post("/clients/{id}/webhook", h.ConfigureWebhook)
 		r.Post("/payer-accounts", h.CreatePayerAccount)
 		r.Post("/beneficiaries", h.CreateBeneficiary)
 		r.Post("/beneficiaries/{id}/pix-keys", h.AddPixKey)
@@ -244,6 +251,94 @@ func (h *AdminHandler) CreateAPIKey(w http.ResponseWriter, r *http.Request) {
 		"token":  token,
 		"scopes": req.Scopes,
 		"warning": "store this token securely — it will not be shown again",
+	})
+}
+
+// ----- Clients -----
+
+type createClientReq struct {
+	Name           string `json:"name" validate:"required"`
+	DocumentType   string `json:"document_type" validate:"required,oneof=CPF CNPJ"`
+	DocumentNumber string `json:"document_number" validate:"required"`
+	WebhookURL     string `json:"webhook_url"`
+}
+
+func (h *AdminHandler) CreateClient(w http.ResponseWriter, r *http.Request) {
+	var req createClientReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid json", nil)
+		return
+	}
+	if req.Name == "" || req.DocumentNumber == "" {
+		writeJSONError(w, http.StatusBadRequest, "name and document_number required", nil)
+		return
+	}
+
+	// Generate HMAC secret for webhooks
+	secretBytes := make([]byte, 32)
+	if _, err := rand.Read(secretBytes); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "generate secret", nil)
+		return
+	}
+	webhookSecret := "whsec_" + base64.RawURLEncoding.EncodeToString(secretBytes)
+
+	c := &client.Client{
+		ID:             uuid.New(),
+		Name:           req.Name,
+		DocumentType:   req.DocumentType,
+		DocumentNumber: req.DocumentNumber,
+		Active:         true,
+		WebhookURL:     req.WebhookURL,
+		WebhookSecret:  webhookSecret,
+	}
+	if err := h.clients.Insert(r.Context(), c); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "insert client", map[string]any{"detail": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]any{
+		"id":             c.ID.String(),
+		"name":           c.Name,
+		"webhook_secret": webhookSecret,
+		"warning":        "store the webhook_secret securely — it will not be shown again",
+	})
+}
+
+type configureWebhookReq struct {
+	WebhookURL string `json:"webhook_url" validate:"required,url"`
+}
+
+func (h *AdminHandler) ConfigureWebhook(w http.ResponseWriter, r *http.Request) {
+	clientID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid client id", nil)
+		return
+	}
+	var req configureWebhookReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid json", nil)
+		return
+	}
+
+	c, err := h.clients.Get(r.Context(), clientID)
+	if err != nil {
+		writeJSONError(w, http.StatusNotFound, "client not found", nil)
+		return
+	}
+
+	secret := c.WebhookSecret
+	if secret == "" {
+		secretBytes := make([]byte, 32)
+		_, _ = rand.Read(secretBytes)
+		secret = "whsec_" + base64.RawURLEncoding.EncodeToString(secretBytes)
+	}
+
+	if err := h.clients.UpdateWebhook(r.Context(), clientID, req.WebhookURL, secret); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "update webhook", map[string]any{"detail": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"webhook_url":    req.WebhookURL,
+		"webhook_secret": secret,
 	})
 }
 

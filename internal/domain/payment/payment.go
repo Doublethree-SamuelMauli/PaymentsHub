@@ -43,6 +43,7 @@ type Payment struct {
 	IdempotencyKey      string
 	BankReference       string
 	RejectionReason     string
+	ClientID            *uuid.UUID
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 }

@@ -57,6 +57,7 @@ func (r *PaymentRepository) Insert(ctx context.Context, p *payment.Payment) erro
 		Description:         nullText(p.Description),
 		ScheduledFor:        nullDate(p.ScheduledFor),
 		IdempotencyKey:      p.IdempotencyKey,
+		ClientID:            uuidPtrToPg(p.ClientID),
 	}
 
 	row, err := r.q.InsertPayment(ctx, args)
@@ -139,6 +140,10 @@ func paymentFromRow(row dbgen.Payment) *payment.Payment {
 	if row.BeneficiaryID.Valid {
 		bid := pgToUUID(row.BeneficiaryID)
 		p.BeneficiaryID = &bid
+	}
+	if row.ClientID.Valid {
+		cid := pgToUUID(row.ClientID)
+		p.ClientID = &cid
 	}
 	if len(row.BeneficiarySnapshot) > 0 {
 		_ = json.Unmarshal(row.BeneficiarySnapshot, &p.BeneficiarySnapshot)

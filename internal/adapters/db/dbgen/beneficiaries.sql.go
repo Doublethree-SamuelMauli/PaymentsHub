@@ -12,7 +12,7 @@ import (
 )
 
 const getBeneficiary = `-- name: GetBeneficiary :one
-SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at FROM beneficiaries WHERE id = $1
+SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at, client_id FROM beneficiaries WHERE id = $1
 `
 
 func (q *Queries) GetBeneficiary(ctx context.Context, id pgtype.UUID) (Beneficiary, error) {
@@ -33,12 +33,13 @@ func (q *Queries) GetBeneficiary(ctx context.Context, id pgtype.UUID) (Beneficia
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
 
 const getBeneficiaryByDocument = `-- name: GetBeneficiaryByDocument :one
-SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at FROM beneficiaries WHERE document_number = $1
+SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at, client_id FROM beneficiaries WHERE document_number = $1
 `
 
 func (q *Queries) GetBeneficiaryByDocument(ctx context.Context, documentNumber string) (Beneficiary, error) {
@@ -59,6 +60,7 @@ func (q *Queries) GetBeneficiaryByDocument(ctx context.Context, documentNumber s
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
@@ -68,7 +70,7 @@ INSERT INTO beneficiaries (
     id, kind, legal_name, trade_name, document_type, document_number,
     email, phone, tags, default_payment_method, notes, active
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-RETURNING id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at
+RETURNING id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at, client_id
 `
 
 type InsertBeneficiaryParams struct {
@@ -117,6 +119,7 @@ func (q *Queries) InsertBeneficiary(ctx context.Context, arg InsertBeneficiaryPa
 		&i.Active,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ClientID,
 	)
 	return i, err
 }
@@ -213,7 +216,7 @@ func (q *Queries) InsertBeneficiaryPixKey(ctx context.Context, arg InsertBenefic
 }
 
 const listBeneficiaries = `-- name: ListBeneficiaries :many
-SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at FROM beneficiaries
+SELECT id, kind, legal_name, trade_name, document_type, document_number, email, phone, tags, default_payment_method, notes, active, created_at, updated_at, client_id FROM beneficiaries
 WHERE active = TRUE
 ORDER BY legal_name
 LIMIT $1 OFFSET $2
@@ -248,6 +251,7 @@ func (q *Queries) ListBeneficiaries(ctx context.Context, arg ListBeneficiariesPa
 			&i.Active,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ClientID,
 		); err != nil {
 			return nil, err
 		}

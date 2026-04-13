@@ -33,6 +33,7 @@ type ReceivePaymentInput struct {
 	Payee          map[string]any
 	Description    string
 	ScheduledFor   *time.Time
+	ClientID       *uuid.UUID
 	Actor          string // usually "apikey:<label>"
 	RequestHash    string // sha256 of request payload, for idempotency check
 }
@@ -126,6 +127,7 @@ func (uc *ReceivePayment) Execute(ctx context.Context, in ReceivePaymentInput) (
 	p.BeneficiarySnapshot = map[string]any{"frozen_at": uc.clock().UTC().Format(time.RFC3339)}
 	p.Description = in.Description
 	p.ScheduledFor = in.ScheduledFor
+	p.ClientID = in.ClientID
 
 	if err := uc.payments.Insert(ctx, p); err != nil {
 		return nil, fmt.Errorf("insert payment: %w", err)

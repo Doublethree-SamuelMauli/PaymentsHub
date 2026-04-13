@@ -4,6 +4,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -120,6 +121,7 @@ func (h *PaymentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Payee:          payee,
 		Description:    req.Description,
 		ScheduledFor:   scheduledFor,
+		ClientID:       tenantIDPtr(r.Context()),
 		Actor:          "apikey:" + mw.APIKeyLabelFromContext(r.Context()),
 		RequestHash:    app.HashRequestBody(rawBody),
 	}
@@ -225,4 +227,12 @@ func writeJSON(w http.ResponseWriter, code int, body any) {
 
 func writeJSONError(w http.ResponseWriter, code int, msg string, details map[string]any) {
 	writeJSON(w, code, dto.ErrorResponse{Error: msg, Details: details})
+}
+
+func tenantIDPtr(ctx context.Context) *uuid.UUID {
+	tid := mw.TenantFromContext(ctx)
+	if tid == uuid.Nil {
+		return nil
+	}
+	return &tid
 }

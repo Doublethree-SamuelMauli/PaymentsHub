@@ -20,6 +20,8 @@ type Querier interface {
 	GetBankCertificate(ctx context.Context, id pgtype.UUID) (BankCertificate, error)
 	GetBeneficiary(ctx context.Context, id pgtype.UUID) (Beneficiary, error)
 	GetBeneficiaryByDocument(ctx context.Context, documentNumber string) (Beneficiary, error)
+	GetClient(ctx context.Context, id pgtype.UUID) (Client, error)
+	GetClientByDocument(ctx context.Context, documentNumber string) (Client, error)
 	GetCnabFile(ctx context.Context, id pgtype.UUID) (CnabFile, error)
 	GetCnabFileByHash(ctx context.Context, fileHash string) (CnabFile, error)
 	GetIdempotencyKey(ctx context.Context, key string) (IdempotencyKey, error)
@@ -30,11 +32,13 @@ type Querier interface {
 	GetPaymentForUpdate(ctx context.Context, id pgtype.UUID) (Payment, error)
 	GetPaymentRun(ctx context.Context, id pgtype.UUID) (PaymentRun, error)
 	GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (PaymentRun, error)
+	GetWebhookDelivery(ctx context.Context, id pgtype.UUID) (WebhookDelivery, error)
 	InsertApiKey(ctx context.Context, arg InsertApiKeyParams) (ApiKey, error)
 	InsertBankCertificate(ctx context.Context, arg InsertBankCertificateParams) (BankCertificate, error)
 	InsertBeneficiary(ctx context.Context, arg InsertBeneficiaryParams) (Beneficiary, error)
 	InsertBeneficiaryBankAccount(ctx context.Context, arg InsertBeneficiaryBankAccountParams) (BeneficiaryBankAccount, error)
 	InsertBeneficiaryPixKey(ctx context.Context, arg InsertBeneficiaryPixKeyParams) (BeneficiaryPixKey, error)
+	InsertClient(ctx context.Context, arg InsertClientParams) (Client, error)
 	InsertCnabFile(ctx context.Context, arg InsertCnabFileParams) (CnabFile, error)
 	InsertIdempotencyKey(ctx context.Context, arg InsertIdempotencyKeyParams) (IdempotencyKey, error)
 	InsertPayerAccount(ctx context.Context, arg InsertPayerAccountParams) (PayerAccount, error)
@@ -42,30 +46,39 @@ type Querier interface {
 	InsertPaymentEvent(ctx context.Context, arg InsertPaymentEventParams) (PaymentEvent, error)
 	InsertPaymentRun(ctx context.Context, arg InsertPaymentRunParams) (PaymentRun, error)
 	InsertPrevalidationResult(ctx context.Context, arg InsertPrevalidationResultParams) (PrevalidationResult, error)
+	InsertWebhookDelivery(ctx context.Context, arg InsertWebhookDeliveryParams) (WebhookDelivery, error)
 	LatestPrevalidation(ctx context.Context, arg LatestPrevalidationParams) (PrevalidationResult, error)
 	ListApiKeys(ctx context.Context) ([]ApiKey, error)
+	ListApiKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ApiKey, error)
 	ListBankCertificatesByBank(ctx context.Context, arg ListBankCertificatesByBankParams) ([]BankCertificate, error)
 	ListBeneficiaries(ctx context.Context, arg ListBeneficiariesParams) ([]Beneficiary, error)
 	ListBeneficiaryBankAccounts(ctx context.Context, beneficiaryID pgtype.UUID) ([]BeneficiaryBankAccount, error)
 	ListBeneficiaryPixKeys(ctx context.Context, beneficiaryID pgtype.UUID) ([]BeneficiaryPixKey, error)
+	ListClients(ctx context.Context) ([]Client, error)
 	ListCnabFilesByRun(ctx context.Context, runID pgtype.UUID) ([]CnabFile, error)
 	ListCnabFilesByStatus(ctx context.Context, status string) ([]CnabFile, error)
 	ListPayerAccounts(ctx context.Context) ([]PayerAccount, error)
 	ListPaymentEventsForPayment(ctx context.Context, paymentID pgtype.UUID) ([]PaymentEvent, error)
 	ListPaymentRunsByDate(ctx context.Context, arg ListPaymentRunsByDateParams) ([]PaymentRun, error)
+	ListPaymentsByClientAndStatus(ctx context.Context, arg ListPaymentsByClientAndStatusParams) ([]Payment, error)
 	ListPaymentsByStatus(ctx context.Context, arg ListPaymentsByStatusParams) ([]Payment, error)
 	ListPaymentsForRun(ctx context.Context, runID pgtype.UUID) ([]Payment, error)
+	ListPendingWebhookDeliveries(ctx context.Context, limit int32) ([]WebhookDelivery, error)
 	ListPrevalidationsByPayment(ctx context.Context, paymentID pgtype.UUID) ([]PrevalidationResult, error)
 	ListRunItems(ctx context.Context, runID pgtype.UUID) ([]PaymentRunItem, error)
+	ListWebhookDeliveriesByPayment(ctx context.Context, paymentID pgtype.UUID) ([]WebhookDelivery, error)
 	MarkRunItemExecuted(ctx context.Context, arg MarkRunItemExecutedParams) error
 	MarkRunItemSettled(ctx context.Context, arg MarkRunItemSettledParams) error
 	RevokeApiKey(ctx context.Context, id pgtype.UUID) error
+	SetClientActive(ctx context.Context, arg SetClientActiveParams) error
 	SetPayerAccountActive(ctx context.Context, arg SetPayerAccountActiveParams) error
 	TouchApiKey(ctx context.Context, id pgtype.UUID) error
+	UpdateClientWebhook(ctx context.Context, arg UpdateClientWebhookParams) error
 	UpdateCnabFileStatus(ctx context.Context, arg UpdateCnabFileStatusParams) (CnabFile, error)
 	UpdatePaymentRunCounters(ctx context.Context, arg UpdatePaymentRunCountersParams) error
 	UpdatePaymentRunStatus(ctx context.Context, arg UpdatePaymentRunStatusParams) (PaymentRun, error)
 	UpdatePaymentStatus(ctx context.Context, arg UpdatePaymentStatusParams) (Payment, error)
+	UpdateWebhookDeliveryStatus(ctx context.Context, arg UpdateWebhookDeliveryStatusParams) error
 }
 
 var _ Querier = (*Queries)(nil)
