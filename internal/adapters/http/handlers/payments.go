@@ -164,12 +164,24 @@ func (h *PaymentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 // List handles GET /v1/payments.
 func (h *PaymentsHandler) List(w http.ResponseWriter, r *http.Request) {
 	status := r.URL.Query().Get("status")
-	if status == "" {
-		status = "RECEIVED"
-	}
 	limit := 100
 	offset := 0
-	payments, err := h.payments.ListByStatus(r.Context(), payment.Status(status), limit, offset)
+
+	type lister interface {
+		ListAll(ctx context.Context, limit, offset int) ([]*payment.Payment, error)
+	}
+
+	var payments []*payment.Payment
+	var err error
+	if status == "" || status == "ALL" {
+		if repo, ok := h.payments.(lister); ok {
+			payments, err = repo.ListAll(r.Context(), limit, offset)
+		} else {
+			payments, err = h.payments.ListByStatus(r.Context(), payment.StatusReceived, limit, offset)
+		}
+	} else {
+		payments, err = h.payments.ListByStatus(r.Context(), payment.Status(status), limit, offset)
+	}
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, "list payments", nil)
 		return

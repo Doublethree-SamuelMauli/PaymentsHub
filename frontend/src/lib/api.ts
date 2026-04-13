@@ -5,34 +5,24 @@ class ApiClient {
 
   setToken(token: string) {
     this.token = token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("ph_token", token);
-    }
+    if (typeof window !== "undefined") localStorage.setItem("ph_token", token);
   }
 
   getToken(): string | null {
     if (this.token) return this.token;
-    if (typeof window !== "undefined") {
-      this.token = localStorage.getItem("ph_token");
-    }
+    if (typeof window !== "undefined") this.token = localStorage.getItem("ph_token");
     return this.token;
   }
 
   clearToken() {
     this.token = null;
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("ph_token");
-    }
+    if (typeof window !== "undefined") localStorage.removeItem("ph_token");
   }
 
-  private async request<T>(method: string, path: string, body?: unknown): Promise<T> {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
+  private async request<T>(method: string, path: string, body?: unknown, extraHeaders?: Record<string, string>): Promise<T> {
+    const headers: Record<string, string> = { "Content-Type": "application/json", ...extraHeaders };
     const token = this.getToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const res = await fetch(`${API_BASE}${path}`, {
       method,
@@ -42,69 +32,56 @@ class ApiClient {
 
     if (res.status === 401) {
       this.clearToken();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
+      if (typeof window !== "undefined") window.location.href = "/login";
       throw new Error("Unauthorized");
     }
-
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: res.statusText }));
       throw new Error(err.error || `HTTP ${res.status}`);
     }
-
     if (res.status === 204) return {} as T;
     return res.json();
   }
 
-  get<T>(path: string) {
-    return this.request<T>("GET", path);
-  }
-  post<T>(path: string, body?: unknown) {
-    return this.request<T>("POST", path, body);
-  }
-  del<T>(path: string) {
-    return this.request<T>("DELETE", path);
-  }
+  get<T>(path: string) { return this.request<T>("GET", path); }
+  post<T>(path: string, body?: unknown, headers?: Record<string, string>) { return this.request<T>("POST", path, body, headers); }
 
-  // Domain methods
   async getPayments(status?: string) {
-    const params = status ? `?status=${status}&limit=100&offset=0` : "?limit=100&offset=0";
-    return this.get<PaymentListItem[]>(`/v1/payments${params}`);
+    const q = status && status !== "ALL" ? `?status=${status}&limit=200` : "?limit=200";
+    return this.get<PaymentListItem[]>(`/v1/payments${q}`);
   }
 
-  async getPayment(id: string) {
-    return this.get<PaymentDetail>(`/v1/payments/${id}`);
-  }
-
-  async getRuns() {
-    return this.get<Run[]>("/v1/runs");
-  }
-
-  async createRun(runDate: string) {
-    return this.post<Run>("/v1/runs", { run_date: runDate });
-  }
-
-  async approveRun(id: string) {
-    return this.post<Run>(`/v1/runs/${id}/approve`);
-  }
+  async getPayment(id: string) { return this.get<PaymentDetail>(`/v1/payments/${id}`); }
+  async getRuns() { return this.get<Run[]>("/v1/runs"); }
+  async createRun(runDate: string) { return this.post<Run>("/v1/runs", { run_date: runDate }); }
+  async approveRun(id: string) { return this.post<Run>(`/v1/runs/${id}/approve`); }
 
   async attachPayments(runId: string, paymentIds: string[]) {
-    return this.post<{ attached: string[]; rejected: unknown[] }>(`/v1/runs/${runId}/attach`, {
-      payment_ids: paymentIds,
-    });
+    return this.post<{ attached: string[]; rejected: unknown[] }>(`/v1/runs/${runId}/attach`, { payment_ids: paymentIds });
   }
 
-  async holdPayment(id: string, reason?: string) {
-    return this.post(`/v1/payments/${id}/hold`, { reason });
+  async createPayment(data: CreatePaymentInput) {
+    const idemKey = crypto.randomUUID();
+    return this.post<PaymentListItem>("/v1/payments", data, { "Idempotency-Key": idemKey });
   }
 
-  async cancelPayment(id: string, reason?: string) {
-    return this.post(`/v1/payments/${id}/cancel`, { reason });
-  }
+  async holdPayment(id: string, reason?: string) { return this.post(`/v1/payments/${id}/hold`, { reason }); }
+  async unholdPayment(id: string) { return this.post(`/v1/payments/${id}/unhold`, {}); }
+  async cancelPayment(id: string, reason?: string) { return this.post(`/v1/payments/${id}/cancel`, { reason }); }
+  async rejectPayment(id: string, reason?: string) { return this.post(`/v1/payments/${id}/reject`, { reason }); }
 }
 
 export const api = new ApiClient();
+
+export interface CreatePaymentInput {
+  external_id?: string;
+  type: string;
+  amount_cents: number;
+  payer_account_id: string;
+  payee_method: string;
+  payee: Record<string, string>;
+  description?: string;
+}
 
 export interface PaymentListItem {
   id: string;
@@ -114,9 +91,13 @@ export interface PaymentListItem {
   amount_cents: number;
   currency: string;
   payee_method: string;
+  payee: Record<string, string>;
   description: string;
   created_at: string;
+  updated_at: string;
   idempotency_key: string;
+  bank_reference: string;
+  payer_account_id: string;
 }
 
 export interface PaymentEvent {
@@ -128,11 +109,7 @@ export interface PaymentEvent {
 }
 
 export interface PaymentDetail {
-  payment: PaymentListItem & {
-    payer_account_id: string;
-    payee: Record<string, string>;
-    bank_reference: string;
-  };
+  payment: PaymentListItem;
   timeline: PaymentEvent[];
 }
 

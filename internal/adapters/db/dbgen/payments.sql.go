@@ -188,6 +188,57 @@ func (q *Queries) InsertPayment(ctx context.Context, arg InsertPaymentParams) (P
 	return i, err
 }
 
+const listAllPayments = `-- name: ListAllPayments :many
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListAllPaymentsParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) ListAllPayments(ctx context.Context, arg ListAllPaymentsParams) ([]Payment, error) {
+	rows, err := q.db.Query(ctx, listAllPayments, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Payment{}
+	for rows.Next() {
+		var i Payment
+		if err := rows.Scan(
+			&i.ID,
+			&i.ExternalID,
+			&i.Type,
+			&i.Status,
+			&i.AmountCents,
+			&i.Currency,
+			&i.PayerAccountID,
+			&i.BeneficiaryID,
+			&i.BeneficiarySnapshot,
+			&i.PayeeMethod,
+			&i.Payee,
+			&i.Description,
+			&i.ScheduledFor,
+			&i.IdempotencyKey,
+			&i.BankReference,
+			&i.RejectionReason,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ClientID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPaymentsByClientAndStatus = `-- name: ListPaymentsByClientAndStatus :many
 SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
 WHERE client_id = $1 AND status = $2

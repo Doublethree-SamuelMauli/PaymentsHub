@@ -8,95 +8,83 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, RefreshCw } from "lucide-react";
 
-const STATUSES = [
-  "ALL", "RECEIVED", "VALIDATED_LOCAL", "PREVALIDATED", "UNDER_REVIEW",
-  "APPROVED", "ON_HOLD", "SUBMITTING", "SENT", "SETTLED", "FAILED", "REJECTED", "CANCELED",
-];
+const STATUSES = ["ALL", "RECEIVED", "PREVALIDATED", "UNDER_REVIEW", "APPROVED", "ON_HOLD", "SUBMITTING", "SENT", "SETTLED", "FAILED", "REJECTED", "CANCELED"];
 
 export default function PaymentsPage() {
   const [payments, setPayments] = useState<PaymentListItem[]>([]);
   const [filter, setFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  function refresh() {
     setLoading(true);
-    const statusParam = filter === "ALL" ? undefined : filter;
-    api.getPayments(statusParam).then(setPayments).catch(console.error).finally(() => setLoading(false));
-  }, [filter]);
+    api.getPayments(filter === "ALL" ? undefined : filter).then(setPayments).catch(console.error).finally(() => setLoading(false));
+  }
+
+  useEffect(() => { refresh(); }, [filter]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Pagamentos</h2>
-          <p className="text-sm text-zinc-500 mt-1">Lista completa de pagamentos</p>
-        </div>
+        <h2 className="text-lg font-semibold text-zinc-800">Pagamentos</h2>
+        <Button variant="outline" size="sm" onClick={refresh} className="gap-1.5 text-xs">
+          <RefreshCw className="h-3 w-3" /> Atualizar
+        </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1">
         {STATUSES.map((s) => (
-          <Button
+          <button
             key={s}
-            variant={filter === s ? "default" : "outline"}
-            size="sm"
             onClick={() => setFilter(s)}
+            className={`px-2 py-1 rounded text-[11px] font-medium transition-colors ${
+              filter === s ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+            }`}
           >
             {s}
-          </Button>
+          </button>
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">
+      <Card className="border-zinc-200">
+        <CardHeader className="pb-0 pt-3 px-4">
+          <CardTitle className="text-xs text-zinc-400 font-medium">
             {loading ? "Carregando..." : `${payments.length} pagamentos`}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-0 pb-0">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>ID / Ref</TableHead>
+              <TableRow className="text-[11px]">
+                <TableHead className="pl-4">Ref</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Valor</TableHead>
-                <TableHead>Descrição</TableHead>
-                <TableHead>Criado em</TableHead>
-                <TableHead></TableHead>
+                <TableHead>Descricao</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead className="pr-4"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {payments.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-mono text-xs">
-                    {p.external_id || p.id.slice(0, 8)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{p.type}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={statusColor(p.status)}>
-                      {p.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-mono">{formatBRL(p.amount_cents)}</TableCell>
-                  <TableCell className="text-sm text-zinc-500 max-w-[200px] truncate">
-                    {p.description}
-                  </TableCell>
-                  <TableCell className="text-sm text-zinc-500">{formatDate(p.created_at)}</TableCell>
-                  <TableCell>
+                <TableRow key={p.id} className="text-[13px]">
+                  <TableCell className="pl-4 font-mono text-xs text-zinc-600">{p.external_id || p.id.slice(0, 8)}</TableCell>
+                  <TableCell><Badge variant="outline" className="text-[10px] px-1.5 py-0">{p.type}</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${statusColor(p.status)}`}>{p.status}</Badge></TableCell>
+                  <TableCell className="font-mono text-zinc-700">{formatBRL(p.amount_cents)}</TableCell>
+                  <TableCell className="text-zinc-400 max-w-[180px] truncate">{p.description}</TableCell>
+                  <TableCell className="text-zinc-400 text-xs">{formatDate(p.created_at)}</TableCell>
+                  <TableCell className="pr-4">
                     <Link href={`/dashboard/payments/${p.id}`}>
-                      <Button variant="ghost" size="sm">Ver</Button>
+                      <ArrowRight className="h-3.5 w-3.5 text-zinc-400 hover:text-zinc-700 transition-colors" />
                     </Link>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          {!loading && payments.length === 0 && (
-            <p className="text-center text-sm text-zinc-400 py-8">Nenhum pagamento encontrado</p>
-          )}
+          {!loading && payments.length === 0 && <p className="text-center text-sm text-zinc-400 py-8">Nenhum pagamento</p>}
         </CardContent>
       </Card>
     </div>

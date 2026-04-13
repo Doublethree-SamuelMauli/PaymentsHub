@@ -56,6 +56,7 @@ type Querier interface {
 	InsertPrevalidationResult(ctx context.Context, arg InsertPrevalidationResultParams) (PrevalidationResult, error)
 	InsertWebhookDelivery(ctx context.Context, arg InsertWebhookDeliveryParams) (WebhookDelivery, error)
 	LatestPrevalidation(ctx context.Context, arg LatestPrevalidationParams) (PrevalidationResult, error)
+	ListAllPayments(ctx context.Context, arg ListAllPaymentsParams) ([]Payment, error)
 	ListApiKeys(ctx context.Context) ([]ApiKey, error)
 	ListApiKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ApiKey, error)
 	ListBankCertificatesByBank(ctx context.Context, arg ListBankCertificatesByBankParams) ([]BankCertificate, error)

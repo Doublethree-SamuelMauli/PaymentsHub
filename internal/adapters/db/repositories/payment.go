@@ -120,6 +120,21 @@ func (r *PaymentRepository) ListByStatus(ctx context.Context, status payment.Sta
 	return out, nil
 }
 
+func (r *PaymentRepository) ListAll(ctx context.Context, limit, offset int) ([]*payment.Payment, error) {
+	rows, err := r.q.ListAllPayments(ctx, dbgen.ListAllPaymentsParams{
+		Limit:  int32(limit),
+		Offset: int32(offset),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("list all: %w", err)
+	}
+	out := make([]*payment.Payment, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, paymentFromRow(row))
+	}
+	return out, nil
+}
+
 func paymentFromRow(row dbgen.Payment) *payment.Payment {
 	p := &payment.Payment{
 		ID:             pgToUUID(row.ID),

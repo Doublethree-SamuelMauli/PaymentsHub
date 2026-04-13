@@ -37,6 +37,11 @@ WHERE client_id = $1 AND status = $2
 ORDER BY created_at DESC
 LIMIT $3 OFFSET $4;
 
+-- name: ListAllPayments :many
+SELECT * FROM payments
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2;
+
 -- name: CountPaymentsByStatus :one
 SELECT count(*) FROM payments WHERE status = $1;
 
