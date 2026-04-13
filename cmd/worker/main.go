@@ -65,13 +65,23 @@ func run() error {
 	river.AddWorker(workers, queue.NewPrevalidatePaymentWorker(paymentRepo, eventRepo, gateway, logger))
 	river.AddWorker(workers, queue.NewSubmitPixWorker(paymentRepo, eventRepo, gateway, logger))
 	river.AddWorker(workers, queue.NewGenerateCnabWorker(logger))
+	river.AddWorker(workers, queue.NewReconcilePixWorker(paymentRepo, eventRepo, gateway, logger))
 
 	riverClient, err := river.NewClient(riverpgxv5.New(pool), &river.Config{
 		Queues: map[string]river.QueueConfig{
 			river.QueueDefault: {MaxWorkers: 20},
 		},
-		Workers: workers,
-		Logger:  slog.New(logger.Handler()),
+		Workers:        workers,
+		Logger:         slog.New(logger.Handler()),
+		PeriodicJobs: []*river.PeriodicJob{
+			river.NewPeriodicJob(
+				river.PeriodicInterval(2*time.Minute),
+				func() (river.JobArgs, *river.InsertOpts) {
+					return queue.ReconcilePixArgs{}, nil
+				},
+				&river.PeriodicJobOpts{RunOnStart: true},
+			),
+		},
 	})
 	if err != nil {
 		return fmt.Errorf("new river client: %w", err)

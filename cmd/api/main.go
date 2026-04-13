@@ -77,6 +77,7 @@ func run() error {
 	paymentsHandler := handlers.NewPaymentsHandler(receivePayment, paymentRepo, eventRepo)
 	runsHandler := handlers.NewRunsHandler(runService)
 	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo)
+	webhookHandler := handlers.NewWebhookHandler(paymentRepo, eventRepo, logger)
 
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{
 		Logger:          logger,
@@ -86,6 +87,7 @@ func run() error {
 		Payments:        paymentsHandler,
 		Runs:            runsHandler,
 		Admin:           adminHandler,
+		Webhooks:        webhookHandler,
 	})
 
 	server := &http.Server{

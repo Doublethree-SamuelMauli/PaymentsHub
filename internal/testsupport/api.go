@@ -12,6 +12,8 @@ import (
 
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
 	httpadapter "github.com/vanlink-ltda/paymentshub/internal/adapters/http"
+	"log/slog"
+
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/handlers"
 	"github.com/vanlink-ltda/paymentshub/internal/app"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/logging"
@@ -66,6 +68,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		Payments:       handlers.NewPaymentsHandler(receive, payments, events),
 		Runs:           handlers.NewRunsHandler(runService),
 		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys),
+		Webhooks:       handlers.NewWebhookHandler(payments, events, slog.New(logger.Handler())),
 		RequestTimeout: 5 * time.Second,
 		ReadinessChecks: []httpadapter.ReadinessCheck{
 			func(r *nethttp.Request) error {

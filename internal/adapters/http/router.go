@@ -26,6 +26,7 @@ type RouterDeps struct {
 	Payments *handlers.PaymentsHandler
 	Runs     *handlers.RunsHandler
 	Admin    *handlers.AdminHandler
+	Webhooks *handlers.WebhookHandler
 }
 
 // NewRouter builds the chi router with the middleware stack and all routes.
@@ -58,6 +59,11 @@ func NewRouter(deps RouterDeps) http.Handler {
 			deps.Admin.Register(r)
 		}
 	})
+
+	// Webhook routes — NOT behind API key auth (use signature validation).
+	if deps.Webhooks != nil {
+		deps.Webhooks.Register(r)
+	}
 
 	return r
 }
