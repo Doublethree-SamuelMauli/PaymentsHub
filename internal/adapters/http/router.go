@@ -7,9 +7,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/handlers"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/middleware"
+
+	_ "github.com/vanlink-ltda/paymentshub/internal/platform/metrics"
 )
 
 // RouterDeps is the dependency bundle NewRouter needs.
@@ -33,9 +36,11 @@ type RouterDeps struct {
 func NewRouter(deps RouterDeps) http.Handler {
 	r := chi.NewRouter()
 
+	r.Use(middleware.CorrelationID)
 	r.Use(chimw.RequestID)
 	r.Use(chimw.RealIP)
 	r.Use(chimw.Recoverer)
+	r.Use(middleware.PrometheusMetrics)
 	if deps.RequestTimeout > 0 {
 		r.Use(chimw.Timeout(deps.RequestTimeout))
 	}
@@ -43,6 +48,7 @@ func NewRouter(deps RouterDeps) http.Handler {
 	health := NewHealthHandlers(deps.ReadinessChecks...)
 	r.Get("/healthz", health.Livez)
 	r.Get("/readyz", health.Readyz)
+	r.Handle("/metrics", promhttp.Handler())
 
 	// Authenticated routes
 	r.Group(func(r chi.Router) {
