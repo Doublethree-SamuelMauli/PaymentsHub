@@ -9,7 +9,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/dbgen"
 	mw "github.com/vanlink-ltda/paymentshub/internal/adapters/http/middleware"
 	"github.com/vanlink-ltda/paymentshub/internal/app"
 	"github.com/vanlink-ltda/paymentshub/internal/domain"
@@ -18,14 +21,44 @@ import (
 // RunsHandler exposes /v1/runs/* and payment-level approval actions.
 type RunsHandler struct {
 	runs *app.RunService
+	q    *dbgen.Queries
 }
 
-func NewRunsHandler(runs *app.RunService) *RunsHandler {
-	return &RunsHandler{runs: runs}
+func NewRunsHandler(runs *app.RunService, pool *pgxpool.Pool) *RunsHandler {
+	return &RunsHandler{runs: runs, q: dbgen.New(pool)}
+}
+
+func (h *RunsHandler) ListRuns(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	from := pgtype.Date{Time: now.AddDate(0, -1, 0), Valid: true}
+	to := pgtype.Date{Time: now.AddDate(0, 0, 1), Valid: true}
+	rows, err := h.q.ListPaymentRunsByDate(r.Context(), dbgen.ListPaymentRunsByDateParams{
+		RunDate:   from,
+		RunDate_2: to,
+	})
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "list runs", nil)
+		return
+	}
+	out := make([]map[string]any, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, map[string]any{
+			"id":                 uuid.UUID(row.ID.Bytes).String(),
+			"run_date":           row.RunDate.Time.Format("2006-01-02"),
+			"status":             row.Status,
+			"total_items":        row.TotalItems,
+			"total_amount_cents": row.TotalAmountCents,
+			"pix_count":          row.PixCount,
+			"ted_count":          row.TedCount,
+			"approved_by":        row.ApprovedBy.String,
+		})
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (h *RunsHandler) Register(r chi.Router) {
 	r.Route("/v1/runs", func(r chi.Router) {
+		r.Get("/", h.ListRuns)
 		r.With(mw.RequireScope("runs:write")).Post("/", h.Create)
 		r.With(mw.RequireScope("runs:write")).Post("/{id}/attach", h.Attach)
 		r.With(mw.RequireScope("runs:write")).Post("/{id}/detach", h.Detach)

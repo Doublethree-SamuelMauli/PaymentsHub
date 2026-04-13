@@ -76,7 +76,7 @@ func run() error {
 
 	// HTTP handlers
 	paymentsHandler := handlers.NewPaymentsHandler(receivePayment, paymentRepo, eventRepo)
-	runsHandler := handlers.NewRunsHandler(runService)
+	runsHandler := handlers.NewRunsHandler(runService, pool)
 	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo, clientRepo, pool)
 	webhookHandler := handlers.NewWebhookHandler(paymentRepo, eventRepo, logger)
 

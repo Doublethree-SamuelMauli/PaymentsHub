@@ -48,6 +48,7 @@ func NewPaymentsHandler(
 // Register mounts the payment routes on a chi router under /v1/payments.
 func (h *PaymentsHandler) Register(r chi.Router) {
 	r.Route("/v1/payments", func(r chi.Router) {
+		r.Get("/", h.List)
 		r.Get("/{id}", h.Get)
 		r.With(mw.RequireScope("payments:write")).Post("/", h.Create)
 	})
@@ -158,6 +159,41 @@ func (h *PaymentsHandler) Create(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:      result.Payment.CreatedAt,
 		UpdatedAt:      result.Payment.UpdatedAt,
 	})
+}
+
+// List handles GET /v1/payments.
+func (h *PaymentsHandler) List(w http.ResponseWriter, r *http.Request) {
+	status := r.URL.Query().Get("status")
+	if status == "" {
+		status = "RECEIVED"
+	}
+	limit := 100
+	offset := 0
+	payments, err := h.payments.ListByStatus(r.Context(), payment.Status(status), limit, offset)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "list payments", nil)
+		return
+	}
+	out := make([]dto.PaymentResponse, 0, len(payments))
+	for _, p := range payments {
+		out = append(out, dto.PaymentResponse{
+			ID:             p.ID.String(),
+			ExternalID:     p.ExternalID,
+			Type:           string(p.Type),
+			Status:         string(p.Status),
+			AmountCents:    p.Amount.Int64(),
+			Currency:       p.Currency,
+			PayerAccountID: p.PayerAccountID.String(),
+			PayeeMethod:    string(p.PayeeMethod),
+			Payee:          p.Payee,
+			Description:    p.Description,
+			IdempotencyKey: p.IdempotencyKey,
+			BankReference:  p.BankReference,
+			CreatedAt:      p.CreatedAt,
+			UpdatedAt:      p.UpdatedAt,
+		})
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 // Get handles GET /v1/payments/:id.
