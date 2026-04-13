@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/riverqueue/river"
 
+	"github.com/vanlink-ltda/paymentshub/internal/app"
 	"github.com/vanlink-ltda/paymentshub/internal/app/ports"
 	"github.com/vanlink-ltda/paymentshub/internal/domain/payment"
 )
@@ -27,23 +28,26 @@ func (PrevalidatePaymentArgs) Kind() string { return "prevalidate_payment" }
 
 type PrevalidatePaymentWorker struct {
 	river.WorkerDefaults[PrevalidatePaymentArgs]
-	payments ports.PaymentRepository
-	events   ports.PaymentEventRepository
-	gateway  ports.PaymentGateway
-	logger   *slog.Logger
+	payments    ports.PaymentRepository
+	events      ports.PaymentEventRepository
+	gateway     ports.PaymentGateway
+	preanalysis *app.PreAnalysisService
+	logger      *slog.Logger
 }
 
 func NewPrevalidatePaymentWorker(
 	payments ports.PaymentRepository,
 	events ports.PaymentEventRepository,
 	gateway ports.PaymentGateway,
+	preanalysis *app.PreAnalysisService,
 	logger *slog.Logger,
 ) *PrevalidatePaymentWorker {
 	return &PrevalidatePaymentWorker{
-		payments: payments,
-		events:   events,
-		gateway:  gateway,
-		logger:   logger,
+		payments:    payments,
+		events:      events,
+		gateway:     gateway,
+		preanalysis: preanalysis,
+		logger:      logger,
 	}
 }
 
@@ -98,6 +102,39 @@ func (w *PrevalidatePaymentWorker) Work(ctx context.Context, job *river.Job[Prev
 		}
 	}
 
+	// Pre-analysis rules engine (limits, blacklist, duplicates)
+	if w.preanalysis != nil {
+		verdict, err := w.preanalysis.Evaluate(ctx, p)
+		if err != nil {
+			w.logger.Warn("preanalysis error, will retry", slog.String("payment_id", pid.String()), slog.Any("err", err))
+			return err
+		}
+		switch verdict.Action {
+		case "REJECT":
+			_ = w.payments.UpdateStatus(ctx, pid, payment.StatusRejected, "", verdict.Reason)
+			_ = w.events.Insert(ctx, ports.PaymentEvent{
+				PaymentID:  pid,
+				FromStatus: string(payment.StatusValidatedLocal),
+				ToStatus:   string(payment.StatusRejected),
+				Actor:      "SYSTEM",
+				Reason:     "preanalysis rejected [" + verdict.Rule + "]: " + verdict.Reason,
+			})
+			w.logger.Info("payment rejected by preanalysis", slog.String("payment_id", pid.String()), slog.String("rule", verdict.Rule))
+			return nil
+		case "REVIEW":
+			_ = w.payments.UpdateStatus(ctx, pid, payment.StatusUnderReview, "", verdict.Reason)
+			_ = w.events.Insert(ctx, ports.PaymentEvent{
+				PaymentID:  pid,
+				FromStatus: string(payment.StatusValidatedLocal),
+				ToStatus:   string(payment.StatusUnderReview),
+				Actor:      "SYSTEM",
+				Reason:     "preanalysis flagged [" + verdict.Rule + "]: " + verdict.Reason,
+			})
+			w.logger.Info("payment under review", slog.String("payment_id", pid.String()), slog.String("rule", verdict.Rule))
+			return nil
+		}
+	}
+
 	// Transition VALIDATED_LOCAL → PREVALIDATED
 	if err := w.payments.UpdateStatus(ctx, pid, payment.StatusPrevalidated, "", ""); err != nil {
 		return fmt.Errorf("transition to prevalidated: %w", err)
@@ -107,7 +144,7 @@ func (w *PrevalidatePaymentWorker) Work(ctx context.Context, job *river.Job[Prev
 		FromStatus: string(payment.StatusValidatedLocal),
 		ToStatus:   string(payment.StatusPrevalidated),
 		Actor:      "SYSTEM",
-		Reason:     "prevalidation ok",
+		Reason:     "prevalidation + preanalysis ok",
 	})
 
 	w.logger.Info("payment prevalidated", slog.String("payment_id", pid.String()))

@@ -12,18 +12,23 @@ import (
 
 type Querier interface {
 	AttachPaymentToRun(ctx context.Context, arg AttachPaymentToRunParams) (PaymentRunItem, error)
+	CheckBlacklist(ctx context.Context, arg CheckBlacklistParams) ([]BlacklistEntry, error)
 	CountPaymentsByStatus(ctx context.Context, status string) (int64, error)
+	DeactivateBlacklistEntry(ctx context.Context, id pgtype.UUID) error
 	DeleteBankCertificate(ctx context.Context, id pgtype.UUID) error
 	DeleteExpiredIdempotencyKeys(ctx context.Context) error
 	DetachPaymentFromRun(ctx context.Context, arg DetachPaymentFromRunParams) error
+	FindDuplicatePayments(ctx context.Context, arg FindDuplicatePaymentsParams) ([]Payment, error)
 	GetApiKeyByHash(ctx context.Context, keyHash string) (ApiKey, error)
 	GetBankCertificate(ctx context.Context, id pgtype.UUID) (BankCertificate, error)
 	GetBeneficiary(ctx context.Context, id pgtype.UUID) (Beneficiary, error)
 	GetBeneficiaryByDocument(ctx context.Context, documentNumber string) (Beneficiary, error)
 	GetClient(ctx context.Context, id pgtype.UUID) (Client, error)
 	GetClientByDocument(ctx context.Context, documentNumber string) (Client, error)
+	GetClientLimit(ctx context.Context, clientID pgtype.UUID) (ClientLimit, error)
 	GetCnabFile(ctx context.Context, id pgtype.UUID) (CnabFile, error)
 	GetCnabFileByHash(ctx context.Context, fileHash string) (CnabFile, error)
+	GetDuplicateRule(ctx context.Context, clientID pgtype.UUID) (DuplicateRule, error)
 	GetIdempotencyKey(ctx context.Context, key string) (IdempotencyKey, error)
 	GetPayerAccount(ctx context.Context, id pgtype.UUID) (PayerAccount, error)
 	GetPayerAccountByLabel(ctx context.Context, label string) (PayerAccount, error)
@@ -38,8 +43,11 @@ type Querier interface {
 	InsertBeneficiary(ctx context.Context, arg InsertBeneficiaryParams) (Beneficiary, error)
 	InsertBeneficiaryBankAccount(ctx context.Context, arg InsertBeneficiaryBankAccountParams) (BeneficiaryBankAccount, error)
 	InsertBeneficiaryPixKey(ctx context.Context, arg InsertBeneficiaryPixKeyParams) (BeneficiaryPixKey, error)
+	InsertBlacklistEntry(ctx context.Context, arg InsertBlacklistEntryParams) (BlacklistEntry, error)
 	InsertClient(ctx context.Context, arg InsertClientParams) (Client, error)
+	InsertClientLimit(ctx context.Context, arg InsertClientLimitParams) (ClientLimit, error)
 	InsertCnabFile(ctx context.Context, arg InsertCnabFileParams) (CnabFile, error)
+	InsertDuplicateRule(ctx context.Context, arg InsertDuplicateRuleParams) (DuplicateRule, error)
 	InsertIdempotencyKey(ctx context.Context, arg InsertIdempotencyKeyParams) (IdempotencyKey, error)
 	InsertPayerAccount(ctx context.Context, arg InsertPayerAccountParams) (PayerAccount, error)
 	InsertPayment(ctx context.Context, arg InsertPaymentParams) (Payment, error)
@@ -54,6 +62,7 @@ type Querier interface {
 	ListBeneficiaries(ctx context.Context, arg ListBeneficiariesParams) ([]Beneficiary, error)
 	ListBeneficiaryBankAccounts(ctx context.Context, beneficiaryID pgtype.UUID) ([]BeneficiaryBankAccount, error)
 	ListBeneficiaryPixKeys(ctx context.Context, beneficiaryID pgtype.UUID) ([]BeneficiaryPixKey, error)
+	ListBlacklistByClient(ctx context.Context, clientID pgtype.UUID) ([]BlacklistEntry, error)
 	ListClients(ctx context.Context) ([]Client, error)
 	ListCnabFilesByRun(ctx context.Context, runID pgtype.UUID) ([]CnabFile, error)
 	ListCnabFilesByStatus(ctx context.Context, status string) ([]CnabFile, error)
@@ -72,7 +81,10 @@ type Querier interface {
 	RevokeApiKey(ctx context.Context, id pgtype.UUID) error
 	SetClientActive(ctx context.Context, arg SetClientActiveParams) error
 	SetPayerAccountActive(ctx context.Context, arg SetPayerAccountActiveParams) error
+	SumPaymentsMonthByClient(ctx context.Context, clientID pgtype.UUID) (int64, error)
+	SumPaymentsTodayByClient(ctx context.Context, clientID pgtype.UUID) (int64, error)
 	TouchApiKey(ctx context.Context, id pgtype.UUID) error
+	UpdateClientLimit(ctx context.Context, arg UpdateClientLimitParams) error
 	UpdateClientWebhook(ctx context.Context, arg UpdateClientWebhookParams) error
 	UpdateCnabFileStatus(ctx context.Context, arg UpdateCnabFileStatusParams) (CnabFile, error)
 	UpdatePaymentRunCounters(ctx context.Context, arg UpdatePaymentRunCountersParams) error

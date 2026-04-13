@@ -74,6 +74,16 @@ type BeneficiaryPixKey struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
+type BlacklistEntry struct {
+	ID             pgtype.UUID
+	ClientID       pgtype.UUID
+	DocumentNumber string
+	Reason         string
+	Active         bool
+	CreatedBy      string
+	CreatedAt      pgtype.Timestamptz
+}
+
 type Client struct {
 	ID             pgtype.UUID
 	Name           string
@@ -84,6 +94,18 @@ type Client struct {
 	WebhookSecret  pgtype.Text
 	CreatedAt      pgtype.Timestamptz
 	UpdatedAt      pgtype.Timestamptz
+}
+
+type ClientLimit struct {
+	ID                   pgtype.UUID
+	ClientID             pgtype.UUID
+	DailyLimitCents      int64
+	MonthlyLimitCents    int64
+	MaxSingleCents       int64
+	RequireApprovalAbove int64
+	Active               bool
+	CreatedAt            pgtype.Timestamptz
+	UpdatedAt            pgtype.Timestamptz
 }
 
 type CnabFile struct {
@@ -102,6 +124,16 @@ type CnabFile struct {
 	UploadAck      pgtype.Text
 	ReturnedAt     pgtype.Timestamptz
 	ProcessedAt    pgtype.Timestamptz
+}
+
+type DuplicateRule struct {
+	ID          pgtype.UUID
+	ClientID    pgtype.UUID
+	WindowHours int32
+	MatchFields []string
+	Action      string
+	Active      bool
+	CreatedAt   pgtype.Timestamptz
 }
 
 type IdempotencyKey struct {

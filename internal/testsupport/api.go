@@ -69,7 +69,7 @@ func SpawnAPIWithDB(t *testing.T) *API {
 		APIKeys:        apiKeys,
 		Payments:       handlers.NewPaymentsHandler(receive, payments, events),
 		Runs:           handlers.NewRunsHandler(runService),
-		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys, clients),
+		Admin:          handlers.NewAdminHandler(payerAccts, beneficiaries, apiKeys, clients, pool),
 		Webhooks:       handlers.NewWebhookHandler(payments, events, slog.New(logger.Handler())),
 		RequestTimeout: 5 * time.Second,
 		ReadinessChecks: []httpadapter.ReadinessCheck{

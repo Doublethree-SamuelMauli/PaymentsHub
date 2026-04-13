@@ -20,6 +20,7 @@ import (
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/queue"
+	"github.com/vanlink-ltda/paymentshub/internal/app"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/config"
 	"github.com/vanlink-ltda/paymentshub/internal/platform/logging"
 )
@@ -58,14 +59,17 @@ func run() error {
 
 	paymentRepo := repositories.NewPaymentRepository(pool)
 	eventRepo := repositories.NewPaymentEventRepository(pool)
+	runRepo := repositories.NewRunRepository(pool)
 
 	gateway := buildGateway(cfg, logger)
+	preanalysis := app.NewPreAnalysisService(pool)
 
 	workers := river.NewWorkers()
-	river.AddWorker(workers, queue.NewPrevalidatePaymentWorker(paymentRepo, eventRepo, gateway, logger))
+	river.AddWorker(workers, queue.NewPrevalidatePaymentWorker(paymentRepo, eventRepo, gateway, preanalysis, logger))
 	river.AddWorker(workers, queue.NewSubmitPixWorker(paymentRepo, eventRepo, gateway, logger))
 	river.AddWorker(workers, queue.NewGenerateCnabWorker(logger))
 	river.AddWorker(workers, queue.NewReconcilePixWorker(paymentRepo, eventRepo, gateway, logger))
+	river.AddWorker(workers, queue.NewAutoGroupRunWorker(runRepo, paymentRepo, logger))
 
 	riverClient, err := river.NewClient(riverpgxv5.New(pool), &river.Config{
 		Queues: map[string]river.QueueConfig{
@@ -80,6 +84,13 @@ func run() error {
 					return queue.ReconcilePixArgs{}, nil
 				},
 				&river.PeriodicJobOpts{RunOnStart: true},
+			),
+			river.NewPeriodicJob(
+				river.PeriodicInterval(5*time.Minute),
+				func() (river.JobArgs, *river.InsertOpts) {
+					return queue.AutoGroupRunArgs{}, nil
+				},
+				&river.PeriodicJobOpts{RunOnStart: false},
 			),
 		},
 	})

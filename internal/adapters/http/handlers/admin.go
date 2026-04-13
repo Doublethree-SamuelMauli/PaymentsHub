@@ -10,7 +10,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	mw "github.com/vanlink-ltda/paymentshub/internal/adapters/http/middleware"
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/dbgen"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
 	"github.com/vanlink-ltda/paymentshub/internal/app/ports"
 	"github.com/vanlink-ltda/paymentshub/internal/domain/beneficiary"
@@ -23,6 +27,7 @@ type AdminHandler struct {
 	beneficiaries ports.BeneficiaryRepository
 	apiKeys       ports.APIKeyRepository
 	clients       *repositories.ClientRepository
+	q             *dbgen.Queries
 }
 
 func NewAdminHandler(
@@ -30,12 +35,14 @@ func NewAdminHandler(
 	beneficiaries ports.BeneficiaryRepository,
 	apiKeys ports.APIKeyRepository,
 	clients *repositories.ClientRepository,
+	pool *pgxpool.Pool,
 ) *AdminHandler {
 	return &AdminHandler{
 		payerAccts:    payerAccts,
 		beneficiaries: beneficiaries,
 		apiKeys:       apiKeys,
 		clients:       clients,
+		q:             dbgen.New(pool),
 	}
 }
 
@@ -49,6 +56,9 @@ func (h *AdminHandler) Register(r chi.Router) {
 		r.Post("/beneficiaries/{id}/pix-keys", h.AddPixKey)
 		r.Post("/beneficiaries/{id}/bank-accounts", h.AddBankAccount)
 		r.Post("/api-keys", h.CreateAPIKey)
+		r.Post("/clients/{id}/limits", h.SetClientLimits)
+		r.Post("/blacklist", h.AddBlacklistEntry)
+		r.Post("/clients/{id}/duplicate-rule", h.SetDuplicateRule)
 	})
 }
 
@@ -340,6 +350,134 @@ func (h *AdminHandler) ConfigureWebhook(w http.ResponseWriter, r *http.Request) 
 		"webhook_url":    req.WebhookURL,
 		"webhook_secret": secret,
 	})
+}
+
+// ----- Limits -----
+
+type setLimitsReq struct {
+	DailyLimitCents      int64 `json:"daily_limit_cents"`
+	MonthlyLimitCents    int64 `json:"monthly_limit_cents"`
+	MaxSingleCents       int64 `json:"max_single_cents"`
+	RequireApprovalAbove int64 `json:"require_approval_above"`
+}
+
+func (h *AdminHandler) SetClientLimits(w http.ResponseWriter, r *http.Request) {
+	clientID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid client id", nil)
+		return
+	}
+	var req setLimitsReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid json", nil)
+		return
+	}
+
+	pgID := pgtype.UUID{Bytes: clientID, Valid: true}
+	_, err = h.q.GetClientLimit(r.Context(), pgID)
+	if err != nil {
+		_, err = h.q.InsertClientLimit(r.Context(), dbgen.InsertClientLimitParams{
+			ID:                   pgtype.UUID{Bytes: uuid.New(), Valid: true},
+			ClientID:             pgID,
+			DailyLimitCents:      req.DailyLimitCents,
+			MonthlyLimitCents:    req.MonthlyLimitCents,
+			MaxSingleCents:       req.MaxSingleCents,
+			RequireApprovalAbove: req.RequireApprovalAbove,
+		})
+	} else {
+		err = h.q.UpdateClientLimit(r.Context(), dbgen.UpdateClientLimitParams{
+			ClientID:             pgID,
+			DailyLimitCents:      req.DailyLimitCents,
+			MonthlyLimitCents:    req.MonthlyLimitCents,
+			MaxSingleCents:       req.MaxSingleCents,
+			RequireApprovalAbove: req.RequireApprovalAbove,
+		})
+	}
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "set limits", map[string]any{"detail": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+// ----- Blacklist -----
+
+type addBlacklistReq struct {
+	ClientID       string `json:"client_id"`
+	DocumentNumber string `json:"document_number" validate:"required"`
+	Reason         string `json:"reason" validate:"required"`
+}
+
+func (h *AdminHandler) AddBlacklistEntry(w http.ResponseWriter, r *http.Request) {
+	var req addBlacklistReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid json", nil)
+		return
+	}
+	if req.DocumentNumber == "" || req.Reason == "" {
+		writeJSONError(w, http.StatusBadRequest, "document_number and reason required", nil)
+		return
+	}
+	var pgClientID pgtype.UUID
+	if req.ClientID != "" {
+		cid, err := uuid.Parse(req.ClientID)
+		if err != nil {
+			writeJSONError(w, http.StatusBadRequest, "invalid client_id", nil)
+			return
+		}
+		pgClientID = pgtype.UUID{Bytes: cid, Valid: true}
+	}
+	actor := mw.APIKeyLabelFromContext(r.Context())
+	entry, err := h.q.InsertBlacklistEntry(r.Context(), dbgen.InsertBlacklistEntryParams{
+		ID:             pgtype.UUID{Bytes: uuid.New(), Valid: true},
+		ClientID:       pgClientID,
+		DocumentNumber: req.DocumentNumber,
+		Reason:         req.Reason,
+		CreatedBy:      actor,
+	})
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "insert blacklist", map[string]any{"detail": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]string{"id": uuid.UUID(entry.ID.Bytes).String()})
+}
+
+// ----- Duplicate Rule -----
+
+type setDuplicateRuleReq struct {
+	WindowHours int    `json:"window_hours"`
+	Action      string `json:"action" validate:"oneof=REVIEW REJECT ALLOW"`
+}
+
+func (h *AdminHandler) SetDuplicateRule(w http.ResponseWriter, r *http.Request) {
+	clientID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid client id", nil)
+		return
+	}
+	var req setDuplicateRuleReq
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "invalid json", nil)
+		return
+	}
+	if req.WindowHours <= 0 {
+		req.WindowHours = 24
+	}
+	if req.Action == "" {
+		req.Action = "REVIEW"
+	}
+	_, err = h.q.InsertDuplicateRule(r.Context(), dbgen.InsertDuplicateRuleParams{
+		ID:          pgtype.UUID{Bytes: uuid.New(), Valid: true},
+		ClientID:    pgtype.UUID{Bytes: clientID, Valid: true},
+		WindowHours: int32(req.WindowHours),
+		MatchFields: []string{"beneficiary_id", "amount_cents"},
+		Action:      req.Action,
+	})
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "insert rule", map[string]any{"detail": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]string{"status": "ok"})
 }
 
 // Silence unused import when embedded helpers shuffle.
