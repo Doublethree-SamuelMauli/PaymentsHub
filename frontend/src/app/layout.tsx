@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "PaymentsHub",
-  description: "Orquestrador SaaS de Pagamentos Bancários",
+  description: "One platform to payments benefits",
 };
 
 export default function RootLayout({
@@ -24,10 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="pt-BR"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-white">{children}</body>
     </html>
   );
 }

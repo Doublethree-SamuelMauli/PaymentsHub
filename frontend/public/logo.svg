@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" fill="none">
+  <!-- Shield -->
+  <g transform="translate(0, 2)">
+    <!-- Shield shape - dark blue left -->
+    <path d="M24 4C24 4 28 2 28 2C28 2 32 4 32 4L40 8V28C40 38 28 48 28 48C28 48 16 38 16 28V8L24 4Z" fill="#1a365d"/>
+    <!-- Shield shape - green right overlay -->
+    <path d="M28 2L28 48C28 48 40 38 40 28V8L32 4L28 2Z" fill="#22863a"/>
+    <!-- Green diagonal band -->
+    <path d="M20 18L28 30L40 14V8L32 4L28 2L24 4L16 8V16L20 18Z" fill="#2ea043" opacity="0.7"/>
+    <!-- Checkmark -->
+    <path d="M21 24L26 30L36 18" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Shield glossy effect -->
+    <path d="M24 4C24 4 28 2 28 2V26L16 14V8L24 4Z" fill="white" opacity="0.08"/>
+  </g>
+  <!-- Text -->
+  <text x="52" y="32" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="26" fill="#1a2332">Payments</text>
+  <text x="193" y="32" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="26" fill="#22863a">Hub</text>
+  <text x="52" y="48" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="10" fill="#8b95a5" letter-spacing="0.5">One platform to payments benefits</text>
+</svg>
