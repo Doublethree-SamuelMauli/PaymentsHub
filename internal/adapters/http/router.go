@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/handlers"
@@ -36,6 +37,14 @@ type RouterDeps struct {
 func NewRouter(deps RouterDeps) http.Handler {
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:*", "http://127.0.0.1:*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Idempotency-Key", "X-Correlation-ID"},
+		ExposedHeaders:   []string{"X-Correlation-ID"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 	r.Use(middleware.CorrelationID)
 	r.Use(chimw.RequestID)
 	r.Use(chimw.RealIP)
