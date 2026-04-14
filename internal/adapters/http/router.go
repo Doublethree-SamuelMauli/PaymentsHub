@@ -59,6 +59,11 @@ func NewRouter(deps RouterDeps) http.Handler {
 	r.Get("/readyz", health.Readyz)
 	r.Handle("/metrics", promhttp.Handler())
 
+	// OpenAPI spec + Swagger UI (publico, sem auth)
+	openapi := handlers.NewOpenAPIHandler()
+	r.Get("/openapi.json", openapi.Spec)
+	r.Get("/docs", openapi.SwaggerUI)
+
 	// Authenticated routes
 	r.Group(func(r chi.Router) {
 		if deps.APIKeys != nil {

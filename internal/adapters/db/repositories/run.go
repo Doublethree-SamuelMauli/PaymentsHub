@@ -27,6 +27,10 @@ func NewRunRepository(pool *pgxpool.Pool) *RunRepository {
 	return &RunRepository{pool: pool, q: dbgen.New(pool)}
 }
 
+// Pool exposes the underlying pgxpool for advanced transactional use cases
+// (e.g., reschedule which updates fields not covered by sqlc queries).
+func (r *RunRepository) Pool() *pgxpool.Pool { return r.pool }
+
 func (r *RunRepository) Insert(ctx context.Context, rn *run.Run) error {
 	_, err := r.q.InsertPaymentRun(ctx, dbgen.InsertPaymentRunParams{
 		ID:      uuidToPg(rn.ID),

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Logo, ShieldIcon } from "@/components/logo";
+import { FlowDiagram } from "@/components/flow-diagram";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,12 +15,46 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <Stats />
+      <FlowSection />
       <Features />
       <HowItWorks />
       <CTA />
       <ContactForm />
       <Footer />
     </div>
+  );
+}
+
+function FlowSection() {
+  return (
+    <section className="py-24 sm:py-28 px-4 sm:px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold text-[#22863a] mb-2">Fluxo completo</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1a2744] tracking-tight">
+            Do ERP ao banco em uma unica plataforma
+          </h2>
+          <p className="mt-3 text-[15px] text-zinc-500 max-w-2xl mx-auto">
+            Seu ERP envia os pagamentos. A plataforma valida, agrupa, permite aprovacao manual e envia tudo ao banco como um lote unico.
+          </p>
+        </div>
+        <FlowDiagram />
+        <div className="mt-12 grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-100">
+            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Voce controla</p>
+            <p className="text-sm font-medium text-zinc-800 mt-1">Aprova, rejeita ou reagenda cada pagamento antes de enviar</p>
+          </div>
+          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-100">
+            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">Sem debito automatico</p>
+            <p className="text-sm font-medium text-zinc-800 mt-1">Autorizacao final e sempre manual no internet banking</p>
+          </div>
+          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-100">
+            <p className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">1 pagamento unico</p>
+            <p className="text-sm font-medium text-zinc-800 mt-1">Todos os pagamentos viram um lote consolidado no banco</p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
