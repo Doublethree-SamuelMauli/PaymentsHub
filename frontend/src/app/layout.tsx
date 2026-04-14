@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PaymentsHub",
-  description: "One platform to payments benefits",
+  title: "PaymentsHub - Pagamentos corporativos simplificados",
+  description: "Centralize PIX e TED da sua empresa em uma unica plataforma.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
