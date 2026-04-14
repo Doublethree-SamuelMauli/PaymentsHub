@@ -66,14 +66,42 @@ func APIKeyAuth(keys APIKeyLookup) func(http.Handler) http.Handler {
 	}
 }
 
-// RequireScope returns a middleware that rejects with 403 if the authenticated
-// API key does not have the given scope.
+// scopeToRole maps API key scope requirements to minimum JWT user role
+// required for the same operation. Ensures a single authorization model
+// regardless of whether the caller is a machine (API key) or user (JWT).
+var scopeToRole = map[string]string{
+	"admin":           "admin",
+	"runs:approve":    "approver",
+	"runs:write":      "operator",
+	"payments:write":  "operator",
+	"payments:read":   "viewer",
+	"beneficiaries:write": "operator",
+}
+
+// RequireScope returns a middleware that checks authorization.
+// Accepts either an API key with the scope OR a JWT with an equivalent (or higher) role.
 func RequireScope(scope string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			scopes, _ := r.Context().Value(ctxKeyAPIKeyScopes).([]string)
-			if !hasScope(scopes, scope) {
+			ctx := r.Context()
+			// API key path: check scopes
+			scopes, _ := ctx.Value(ctxKeyAPIKeyScopes).([]string)
+			if len(scopes) > 0 {
+				if hasScope(scopes, scope) {
+					next.ServeHTTP(w, r)
+					return
+				}
 				writeError(w, http.StatusForbidden, "missing_scope:"+scope)
+				return
+			}
+			// JWT path: map scope -> required role
+			requiredRole, ok := scopeToRole[scope]
+			if !ok {
+				requiredRole = "admin"
+			}
+			role := RoleFromContext(ctx)
+			if !roleCovers(role, requiredRole) {
+				writeError(w, http.StatusForbidden, "insufficient_role: need "+requiredRole+" (have "+role+")")
 				return
 			}
 			next.ServeHTTP(w, r)
