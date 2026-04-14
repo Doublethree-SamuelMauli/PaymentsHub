@@ -49,6 +49,8 @@ func NewAdminHandler(
 func (h *AdminHandler) Register(r chi.Router) {
 	r.Route("/v1/admin", func(r chi.Router) {
 		r.Use(mw.RequireScope("admin"))
+		r.Get("/payer-accounts", h.ListPayerAccounts)
+		r.Get("/beneficiaries", h.ListBeneficiaries)
 		r.Post("/clients", h.CreateClient)
 		r.Post("/clients/{id}/webhook", h.ConfigureWebhook)
 		r.Post("/payer-accounts", h.CreatePayerAccount)
@@ -478,6 +480,65 @@ func (h *AdminHandler) SetDuplicateRule(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	writeJSON(w, http.StatusCreated, map[string]string{"status": "ok"})
+}
+
+// ----- List endpoints (for frontend forms) -----
+
+func (h *AdminHandler) ListPayerAccounts(w http.ResponseWriter, r *http.Request) {
+	accounts, err := h.payerAccts.List(r.Context())
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "list payer accounts", nil)
+		return
+	}
+	out := make([]map[string]any, 0, len(accounts))
+	for _, a := range accounts {
+		out = append(out, map[string]any{
+			"id":             a.ID.String(),
+			"bank_code":      a.BankCode,
+			"agency":         a.Agency,
+			"account_number": a.AccountNumber,
+			"account_digit":  a.AccountDigit,
+			"label":          a.Label,
+			"active":         a.Active,
+		})
+	}
+	writeJSON(w, http.StatusOK, out)
+}
+
+func (h *AdminHandler) ListBeneficiaries(w http.ResponseWriter, r *http.Request) {
+	bens, err := h.beneficiaries.List(r.Context(), 200, 0)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "list beneficiaries", nil)
+		return
+	}
+	out := make([]map[string]any, 0, len(bens))
+	for _, b := range bens {
+		keys, _ := h.beneficiaries.ListPixKeys(r.Context(), b.ID)
+		pix := make([]map[string]string, 0, len(keys))
+		for _, k := range keys {
+			pix = append(pix, map[string]string{"key_type": string(k.KeyType), "key_value": k.KeyValue})
+		}
+		accounts, _ := h.beneficiaries.ListBankAccounts(r.Context(), b.ID)
+		banks := make([]map[string]string, 0, len(accounts))
+		for _, a := range accounts {
+			banks = append(banks, map[string]string{
+				"bank_code": a.BankCode, "agency": a.Agency,
+				"account_number": a.AccountNumber, "account_digit": a.AccountDigit,
+				"account_type": string(a.AccountType),
+			})
+		}
+		out = append(out, map[string]any{
+			"id":              b.ID.String(),
+			"kind":            string(b.Kind),
+			"legal_name":      b.LegalName,
+			"document_type":   string(b.DocumentType),
+			"document_number": b.DocumentNumber,
+			"active":          b.Active,
+			"pix_keys":        pix,
+			"bank_accounts":   banks,
+		})
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 // Silence unused import when embedded helpers shuffle.
