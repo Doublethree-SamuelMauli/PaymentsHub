@@ -187,6 +187,9 @@ type Payment struct {
 	CreatedAt           pgtype.Timestamptz
 	UpdatedAt           pgtype.Timestamptz
 	ClientID            pgtype.UUID
+	RescheduledFrom     pgtype.Date
+	RescheduledReason   pgtype.Text
+	OperatorNotes       pgtype.Text
 }
 
 type PaymentEvent struct {
@@ -240,6 +243,19 @@ type SchemaMetadatum struct {
 	Key       string
 	Value     string
 	UpdatedAt pgtype.Timestamptz
+}
+
+type User struct {
+	ID           pgtype.UUID
+	ClientID     pgtype.UUID
+	Email        string
+	PasswordHash string
+	Name         string
+	Role         string
+	Active       bool
+	LastLoginAt  pgtype.Timestamptz
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
 }
 
 type WebhookDelivery struct {

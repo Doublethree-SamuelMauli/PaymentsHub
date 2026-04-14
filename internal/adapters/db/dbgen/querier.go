@@ -37,6 +37,8 @@ type Querier interface {
 	GetPaymentForUpdate(ctx context.Context, id pgtype.UUID) (Payment, error)
 	GetPaymentRun(ctx context.Context, id pgtype.UUID) (PaymentRun, error)
 	GetPaymentRunForUpdate(ctx context.Context, id pgtype.UUID) (PaymentRun, error)
+	GetUser(ctx context.Context, id pgtype.UUID) (User, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetWebhookDelivery(ctx context.Context, id pgtype.UUID) (WebhookDelivery, error)
 	InsertApiKey(ctx context.Context, arg InsertApiKeyParams) (ApiKey, error)
 	InsertBankCertificate(ctx context.Context, arg InsertBankCertificateParams) (BankCertificate, error)
@@ -54,9 +56,11 @@ type Querier interface {
 	InsertPaymentEvent(ctx context.Context, arg InsertPaymentEventParams) (PaymentEvent, error)
 	InsertPaymentRun(ctx context.Context, arg InsertPaymentRunParams) (PaymentRun, error)
 	InsertPrevalidationResult(ctx context.Context, arg InsertPrevalidationResultParams) (PrevalidationResult, error)
+	InsertUser(ctx context.Context, arg InsertUserParams) (User, error)
 	InsertWebhookDelivery(ctx context.Context, arg InsertWebhookDeliveryParams) (WebhookDelivery, error)
 	LatestPrevalidation(ctx context.Context, arg LatestPrevalidationParams) (PrevalidationResult, error)
 	ListAllPayments(ctx context.Context, arg ListAllPaymentsParams) ([]Payment, error)
+	ListAllUsers(ctx context.Context) ([]User, error)
 	ListApiKeys(ctx context.Context) ([]ApiKey, error)
 	ListApiKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ApiKey, error)
 	ListBankCertificatesByBank(ctx context.Context, arg ListBankCertificatesByBankParams) ([]BankCertificate, error)
@@ -76,21 +80,26 @@ type Querier interface {
 	ListPendingWebhookDeliveries(ctx context.Context, limit int32) ([]WebhookDelivery, error)
 	ListPrevalidationsByPayment(ctx context.Context, paymentID pgtype.UUID) ([]PrevalidationResult, error)
 	ListRunItems(ctx context.Context, runID pgtype.UUID) ([]PaymentRunItem, error)
+	ListUsersByClient(ctx context.Context, clientID pgtype.UUID) ([]User, error)
 	ListWebhookDeliveriesByPayment(ctx context.Context, paymentID pgtype.UUID) ([]WebhookDelivery, error)
 	MarkRunItemExecuted(ctx context.Context, arg MarkRunItemExecutedParams) error
 	MarkRunItemSettled(ctx context.Context, arg MarkRunItemSettledParams) error
 	RevokeApiKey(ctx context.Context, id pgtype.UUID) error
 	SetClientActive(ctx context.Context, arg SetClientActiveParams) error
 	SetPayerAccountActive(ctx context.Context, arg SetPayerAccountActiveParams) error
+	SetUserActive(ctx context.Context, arg SetUserActiveParams) error
 	SumPaymentsMonthByClient(ctx context.Context, clientID pgtype.UUID) (int64, error)
 	SumPaymentsTodayByClient(ctx context.Context, clientID pgtype.UUID) (int64, error)
 	TouchApiKey(ctx context.Context, id pgtype.UUID) error
+	TouchUserLogin(ctx context.Context, id pgtype.UUID) error
 	UpdateClientLimit(ctx context.Context, arg UpdateClientLimitParams) error
 	UpdateClientWebhook(ctx context.Context, arg UpdateClientWebhookParams) error
 	UpdateCnabFileStatus(ctx context.Context, arg UpdateCnabFileStatusParams) (CnabFile, error)
 	UpdatePaymentRunCounters(ctx context.Context, arg UpdatePaymentRunCountersParams) error
 	UpdatePaymentRunStatus(ctx context.Context, arg UpdatePaymentRunStatusParams) (PaymentRun, error)
 	UpdatePaymentStatus(ctx context.Context, arg UpdatePaymentStatusParams) (Payment, error)
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
+	UpdateUserRole(ctx context.Context, arg UpdateUserRoleParams) error
 	UpdateWebhookDeliveryStatus(ctx context.Context, arg UpdateWebhookDeliveryStatusParams) error
 }
 

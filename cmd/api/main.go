@@ -79,6 +79,13 @@ func run() error {
 	runsHandler := handlers.NewRunsHandler(runService, pool)
 	adminHandler := handlers.NewAdminHandler(payerAcctRepo, beneficiaryRepo, apiKeyRepo, clientRepo, pool)
 	webhookHandler := handlers.NewWebhookHandler(paymentRepo, eventRepo, logger)
+	authHandler := handlers.NewAuthHandler(pool)
+	usersHandler := handlers.NewUsersHandler(pool)
+
+	jwtSecret := []byte(os.Getenv("PH_JWT_SECRET"))
+	if len(jwtSecret) == 0 {
+		jwtSecret = []byte("paymentshub-dev-secret-change-in-production")
+	}
 
 	router := httpadapter.NewRouter(httpadapter.RouterDeps{
 		Logger:          logger,
@@ -89,6 +96,9 @@ func run() error {
 		Runs:            runsHandler,
 		Admin:           adminHandler,
 		Webhooks:        webhookHandler,
+		Auth:            authHandler,
+		Users:           usersHandler,
+		JWTSecret:       jwtSecret,
 	})
 
 	server := &http.Server{

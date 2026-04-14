@@ -23,7 +23,7 @@ func (q *Queries) CountPaymentsByStatus(ctx context.Context, status string) (int
 }
 
 const getPayment = `-- name: GetPayment :one
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments WHERE id = $1
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments WHERE id = $1
 `
 
 func (q *Queries) GetPayment(ctx context.Context, id pgtype.UUID) (Payment, error) {
@@ -49,12 +49,15 @@ func (q *Queries) GetPayment(ctx context.Context, id pgtype.UUID) (Payment, erro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ClientID,
+		&i.RescheduledFrom,
+		&i.RescheduledReason,
+		&i.OperatorNotes,
 	)
 	return i, err
 }
 
 const getPaymentByIdempotencyKey = `-- name: GetPaymentByIdempotencyKey :one
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments WHERE idempotency_key = $1
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments WHERE idempotency_key = $1
 `
 
 func (q *Queries) GetPaymentByIdempotencyKey(ctx context.Context, idempotencyKey string) (Payment, error) {
@@ -80,12 +83,15 @@ func (q *Queries) GetPaymentByIdempotencyKey(ctx context.Context, idempotencyKey
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ClientID,
+		&i.RescheduledFrom,
+		&i.RescheduledReason,
+		&i.OperatorNotes,
 	)
 	return i, err
 }
 
 const getPaymentForUpdate = `-- name: GetPaymentForUpdate :one
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments WHERE id = $1 FOR UPDATE
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments WHERE id = $1 FOR UPDATE
 `
 
 func (q *Queries) GetPaymentForUpdate(ctx context.Context, id pgtype.UUID) (Payment, error) {
@@ -111,6 +117,9 @@ func (q *Queries) GetPaymentForUpdate(ctx context.Context, id pgtype.UUID) (Paym
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ClientID,
+		&i.RescheduledFrom,
+		&i.RescheduledReason,
+		&i.OperatorNotes,
 	)
 	return i, err
 }
@@ -124,7 +133,7 @@ INSERT INTO payments (
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
 )
-RETURNING id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id
+RETURNING id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes
 `
 
 type InsertPaymentParams struct {
@@ -184,12 +193,15 @@ func (q *Queries) InsertPayment(ctx context.Context, arg InsertPaymentParams) (P
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ClientID,
+		&i.RescheduledFrom,
+		&i.RescheduledReason,
+		&i.OperatorNotes,
 	)
 	return i, err
 }
 
 const listAllPayments = `-- name: ListAllPayments :many
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -228,6 +240,9 @@ func (q *Queries) ListAllPayments(ctx context.Context, arg ListAllPaymentsParams
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ClientID,
+			&i.RescheduledFrom,
+			&i.RescheduledReason,
+			&i.OperatorNotes,
 		); err != nil {
 			return nil, err
 		}
@@ -240,7 +255,7 @@ func (q *Queries) ListAllPayments(ctx context.Context, arg ListAllPaymentsParams
 }
 
 const listPaymentsByClientAndStatus = `-- name: ListPaymentsByClientAndStatus :many
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments
 WHERE client_id = $1 AND status = $2
 ORDER BY created_at DESC
 LIMIT $3 OFFSET $4
@@ -287,6 +302,9 @@ func (q *Queries) ListPaymentsByClientAndStatus(ctx context.Context, arg ListPay
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ClientID,
+			&i.RescheduledFrom,
+			&i.RescheduledReason,
+			&i.OperatorNotes,
 		); err != nil {
 			return nil, err
 		}
@@ -299,7 +317,7 @@ func (q *Queries) ListPaymentsByClientAndStatus(ctx context.Context, arg ListPay
 }
 
 const listPaymentsByStatus = `-- name: ListPaymentsByStatus :many
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments
 WHERE status = $1
 ORDER BY created_at DESC
 LIMIT $2 OFFSET $3
@@ -340,6 +358,9 @@ func (q *Queries) ListPaymentsByStatus(ctx context.Context, arg ListPaymentsBySt
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ClientID,
+			&i.RescheduledFrom,
+			&i.RescheduledReason,
+			&i.OperatorNotes,
 		); err != nil {
 			return nil, err
 		}
@@ -352,7 +373,7 @@ func (q *Queries) ListPaymentsByStatus(ctx context.Context, arg ListPaymentsBySt
 }
 
 const listPaymentsForRun = `-- name: ListPaymentsForRun :many
-SELECT p.id, p.external_id, p.type, p.status, p.amount_cents, p.currency, p.payer_account_id, p.beneficiary_id, p.beneficiary_snapshot, p.payee_method, p.payee, p.description, p.scheduled_for, p.idempotency_key, p.bank_reference, p.rejection_reason, p.created_at, p.updated_at, p.client_id
+SELECT p.id, p.external_id, p.type, p.status, p.amount_cents, p.currency, p.payer_account_id, p.beneficiary_id, p.beneficiary_snapshot, p.payee_method, p.payee, p.description, p.scheduled_for, p.idempotency_key, p.bank_reference, p.rejection_reason, p.created_at, p.updated_at, p.client_id, p.rescheduled_from, p.rescheduled_reason, p.operator_notes
 FROM payments p
 JOIN payment_run_items i ON i.payment_id = p.id
 WHERE i.run_id = $1
@@ -388,6 +409,9 @@ func (q *Queries) ListPaymentsForRun(ctx context.Context, runID pgtype.UUID) ([]
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ClientID,
+			&i.RescheduledFrom,
+			&i.RescheduledReason,
+			&i.OperatorNotes,
 		); err != nil {
 			return nil, err
 		}
@@ -404,7 +428,7 @@ UPDATE payments
 SET status = $2, updated_at = now(), bank_reference = COALESCE($3, bank_reference),
     rejection_reason = COALESCE($4, rejection_reason)
 WHERE id = $1
-RETURNING id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id
+RETURNING id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes
 `
 
 type UpdatePaymentStatusParams struct {
@@ -442,6 +466,9 @@ func (q *Queries) UpdatePaymentStatus(ctx context.Context, arg UpdatePaymentStat
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.ClientID,
+		&i.RescheduledFrom,
+		&i.RescheduledReason,
+		&i.OperatorNotes,
 	)
 	return i, err
 }

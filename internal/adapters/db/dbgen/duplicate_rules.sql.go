@@ -12,7 +12,7 @@ import (
 )
 
 const findDuplicatePayments = `-- name: FindDuplicatePayments :many
-SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id FROM payments
+SELECT id, external_id, type, status, amount_cents, currency, payer_account_id, beneficiary_id, beneficiary_snapshot, payee_method, payee, description, scheduled_for, idempotency_key, bank_reference, rejection_reason, created_at, updated_at, client_id, rescheduled_from, rescheduled_reason, operator_notes FROM payments
 WHERE client_id = $1
   AND beneficiary_id = $2
   AND amount_cents = $3
@@ -66,6 +66,9 @@ func (q *Queries) FindDuplicatePayments(ctx context.Context, arg FindDuplicatePa
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.ClientID,
+			&i.RescheduledFrom,
+			&i.RescheduledReason,
+			&i.OperatorNotes,
 		); err != nil {
 			return nil, err
 		}
