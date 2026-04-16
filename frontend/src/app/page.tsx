@@ -26,7 +26,6 @@ export default function LandingPage() {
       <ProblemSolution />
       <Features />
       <DashboardPreview />
-      <Testimonials />
       <Pricing />
       <FAQ />
       <CTA />
@@ -762,60 +761,6 @@ function DashboardPreview() {
 }
 
 /* ---------- Testimonials ---------- */
-function Testimonials() {
-  const items = [
-    {
-      quote: "Cortamos 4 horas semanais do fechamento. Aprovação em lote mudou o jogo do nosso financeiro.",
-      author: "Carla Mendes",
-      role: "Head de Finanças, Loggi",
-    },
-    {
-      quote: "A trilha de auditoria sozinha justificou a troca. Agora a controladoria não pede mais print de WhatsApp.",
-      author: "Rodrigo Almeida",
-      role: "CFO, Stone Pagamentos",
-    },
-    {
-      quote: "Plug-and-play com Itaú em uma manhã. A documentação OpenAPI é honesta, sem aquele papo de 'enterprise'.",
-      author: "Beatriz Yamamoto",
-      role: "Lead Engineer, Olist",
-    },
-  ];
-  return (
-    <section className="border-t border-[var(--border)] bg-[var(--card)] py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Clientes</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Times que pararam de improvisar
-          </h2>
-        </div>
-        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {items.map((t, i) => (
-            <ScrollReveal key={i} delay={i * 150} distance={25}><figure
-              key={i}
-              className="relative rounded-2xl border border-[var(--border)] bg-[var(--background)] p-6"
-            >
-              <div className="absolute -top-3 left-6 select-none text-5xl leading-none text-[#1e4ea8]">"</div>
-              <blockquote className="text-sm leading-relaxed text-[var(--foreground)]">
-                {t.quote}
-              </blockquote>
-              <figcaption className="mt-4 flex items-center gap-3 border-t border-[var(--border)] pt-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-xs font-bold text-white">
-                  {t.author.split(" ").map((p) => p[0]).slice(0, 2).join("")}
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[var(--foreground)]">{t.author}</p>
-                  <p className="text-[11px] text-[var(--muted-foreground)]">{t.role}</p>
-                </div>
-              </figcaption>
-            </figure></ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ---------- Pricing ---------- */
 function Pricing() {
   const plans = [
