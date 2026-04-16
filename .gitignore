@@ -33,3 +33,5 @@ secrets/
 
 # testdata scratch
 testdata/_scratch/
+deploy/paymentshub-standalone.tar.gz
+deploy/ecosystem.config.js.local
