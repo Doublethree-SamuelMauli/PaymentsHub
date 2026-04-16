@@ -154,7 +154,7 @@ function Hero() {
             O fim da{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-white">planilha</span>
-              <span className="absolute inset-x-0 bottom-1 -z-0 h-3 -rotate-1 bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
+              <span className="absolute inset-x-[-4px] inset-y-[-2px] -z-0 -rotate-1 rounded-md bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
             </span>
             {" "}de pagamentos da segunda-feira
           </h1>

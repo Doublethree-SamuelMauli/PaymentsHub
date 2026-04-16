@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   CalendarClock,
@@ -28,6 +28,14 @@ import { cn } from "@/lib/utils";
 type ActionKind = "hold" | "reject" | "reschedule" | null;
 
 export default function BatchPage() {
+  return (
+    <Suspense fallback={<LoadingBlock label="Carregando lotes..." />}>
+      <BatchContent />
+    </Suspense>
+  );
+}
+
+function BatchContent() {
   const sp = useSearchParams();
   const initialRun = sp.get("run");
   const [runs, setRuns] = useState<Run[] | null>(null);
@@ -45,11 +53,14 @@ export default function BatchPage() {
     try {
       const r = await api.listRuns();
       setRuns(r || []);
-      if (!selectedId && r && r.length > 0) setSelectedId(r[0].id);
+      setSelectedId((prev) => {
+        if (prev) return prev;
+        return r && r.length > 0 ? r[0].id : null;
+      });
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Erro ao carregar lotes");
     }
-  }, [selectedId]);
+  }, []);
 
   useEffect(() => { loadRuns(); }, [loadRuns]);
 
