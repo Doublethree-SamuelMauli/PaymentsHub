@@ -20,6 +20,7 @@ import (
 
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/db/repositories"
+	"github.com/vanlink-ltda/paymentshub/internal/adapters/banks"
 	httpadapter "github.com/vanlink-ltda/paymentshub/internal/adapters/http"
 	"github.com/vanlink-ltda/paymentshub/internal/adapters/http/handlers"
 	"github.com/vanlink-ltda/paymentshub/internal/app"
@@ -81,6 +82,7 @@ func run() error {
 	webhookHandler := handlers.NewWebhookHandler(paymentRepo, eventRepo, logger)
 	authHandler := handlers.NewAuthHandler(pool)
 	usersHandler := handlers.NewUsersHandler(pool)
+	settingsHandler := handlers.NewSettingsHandler(pool, banks.AllValidators())
 
 	jwtSecret := []byte(os.Getenv("PH_JWT_SECRET"))
 	if len(jwtSecret) == 0 {
@@ -98,6 +100,7 @@ func run() error {
 		Webhooks:        webhookHandler,
 		Auth:            authHandler,
 		Users:           usersHandler,
+		Settings:        settingsHandler,
 		JWTSecret:       jwtSecret,
 	})
 

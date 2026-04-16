@@ -106,6 +106,19 @@ class ApiClient {
   createPayerAccount(data: Record<string, unknown>) { return this.post<{ id: string }>("/v1/admin/payer-accounts", data); }
   createApiKey(label: string, scopes: string[]) { return this.post<{ id: string; token: string }>("/v1/admin/api-keys", { label, scopes }); }
 
+  // Settings — branding
+  getBranding() { return this.get<Branding>("/v1/settings/branding"); }
+  updateBranding(data: Partial<Branding>) { return this.patch("/v1/settings/branding", data); }
+  completeOnboarding() { return this.post("/v1/settings/onboarding/complete", {}); }
+
+  // Settings — bank connections
+  listBankConnections() { return this.get<BankConnection[]>("/v1/settings/bank-connections"); }
+  createBankConnection(data: CreateBankConnectionInput) { return this.post<BankConnection>("/v1/settings/bank-connections", data); }
+  getBankConnection(id: string) { return this.get<BankConnection>(`/v1/settings/bank-connections/${id}`); }
+  updateBankConnection(id: string, data: CreateBankConnectionInput) { return this.patch(`/v1/settings/bank-connections/${id}`, data); }
+  validateBankConnection(id: string) { return this.post<ValidationResult>(`/v1/settings/bank-connections/${id}/validate`, {}); }
+  deleteBankConnection(id: string) { return this.delete(`/v1/settings/bank-connections/${id}`); }
+
   // Users (admin)
   listUsers() { return this.get<UserItem[]>("/v1/users"); }
   createUser(data: { email: string; name: string; role: string; password: string }) {
@@ -142,3 +155,50 @@ export interface Run {
   pix_count: number; ted_count: number;
   approved_by?: string; approved_at?: string;
 }
+export interface Branding {
+  slug: string;
+  logo_url: string;
+  primary_color: string;
+  accent_color: string;
+  onboarding_completed: boolean;
+}
+export interface BankConnection {
+  id: string;
+  bank_code: string;
+  bank_name: string;
+  auth_method: string;
+  has_credentials: boolean;
+  has_certificate: boolean;
+  has_sftp: boolean;
+  status: "draft" | "validating" | "active" | "failed" | "expired";
+  validation_attempts: number;
+  last_validation_error?: string;
+  created_at: string;
+}
+export interface CreateBankConnectionInput {
+  bank_code: string;
+  bank_name: string;
+  auth_method: string;
+  credentials?: { client_id?: string; client_secret?: string; api_key?: string };
+  cert_pem?: string;
+  key_pem?: string;
+  sftp_host?: string;
+  sftp_user?: string;
+  sftp_key_pem?: string;
+  sftp_remessa_dir?: string;
+  sftp_retorno_dir?: string;
+}
+export interface ValidationResult {
+  status?: string;
+  message?: string;
+  error?: string;
+  attempts?: number;
+  contact_support?: string;
+}
+
+export const SUPPORTED_BANKS = [
+  { code: "341", name: "Itaú Unibanco", auth: "OAUTH2_MTLS", hasSFTP: true, logo: "itau" },
+  { code: "077", name: "Banco Inter", auth: "OAUTH2_CERT", hasSFTP: false, logo: "inter" },
+  { code: "237", name: "Bradesco", auth: "OAUTH2_CERT", hasSFTP: true, logo: "bradesco" },
+  { code: "104", name: "Caixa Econômica", auth: "CERTIFICATE_A1", hasSFTP: true, logo: "caixa" },
+] as const;

@@ -17,3 +17,18 @@ UPDATE clients SET webhook_url = $2, webhook_secret = $3, updated_at = now() WHE
 
 -- name: SetClientActive :exec
 UPDATE clients SET active = $2, updated_at = now() WHERE id = $1;
+
+-- name: UpdateClientBranding :exec
+UPDATE clients SET
+    slug = $2,
+    logo_url = $3,
+    brand_primary_color = $4,
+    brand_accent_color = $5,
+    updated_at = now()
+WHERE id = $1;
+
+-- name: SetOnboardingCompleted :exec
+UPDATE clients SET onboarding_completed = TRUE, updated_at = now() WHERE id = $1;
+
+-- name: GetClientBySlug :one
+SELECT * FROM clients WHERE slug = $1;

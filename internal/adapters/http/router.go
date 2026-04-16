@@ -53,6 +53,7 @@ type RouterDeps struct {
 	Webhooks  *handlers.WebhookHandler
 	Auth      *handlers.AuthHandler
 	Users     *handlers.UsersHandler
+	Settings  *handlers.SettingsHandler
 	JWTSecret []byte
 }
 
@@ -114,6 +115,9 @@ func NewRouter(deps RouterDeps) http.Handler {
 		}
 		if deps.Users != nil {
 			deps.Users.Register(r)
+		}
+		if deps.Settings != nil {
+			deps.Settings.Register(r)
 		}
 	})
 
