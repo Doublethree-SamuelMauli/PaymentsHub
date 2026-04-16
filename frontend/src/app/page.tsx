@@ -139,17 +139,6 @@ function Hero() {
 
       <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28">
         <div className="mx-auto max-w-3xl text-center">
-          <a
-            href="#features"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)]/70 px-3 py-1 text-[11px] font-medium text-[var(--muted-foreground)] backdrop-blur transition hover:border-[#1e4ea8]/40"
-          >
-            <span className="rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-2 py-0.5 text-[10px] font-bold text-white">
-              NOVO
-            </span>
-            Aprovação consolidada com PIX + TED no mesmo lote
-            <ArrowRight size={11} />
-          </a>
-
           <h1 className="text-balance mt-6 text-[28px] font-bold leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-7xl">
             O fim da{" "}
             <span className="relative inline-block">
