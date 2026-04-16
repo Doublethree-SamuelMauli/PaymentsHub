@@ -657,13 +657,13 @@ function Features() {
     },
     {
       icon: <Calendar size={20} />,
-      title: "TED automático",
-      desc: "O sistema gera o arquivo que o banco precisa e envia automaticamente. Zero trabalho manual.",
+      title: "TED sem complicação",
+      desc: "Acabou a era de gerar arquivo e fazer upload no portal. O sistema cuida de tudo pra você.",
     },
     {
       icon: <Lock size={20} />,
-      title: "Cada empresa isolada",
-      desc: "Seus dados ficam separados dos outros clientes. Segurança bancária, criptografia em tudo.",
+      title: "Segurança de banco",
+      desc: "Criptografia em todas as etapas. Seus dados protegidos com o mesmo padrão que os bancos usam.",
     },
     {
       icon: <Play size={20} />,
@@ -770,7 +770,7 @@ function Pricing() {
       cadence: "para sempre",
       desc: "Veja como funciona na prática antes de contratar. Sem compromisso.",
       features: [
-        "1 usuário por empresa",
+        "Até 5 usuários com permissões",
         "Até 100 pagamentos/mês",
         "1 banco conectado",
         "PIX e TED automáticos",
@@ -791,7 +791,7 @@ function Pricing() {
         "Até 5.000 pagamentos/mês",
         "Vários bancos (Itaú, Inter, Bradesco, Caixa)",
         "Sua marca, suas cores, seu endereço",
-        "Recebe NF-e, pedidos, planilhas",
+        "Recebe NF-e, pedidos, planilhas · Integrado ao seu ERP",
         "Notificações em tempo real · Suporte 12h",
         "Implantação: R$ 4.900",
       ],
@@ -824,7 +824,7 @@ function Pricing() {
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Preços</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Comece grátis. Pague quando crescer.
+            Planos que cabem na sua operação
           </h2>
           <p className="mt-4 text-sm text-[var(--muted-foreground)]">
             Sem letra miúda, sem taxa por transação. O preço escala com volume, não com susto.
