@@ -15,15 +15,15 @@ import { cn } from "@/lib/utils";
 
 const STATUSES = [
   { v: "ALL", label: "Todos" },
-  { v: "RECEIVED", label: "Recebidos" },
-  { v: "VALIDATED_LOCAL", label: "Validados" },
-  { v: "UNDER_REVIEW", label: "Em revisão" },
+  { v: "RECEIVED", label: "Novos" },
+  { v: "VALIDATED_LOCAL", label: "Conferidos" },
+  { v: "UNDER_REVIEW", label: "Em análise" },
   { v: "ON_HOLD", label: "Pausados" },
   { v: "APPROVED", label: "Aprovados" },
   { v: "SENT", label: "Enviados" },
-  { v: "SETTLED", label: "Liquidados" },
-  { v: "FAILED", label: "Falharam" },
-  { v: "REJECTED", label: "Rejeitados" },
+  { v: "SETTLED", label: "Pagos" },
+  { v: "FAILED", label: "Com erro" },
+  { v: "REJECTED", label: "Recusados" },
 ];
 
 export default function PaymentsPage() {
@@ -59,7 +59,7 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Pagamentos"
-        description="Todos os pagamentos ingeridos pelo sistema."
+        description="Todos os pagamentos registrados no sistema."
         actions={canWrite && (
           <button
             onClick={() => setShowCreate(true)}
@@ -76,7 +76,7 @@ export default function PaymentsPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por ID, beneficiário, descrição..."
+            placeholder="Buscar por referência, fornecedor, descrição..."
             className="w-full rounded-lg border border-[var(--border)] bg-[var(--card)] py-2 pl-9 pr-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--brand-accent)]"
           />
         </div>
@@ -119,7 +119,7 @@ export default function PaymentsPage() {
             <table className="w-full text-sm">
               <thead className="text-left text-[10.5px] uppercase tracking-wider text-[var(--muted-foreground)]">
                 <tr>
-                  <th className="px-4 py-2.5 font-medium">External ID</th>
+                  <th className="px-4 py-2.5 font-medium">Referência</th>
                   <th className="px-4 py-2.5 font-medium">Tipo</th>
                   <th className="px-4 py-2.5 font-medium">Beneficiário</th>
                   <th className="px-4 py-2.5 font-medium">Valor</th>

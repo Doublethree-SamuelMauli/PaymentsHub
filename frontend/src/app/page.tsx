@@ -602,7 +602,7 @@ function ProblemSolution() {
               "Planilhas entre financeiro e diretoria",
               "Aprovação por WhatsApp, sem trilha de auditoria",
               "Erro de digitação já te custou algo?",
-              "Cada banco tem um portal",
+              "Cada banco tem um portal — muito tempo gasto",
             ].map((p) => (
               <li key={p} className="flex items-start gap-2.5">
                 <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">×</span>
@@ -618,7 +618,7 @@ function ProblemSolution() {
           </h2>
           <ul className="mt-6 space-y-3 text-sm text-[var(--muted-foreground)]">
             {[
-              "Ingestão automática com seu ERP",
+              "Nota fiscal, pedido de compra e quem aprovou — tudo junto",
               "Workflow permissionado por níveis",
               "Validação de PIX/TED antes de tocar o banco",
               "Atualizações em tempo real",
@@ -1062,9 +1062,9 @@ function Footer() {
               <a href="tel:+5547992770701" className="hover:text-[var(--foreground)]">(47) 99277-0701</a>
             </address>
           </div>
-          <FooterCol title="Produto" links={[["Funcionalidades", "#features"], ["Preços", "#pricing"], ["Changelog", "/changelog"], ["Status", "/status"]]} />
-          <FooterCol title="Empresa" links={[["Sobre", "/about"], ["Blog", "/blog"], ["Contato", "/contact"], ["Carreiras", "/careers"]]} />
-          <FooterCol title="Recursos" links={[["Documentação API", "/docs"], ["FAQ", "#faq"], ["LGPD", "/about#lgpd"], ["Termos", "/about#termos"]]} />
+          <FooterCol title="Produto" links={[["Como funciona", "#features"], ["Preços", "#pricing"], ["Perguntas frequentes", "#faq"]]} />
+          <FooterCol title="Empresa" links={[["Sobre a doublethree", "/about"], ["Blog", "/blog"], ["Contato", "/contact"]]} />
+          <FooterCol title="Legal" links={[["Política de privacidade", "/about#lgpd"], ["Termos de uso", "/about#termos"]]} />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--border)] pt-6 text-[11px] text-[var(--muted-foreground)] md:flex-row">
           <p>© {new Date().getFullYear()} Double Three Tecnologia · CNPJ 33.720.345/0001-79</p>

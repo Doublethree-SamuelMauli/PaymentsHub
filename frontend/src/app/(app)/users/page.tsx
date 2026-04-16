@@ -40,8 +40,8 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Usuários"
-        description="Gerencie acessos e funções da sua equipe."
+        title="Equipe"
+        description="Pessoas que acessam o sistema e o que cada uma pode fazer."
         actions={
           <button
             onClick={() => setShowCreate(true)}
@@ -66,7 +66,7 @@ export default function UsersPage() {
                 <tr>
                   <th className="px-4 py-2.5 font-medium">Nome</th>
                   <th className="px-4 py-2.5 font-medium">E-mail</th>
-                  <th className="px-4 py-2.5 font-medium">Função</th>
+                  <th className="px-4 py-2.5 font-medium">Permissão</th>
                   <th className="px-4 py-2.5 font-medium">Status</th>
                   <th className="px-4 py-2.5 font-medium">Último acesso</th>
                   <th className="px-4 py-2.5 font-medium text-right">Ações</th>

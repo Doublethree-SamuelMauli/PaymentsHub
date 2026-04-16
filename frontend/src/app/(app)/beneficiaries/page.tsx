@@ -29,8 +29,8 @@ export default function BeneficiariesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Beneficiários"
-        description="Cadastro de favorecidos para envio de pagamentos."
+        title="Fornecedores"
+        description="Empresas e pessoas que recebem seus pagamentos."
         actions={canWrite && (
           <button
             onClick={() => setShowCreate(true)}
@@ -46,7 +46,7 @@ export default function BeneficiariesPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por nome ou documento..."
+          placeholder="Buscar por nome ou CNPJ/CPF..."
           className="w-full rounded-lg border border-[var(--border)] bg-[var(--card)] py-2 pl-9 pr-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--brand-accent)]"
         />
       </div>
@@ -56,7 +56,7 @@ export default function BeneficiariesPage() {
       {!list ? (
         <LoadingBlock label="Carregando..." />
       ) : filtered.length === 0 ? (
-        <EmptyState icon={<UserSquare2 size={20} />} title="Nenhum beneficiário" description="Cadastre o primeiro favorecido." />
+        <EmptyState icon={<UserSquare2 size={20} />} title="Nenhum fornecedor" description="Cadastre o primeiro fornecedor que vai receber pagamentos." />
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((b) => (
@@ -140,7 +140,7 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-[var(--foreground)]">Novo beneficiário</h3>
+          <h3 className="text-base font-semibold text-[var(--foreground)]">Novo fornecedor</h3>
           <button onClick={onClose} className="rounded-md p-1 text-[var(--muted-foreground)] hover:bg-[var(--muted)]"><X size={14} /></button>
         </div>
 

@@ -25,11 +25,11 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minRole: "viewer", group: "main" },
-  { href: "/batch", label: "Lote do Dia", icon: CalendarClock, minRole: "viewer", group: "main" },
+  { href: "/dashboard", label: "Painel", icon: LayoutDashboard, minRole: "viewer", group: "main" },
+  { href: "/batch", label: "Aprovar lote", icon: CalendarClock, minRole: "viewer", group: "main" },
   { href: "/payments", label: "Pagamentos", icon: Receipt, minRole: "viewer", group: "main" },
-  { href: "/beneficiaries", label: "Beneficiários", icon: UserSquare2, minRole: "operator", group: "manage" },
-  { href: "/users", label: "Usuários", icon: UsersIcon, minRole: "admin", group: "manage" },
+  { href: "/beneficiaries", label: "Fornecedores", icon: UserSquare2, minRole: "operator", group: "manage" },
+  { href: "/users", label: "Equipe", icon: UsersIcon, minRole: "admin", group: "manage" },
   { href: "/settings", label: "Configurações", icon: Settings, minRole: "admin", group: "settings" },
 ];
 

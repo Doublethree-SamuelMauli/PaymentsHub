@@ -90,36 +90,36 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description="Visão geral dos pagamentos processados pela sua organização."
+        title="Painel"
+        description="Resumo dos seus pagamentos e lotes."
       />
 
       <div className="grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4">
         <StatCard
           variant="primary"
-          label="Volume liquidado"
+          label="Total pago"
           value={formatCompactBRL(stats.volume)}
-          subtext={`${stats.settled} pagamentos`}
+          subtext={`${stats.settled} pagamentos liquidados`}
           icon={<CheckCircle2 size={18} />}
         />
         <StatCard
-          label="Total no período"
+          label="Em andamento"
           value={String(stats.total)}
-          subtext="últimos pagamentos"
+          subtext="pagamentos no sistema"
           icon={<Receipt size={18} />}
         />
         <StatCard
           variant="warn"
-          label="Aguardando"
+          label="Aguardando você"
           value={String(stats.pending)}
-          subtext="precisam de ação"
+          subtext="precisam de aprovação"
           icon={<CalendarClock size={18} />}
         />
         <StatCard
           variant="danger"
-          label="Falhas / rejeitados"
+          label="Com problema"
           value={String(stats.failed)}
-          subtext="últimos 200"
+          subtext="falharam ou rejeitados"
           icon={<AlertTriangle size={18} />}
         />
       </div>
@@ -128,8 +128,8 @@ export default function DashboardPage() {
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-[var(--foreground)]">Volume diário</h2>
-              <p className="text-xs text-[var(--muted-foreground)]">Últimos 14 dias</p>
+              <h2 className="text-sm font-semibold text-[var(--foreground)]">Quanto saiu por dia</h2>
+              <p className="text-xs text-[var(--muted-foreground)]">Últimas 2 semanas</p>
             </div>
           </div>
           <div className="h-64">
@@ -137,8 +137,8 @@ export default function DashboardPage() {
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="vol" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#22863a" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#22863a" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#1e4ea8" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#1e4ea8" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
@@ -158,7 +158,7 @@ export default function DashboardPage() {
                   formatter={(v) => [`R$ ${Number(v).toLocaleString("pt-BR")}`, "Volume"]}
                   labelStyle={{ color: "var(--foreground)", fontWeight: 600 }}
                 />
-                <Area type="monotone" dataKey="amountBRL" stroke="#22863a" strokeWidth={2} fill="url(#vol)" />
+                <Area type="monotone" dataKey="amountBRL" stroke="#1e4ea8" strokeWidth={2} fill="url(#vol)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
 
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[var(--foreground)]">Lotes em aberto</h2>
+            <h2 className="text-sm font-semibold text-[var(--foreground)]">Lotes para aprovar</h2>
             <Link href="/batch" className="text-xs text-[var(--brand-accent)] hover:underline">
               Ver todos
             </Link>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
-          <h2 className="text-sm font-semibold text-[var(--foreground)]">Pagamentos recentes</h2>
+          <h2 className="text-sm font-semibold text-[var(--foreground)]">Últimos pagamentos</h2>
           <Link href="/payments" className="inline-flex items-center gap-1 text-xs text-[var(--brand-accent)] hover:underline">
             Ver todos <ArrowRight size={12} />
           </Link>
@@ -211,7 +211,7 @@ export default function DashboardPage() {
           <table className="w-full text-sm">
             <thead className="text-left text-[10.5px] uppercase tracking-wider text-[var(--muted-foreground)]">
               <tr>
-                <th className="px-5 py-2 font-medium">External ID</th>
+                <th className="px-5 py-2 font-medium">Referência</th>
                 <th className="px-5 py-2 font-medium">Tipo</th>
                 <th className="px-5 py-2 font-medium">Valor</th>
                 <th className="px-5 py-2 font-medium">Status</th>
