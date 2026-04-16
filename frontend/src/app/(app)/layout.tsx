@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar open={sbOpen} onClose={() => setSbOpen(false)} />
       <div className="md:pl-64">
         <Topbar onOpenSidebar={() => setSbOpen(true)} />
-        <main className="px-4 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="px-3 py-4 sm:px-4 sm:py-6 md:px-8 md:py-8">{children}</main>
       </div>
     </div>
   );

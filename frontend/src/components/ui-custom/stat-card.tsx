@@ -23,7 +23,7 @@ export function StatCard({ label, value, subtext, icon, trend, variant = "defaul
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg",
+        "group relative overflow-hidden rounded-xl border p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg sm:rounded-2xl sm:p-5",
         isColored && "shadow-[0_12px_32px_-16px_rgba(20,53,115,0.45)]",
         variantStyles[variant],
         className
@@ -40,7 +40,7 @@ export function StatCard({ label, value, subtext, icon, trend, variant = "defaul
           <p className={cn("text-[10.5px] font-bold uppercase tracking-[0.14em]", isColored ? "text-white/75" : "text-[var(--muted-foreground)]")}>
             {label}
           </p>
-          <p className={cn("mt-2.5 text-3xl font-bold tabular-nums tracking-tight", isColored ? "text-white" : "text-[var(--foreground)]")}>
+          <p className={cn("mt-1.5 text-2xl font-bold tabular-nums tracking-tight sm:mt-2.5 sm:text-3xl", isColored ? "text-white" : "text-[var(--foreground)]")}>
             {value}
           </p>
           {subtext && (

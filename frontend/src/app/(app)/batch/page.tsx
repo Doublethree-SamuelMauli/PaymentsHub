@@ -153,9 +153,9 @@ export default function BatchPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr]">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-[260px_1fr]">
         {/* Lista de Runs */}
-        <aside className="space-y-2">
+        <aside className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-x-visible lg:pb-0">
           {runs.length === 0 ? (
             <EmptyState
               icon={<CalendarClock size={20} />}
@@ -169,7 +169,7 @@ export default function BatchPage() {
                 key={r.id}
                 onClick={() => setSelectedId(r.id)}
                 className={cn(
-                  "w-full rounded-xl border p-3 text-left transition",
+                  "min-w-[200px] shrink-0 rounded-xl border p-3 text-left transition lg:min-w-0 lg:w-full",
                   sel
                     ? "border-[var(--brand-accent)] bg-[var(--card)] shadow-sm"
                     : "border-[var(--border)] bg-[var(--card)] hover:border-[var(--brand-accent)]/50"
@@ -205,7 +205,7 @@ export default function BatchPage() {
             />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 xl:grid-cols-4">
                 <StatCard label="Status" value={statusLabel(selected.status)} icon={<CalendarClock size={16} />} />
                 <StatCard label="Itens" value={String(selected.total_items)} subtext={`PIX ${selected.pix_count} · TED ${selected.ted_count}`} />
                 <StatCard label="Volume" value={formatCompactBRL(selected.total_amount_cents)} variant="primary" />

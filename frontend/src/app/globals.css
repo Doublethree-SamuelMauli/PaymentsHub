@@ -91,18 +91,29 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans antialiased;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "cv11", "ss01", "ss03";
+    overflow-x: hidden;
   }
   ::selection {
     background-color: color-mix(in srgb, var(--brand-accent) 25%, transparent);
+  }
+  /* Mobile safe area for notch/gesture bar */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+  }
+  /* Fix input zoom on iOS */
+  @media (max-width: 768px) {
+    input, select, textarea { font-size: 16px !important; }
   }
 }
 

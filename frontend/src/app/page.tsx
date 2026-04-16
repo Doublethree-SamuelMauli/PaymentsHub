@@ -150,7 +150,7 @@ function Hero() {
             <ArrowRight size={11} />
           </a>
 
-          <h1 className="text-balance mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-6xl md:text-7xl">
+          <h1 className="text-balance mt-6 text-[28px] font-bold leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-7xl">
             O fim da{" "}
             <span className="relative inline-block">
               <span className="relative z-10 text-white">planilha</span>
@@ -207,7 +207,7 @@ function ProductMockup() {
         </span>
       </div>
       <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--background)]">
-        <div className="grid grid-cols-[160px_1fr] sm:grid-cols-[200px_1fr]">
+        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
           {/* fake sidebar */}
           <div className="hidden border-r border-[var(--border)] bg-[var(--card)] p-3 sm:block">
             <div className="mb-3 h-2.5 w-20 rounded bg-[var(--muted)]" />
@@ -531,33 +531,34 @@ function Pricing() {
   const plans = [
     {
       name: "Starter",
-      price: "R$ 100",
-      cadence: "/user/mês",
-      desc: "Tudo que você precisa para começar a operar com um banco.",
+      price: "Grátis",
+      cadence: "para sempre",
+      desc: "Demo completa do sistema para você ver como funciona antes de decidir.",
       features: [
-        "R$ 100 por usuário/mês",
+        "1 usuário por empresa",
+        "Até 100 pagamentos/mês",
         "1 conexão bancária",
         "1 conta pagadora",
         "PIX + TED (CNAB 240)",
-        "RBAC com 4 níveis",
-        "Suporte por e-mail",
+        "Setup de implantação: R$ 990",
       ],
-      cta: "Começar agora",
+      cta: "Começar grátis",
       ctaLink: "#demo",
       featured: false,
     },
     {
       name: "Business",
-      price: "R$ 100",
-      cadence: "/user/mês + setup",
-      desc: "Multi-banco, marca própria, volume ilimitado. O plano de quem opera sério.",
+      price: "R$ 97",
+      cadence: "/user/mês",
+      desc: "Para empresas que rodam pagamento todo dia. Multi-banco, marca própria, volume real.",
       features: [
-        "R$ 100 por usuário/mês",
-        "Setup de implantação sob consulta",
+        "Até 20 usuários (RBAC completo)",
+        "Até 5.000 pagamentos/mês",
         "Multi-banco (Itaú, Inter, Bradesco, Caixa)",
-        "Subdomínio + marca própria (white-label leve)",
+        "Subdomínio + logo + cores da empresa",
         "Ingestão via API, NF-e XML, planilha",
-        "Webhooks + suporte prioritário · SLA 12h",
+        "Webhooks · Suporte e-mail SLA 12h",
+        "Setup de implantação: R$ 4.900",
       ],
       cta: "Agendar demo",
       ctaLink: "#demo",
@@ -567,14 +568,15 @@ function Pricing() {
       name: "Enterprise",
       price: "Sob consulta",
       cadence: "contrato anual",
-      desc: "On-premise, SLA contratual, suporte dedicado e integrações customizadas.",
+      desc: "Grande volume, on-premise, SLA contratual e integrações sob medida.",
       features: [
-        "Preço por volume negociado",
+        "Usuários ilimitados",
+        "Pagamentos ilimitados",
+        "Multi-banco + integrações customizadas",
         "On-premise ou VPC dedicada",
         "SLA contratual 99,95%",
-        "Integrações customizadas (ERP, SAP, TOTVS)",
-        "Gerente de conta dedicado",
-        "Suporte Slack compartilhado",
+        "Gerente de conta · Suporte Slack",
+        "Setup e migração sob consulta",
       ],
       cta: "Falar com vendas",
       ctaLink: "#demo",
@@ -597,7 +599,7 @@ function Pricing() {
           {plans.map((p) => (
             <div
               key={p.name}
-              className={`relative rounded-2xl border p-7 ${
+              className={`relative rounded-2xl border p-5 sm:p-7 ${
                 p.featured
                   ? "border-[#1e4ea8] bg-gradient-to-b from-[#143573]/5 to-[#1e4ea8]/5 shadow-2xl shadow-[#1e4ea8]/10"
                   : "border-[var(--border)] bg-[var(--card)]"
