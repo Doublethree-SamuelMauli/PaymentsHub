@@ -765,19 +765,36 @@ function DashboardPreview() {
 function Pricing() {
   const plans = [
     {
-      name: "Starter",
-      price: "Grátis",
+      name: "Grátis",
+      price: "R$ 0",
       cadence: "para sempre",
-      desc: "Veja como funciona na prática antes de contratar. Sem compromisso.",
+      desc: "Conheça o sistema por dentro. 1 usuário, sem compromisso.",
+      features: [
+        "1 usuário",
+        "Até 100 pagamentos/mês",
+        "1 banco conectado",
+        "PIX e TED automáticos",
+        "Aprovação pelo celular",
+      ],
+      cta: "Criar conta grátis",
+      ctaLink: "#demo",
+      featured: false,
+    },
+    {
+      name: "Starter",
+      price: "R$ 97",
+      cadence: "/usuário/mês",
+      desc: "Para começar a operar de verdade. Até 5 pessoas na equipe.",
       features: [
         "Até 5 usuários com permissões",
         "Até 100 pagamentos/mês",
         "1 banco conectado",
         "PIX e TED automáticos",
         "Aprovação pelo celular",
+        "Suporte por e-mail",
         "Implantação: R$ 990",
       ],
-      cta: "Começar grátis",
+      cta: "Começar agora",
       ctaLink: "#demo",
       featured: false,
     },
@@ -787,7 +804,7 @@ function Pricing() {
       cadence: "/usuário/mês",
       desc: "Para quem paga fornecedor todo dia. Vários bancos, sua marca, equipe inteira.",
       features: [
-        "Até 20 usuários com permissões",
+        "Usuários ilimitados · R$ 97 cada",
         "Até 5.000 pagamentos/mês",
         "Vários bancos (Itaú, Inter, Bradesco, Caixa)",
         "Sua marca, suas cores, seu endereço",
@@ -830,7 +847,7 @@ function Pricing() {
             Sem letra miúda, sem taxa por transação. O preço escala com volume, não com susto.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((p) => (
             <div
               key={p.name}
