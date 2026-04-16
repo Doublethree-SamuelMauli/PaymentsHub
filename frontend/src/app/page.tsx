@@ -689,23 +689,13 @@ function Features() {
         <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <ScrollReveal key={f.title} delay={i * 100} distance={20}>
-              <div className={cn(
-                "group relative p-6 transition hover:bg-[var(--background)]",
-                f.highlight
-                  ? "bg-[linear-gradient(to_bottom_right,rgba(20,53,115,0.04),rgba(30,78,168,0.04))]"
-                  : "bg-[var(--card)]"
-              )}>
+              <div className={`group relative p-6 transition hover:bg-[var(--background)] ${f.highlight ? "bg-blue-50/50 dark:bg-blue-950/20" : "bg-[var(--card)]"}`}>
                 {f.highlight && (
                   <div className="absolute right-3 top-3 rounded-full bg-[#143573]/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#1e4ea8]">
                     FEBRABAN
                   </div>
                 )}
-                <div className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-xl transition",
-                  f.highlight
-                    ? "bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-white"
-                    : "bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white"
-                )}>
+                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl transition ${f.highlight ? "bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-white shadow-md shadow-[#143573]/20" : "bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white"}`}>
                   {f.icon}
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-[var(--foreground)]">{f.title}</h3>
@@ -728,7 +718,7 @@ function DashboardPreview() {
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Rastreio completo</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Saiba quem fez o quê e quando
+            Informação sobre os acessos realizados no aplicativo
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
             Cada pagamento tem um histórico completo: quem criou, quem aprovou,
