@@ -61,8 +61,13 @@ func NewRouter(deps RouterDeps) http.Handler {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:*", "http://127.0.0.1:*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedOrigins: []string{
+			"http://localhost:*",
+			"http://127.0.0.1:*",
+			"https://paymentshub.doublethree.com.br",
+			"https://*.doublethree.com.br",
+		},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Idempotency-Key", "X-Correlation-ID"},
 		ExposedHeaders:   []string{"X-Correlation-ID"},
 		AllowCredentials: true,

@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@demo.com");
+  const [email, setEmail] = useState("admin@doublethree.com.br");
   const [password, setPassword] = useState("admin123");
   const [show, setShow] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -112,7 +112,8 @@ export default function LoginPage() {
 
           <div className="mt-4 rounded-md border border-dashed border-[var(--border)] bg-[var(--muted)] px-3 py-2 text-[11px] text-[var(--muted-foreground)]">
             <p className="font-semibold text-[var(--foreground)]">Credenciais de demonstração</p>
-            <p>admin@demo.com · admin123</p>
+            <p>admin@doublethree.com.br · admin123</p>
+            <p className="mt-1 opacity-70">approver · operator · viewer @doublethree.com.br (+123)</p>
           </div>
         </form>
 
