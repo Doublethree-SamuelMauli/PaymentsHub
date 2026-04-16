@@ -1,7 +1,7 @@
 import { Heart, Coffee, Sparkles, Mail } from "lucide-react";
 import { PageHero } from "@/components/marketing/shell";
 
-export const metadata = { title: "Carreiras · PaymentsHub" };
+export const metadata = { title: "Trabalhe na doublethree", description: "Vagas e oportunidades na doublethree. Time enxuto, produto real, operação financeira de verdade." };
 
 export default function CareersPage() {
   return (

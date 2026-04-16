@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { PageHero } from "@/components/marketing/shell";
 
-export const metadata = { title: "Blog · PaymentsHub" };
+export const metadata = { title: "Blog — Pagamentos, bancos e gestão financeira", description: "Artigos sobre pagamentos em lote, PIX vs TED, aprovação financeira e integração bancária para empresas." };
 
 const POSTS = [
   {

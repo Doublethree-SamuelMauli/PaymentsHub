@@ -1,6 +1,6 @@
 import { PageHero } from "@/components/marketing/shell";
 
-export const metadata = { title: "Changelog · PaymentsHub" };
+export const metadata = { title: "Novidades do PaymentsHub", description: "Tudo que mudou no PaymentsHub. Novas funcionalidades, correções e melhorias." };
 
 const RELEASES = [
   {

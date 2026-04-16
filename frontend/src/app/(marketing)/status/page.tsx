@@ -1,7 +1,7 @@
 import { CheckCircle2, AlertTriangle, Activity } from "lucide-react";
 import { PageHero } from "@/components/marketing/shell";
 
-export const metadata = { title: "Status · PaymentsHub" };
+export const metadata = { title: "Status dos serviços PaymentsHub", description: "Status em tempo real dos serviços do PaymentsHub. Uptime, latência e histórico de incidentes." };
 
 const SERVICES = [
   { name: "API · Pagamentos", uptime: 99.98, status: "operational" },

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Building2, Users, Target, Award } from "lucide-react";
 import { PageHero } from "@/components/marketing/shell";
 
-export const metadata = { title: "Sobre · PaymentsHub" };
+export const metadata = { title: "Sobre a doublethree", description: "Empresa de Curitiba especializada em soluções digitais corporativas. Conheça quem está por trás do PaymentsHub." };
 
 export default function AboutPage() {
   return (
