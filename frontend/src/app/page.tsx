@@ -181,7 +181,7 @@ function Hero() {
           </div>
 
           <p className="mt-5 text-[11px] text-[var(--muted-foreground)]">
-            Sem cartão · Sandbox em 5 minutos · Plug-and-play com o seu banco
+            Sem cartão · Teste grátis em minutos · Funciona com o seu banco
           </p>
         </div>
 
@@ -642,33 +642,33 @@ function Features() {
   const features = [
     {
       icon: <Layers size={20} />,
-      title: "Lote consolidado",
-      desc: "Junte 500 pagamentos em uma única transmissão ao banco. Menos taxas, menos fricção.",
+      title: "Aprovação em lote",
+      desc: "Junte todos os pagamentos do dia e aprove de uma vez. Sem ficar clicando um por um no portal do banco.",
     },
     {
       icon: <ShieldCheck size={20} />,
-      title: "RBAC com 4 níveis",
-      desc: "Admin · Aprovador · Operador · Visualizador. Cada ação assinada e auditável.",
+      title: "Controle por perfil",
+      desc: "Quem cria não aprova. Quem aprova não configura. Cada pessoa com sua permissão, tudo registrado.",
     },
     {
       icon: <Sparkles size={20} />,
-      title: "PIX em tempo real",
-      desc: "Integração REST direta com o banco. Confirmação em segundos via webhook.",
+      title: "PIX na hora",
+      desc: "Envia PIX direto do sistema e recebe confirmação em segundos. Sem precisar entrar no banco.",
     },
     {
       icon: <Calendar size={20} />,
-      title: "TED CNAB 240",
-      desc: "Geração automática do arquivo no leiaute FEBRABAN. SFTP ou download manual.",
+      title: "TED automático",
+      desc: "O sistema gera o arquivo que o banco precisa e envia automaticamente. Zero trabalho manual.",
     },
     {
       icon: <Lock size={20} />,
-      title: "Multi-tenant isolado",
-      desc: "Cada cliente em seu próprio escopo. Dual auth: API key (máquina) e JWT (usuário).",
+      title: "Cada empresa isolada",
+      desc: "Seus dados ficam separados dos outros clientes. Segurança bancária, criptografia em tudo.",
     },
     {
       icon: <Play size={20} />,
-      title: "Sandbox em 5 min",
-      desc: "Ambiente Itaú homologado pronto para teste. Suba a primeira run hoje.",
+      title: "Teste antes de contratar",
+      desc: "Ambiente de demonstração pronto em minutos para você ver como funciona na prática.",
     },
   ];
   return (
@@ -681,7 +681,7 @@ function Features() {
               Construído para times de finanças.<br />Vamos facilitar a vida de seus aprovadores?
             </h2>
             <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-              Não é mais um portal de banco. É a camada de orquestração que falta entre seu ERP e o sistema bancário.
+              Chega de portal de banco. Seus pagamentos saem direto do sistema, com aprovação, rastreio e segurança.
             </p>
           </div>
         </ScrollReveal>
@@ -710,21 +710,21 @@ function DashboardPreview() {
       <div className="glow-orb right-[-10%] top-[20%] h-[400px] w-[400px] bg-[#1e4ea8] opacity-30" />
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Segurança</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Rastreio completo</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Auditoria nasce com cada pagamento
+            Saiba quem fez o quê e quando
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
-            Todo evento — recebido, validado, aprovado, enviado, liquidado — fica
-            registrado com ator, timestamp e razão. Conformidade com o que sua
-            auditoria interna pede no fechamento do mês.
+            Cada pagamento tem um histórico completo: quem criou, quem aprovou,
+            quando foi enviado ao banco e quando caiu na conta. Tudo registrado
+            automaticamente — pronto para qualquer auditoria.
           </p>
           <ul className="mt-5 space-y-2 text-sm text-[var(--foreground)]">
             {[
-              "Idempotência por chave em todas as operações",
-              "Hash sha256 nas API keys (token nunca em texto plano)",
-              "Postgres com row-level isolation por client_id",
-              "Logs estruturados prontos para Datadog/Grafana",
+              "Histórico completo de cada pagamento",
+              "Registro de quem aprovou e por quê",
+              "Dados protegidos com criptografia bancária",
+              "Relatórios prontos para auditoria e compliance",
             ].map((p) => (
               <li key={p} className="flex items-start gap-2"><Check size={14} className="mt-0.5 text-emerald-500" />{p}</li>
             ))}
@@ -732,25 +732,25 @@ function DashboardPreview() {
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-lg">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Timeline</span>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-600">SETTLED</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Histórico</span>
+            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Pago</span>
           </div>
           <ol className="space-y-3">
             {[
-              ["09:14:02", "ingest@erp", "Recebido", "criado pela API"],
-              ["09:14:03", "system", "Validado", "PIX key OK"],
-              ["09:32:18", "carla.mendes", "Em revisão", "valor > R$ 10k"],
-              ["10:01:55", "diretor.fin", "Aprovado", "lote BATCH-2841"],
-              ["10:02:01", "system", "Enviado", "Itaú · e2e id 12...8a"],
-              ["10:02:14", "system", "Liquidado", "confirmação webhook"],
+              ["09:14", "Sistema", "Recebido", "pagamento chegou no sistema"],
+              ["09:14", "Sistema", "Validado", "dados conferidos automaticamente"],
+              ["09:32", "Carla Mendes", "Em revisão", "valor acima de R$ 10 mil"],
+              ["10:01", "Diretor financeiro", "Aprovado", "incluído no lote do dia"],
+              ["10:02", "Sistema", "Enviado ao banco", "PIX processado"],
+              ["10:02", "Banco", "Pago", "dinheiro na conta do fornecedor"],
             ].map(([t, who, ev, note], i) => (
               <li key={i} className="relative border-l-2 border-[#1e4ea8]/30 pl-4">
                 <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="text-xs font-semibold text-[var(--foreground)]">{ev}</span>
-                  <span className="font-mono text-[10px] text-[var(--muted-foreground)]">{t}</span>
+                  <span className="text-[10px] text-[var(--muted-foreground)]">{t}</span>
                 </div>
-                <p className="text-[11px] text-[var(--muted-foreground)]">por <span className="font-mono">{who}</span> · {note}</p>
+                <p className="text-[11px] text-[var(--muted-foreground)]">por {who} · {note}</p>
               </li>
             ))}
           </ol>
@@ -768,14 +768,14 @@ function Pricing() {
       name: "Starter",
       price: "Grátis",
       cadence: "para sempre",
-      desc: "Demo completa do sistema para você ver como funciona antes de decidir.",
+      desc: "Veja como funciona na prática antes de contratar. Sem compromisso.",
       features: [
         "1 usuário por empresa",
         "Até 100 pagamentos/mês",
-        "1 conexão bancária",
-        "1 conta pagadora",
-        "PIX + TED (CNAB 240)",
-        "Setup de implantação: R$ 990",
+        "1 banco conectado",
+        "PIX e TED automáticos",
+        "Aprovação pelo celular",
+        "Implantação: R$ 990",
       ],
       cta: "Começar grátis",
       ctaLink: "#demo",
@@ -784,16 +784,16 @@ function Pricing() {
     {
       name: "Business",
       price: "R$ 97",
-      cadence: "/user/mês",
-      desc: "Para empresas que rodam pagamento todo dia. Multi-banco, marca própria, volume real.",
+      cadence: "/usuário/mês",
+      desc: "Para quem paga fornecedor todo dia. Vários bancos, sua marca, equipe inteira.",
       features: [
-        "Até 20 usuários (RBAC completo)",
+        "Até 20 usuários com permissões",
         "Até 5.000 pagamentos/mês",
-        "Multi-banco (Itaú, Inter, Bradesco, Caixa)",
-        "Subdomínio + logo + cores da empresa",
-        "Ingestão via API, NF-e XML, planilha",
-        "Webhooks · Suporte e-mail SLA 12h",
-        "Setup de implantação: R$ 4.900",
+        "Vários bancos (Itaú, Inter, Bradesco, Caixa)",
+        "Sua marca, suas cores, seu endereço",
+        "Recebe NF-e, pedidos, planilhas",
+        "Notificações em tempo real · Suporte 12h",
+        "Implantação: R$ 4.900",
       ],
       cta: "Agendar demo",
       ctaLink: "#demo",
@@ -803,15 +803,15 @@ function Pricing() {
       name: "Enterprise",
       price: "Sob consulta",
       cadence: "contrato anual",
-      desc: "Grande volume, on-premise, SLA contratual e integrações sob medida.",
+      desc: "Para grandes operações. Infraestrutura dedicada, suporte direto e integração sob medida.",
       features: [
         "Usuários ilimitados",
         "Pagamentos ilimitados",
-        "Multi-banco + integrações customizadas",
-        "On-premise ou VPC dedicada",
-        "SLA contratual 99,95%",
-        "Gerente de conta · Suporte Slack",
-        "Setup e migração sob consulta",
+        "Todos os bancos + integrações com seu sistema",
+        "Servidor exclusivo para sua empresa",
+        "Garantia de disponibilidade 99,95%",
+        "Gerente de conta dedicado",
+        "Implantação e migração sob consulta",
       ],
       cta: "Falar com vendas",
       ctaLink: "#demo",
@@ -881,28 +881,28 @@ function Pricing() {
 function FAQ() {
   const items = [
     {
-      q: "Como funciona a homologação com o banco?",
-      a: "No plano Starter já incluímos credenciais de sandbox do Itaú. Para produção, você usa suas próprias credenciais — geramos para você o pacote de testes que o banco exige (geralmente 5 dias úteis).",
+      q: "Como conecta com o meu banco?",
+      a: "Você coloca as credenciais do seu banco no sistema (certificado digital e chaves de acesso). Nós fazemos a verificação automática. Se algo der errado, nosso suporte te ajuda a configurar.",
     },
     {
-      q: "Vocês guardam o dinheiro em algum lugar?",
-      a: "Não. PaymentsHub é uma camada de orquestração — nunca somos custodiantes. O dinheiro sai direto da sua conta bancária para o beneficiário, e nós só intermediamos a instrução.",
+      q: "O dinheiro passa por vocês?",
+      a: "Não. O dinheiro sai direto da sua conta bancária para o fornecedor. O PaymentsHub só organiza e envia a instrução pro banco — nunca toca no dinheiro.",
     },
     {
-      q: "Quanto tempo leva para integrar?",
-      a: "A primeira run no sandbox costuma ser feita no mesmo dia. Para produção a média é 2 semanas, dependendo do tempo de homologação no seu banco.",
+      q: "Quanto tempo leva para começar a usar?",
+      a: "O ambiente de teste fica pronto no mesmo dia. Para começar a pagar fornecedores de verdade, a média é 2 semanas — depende do prazo do seu banco para liberar o acesso.",
     },
     {
-      q: "Vocês oferecem on-premise?",
-      a: "Sim, no plano Scale. Entregamos um Helm chart pronto para Kubernetes, com Postgres gerenciado por você. Compliance bancário pesado normalmente exige isso.",
+      q: "Funciona no celular?",
+      a: "Sim. O aprovador pode ver os pagamentos do dia e aprovar o lote direto pelo celular, de qualquer lugar. O sistema é 100% web, não precisa instalar nada.",
     },
     {
-      q: "Como funciona a aprovação RBAC?",
-      a: "Cada usuário tem uma role (admin, approver, operator, viewer). Operadores ingerem pagamentos, aprovadores liberam o lote diário, admins configuram tudo. Toda mudança fica em uma trilha imutável.",
+      q: "Como funciona a aprovação?",
+      a: "Cada pessoa tem um nível de acesso. Quem registra pagamentos não pode aprovar. Quem aprova não configura o sistema. Tudo fica registrado — quem fez o quê e quando.",
     },
     {
       q: "Posso cancelar quando quiser?",
-      a: "Sim. Não há contrato de fidelidade no Starter e Business. Plano Scale tem contrato anual com SLA — esse é o trade-off do enterprise.",
+      a: "Sim. No Starter e Business não tem contrato de fidelidade. Você cancela quando quiser. Só o Enterprise tem contrato anual.",
     },
   ];
   const [open, setOpen] = useState<number | null>(0);
@@ -982,8 +982,8 @@ function CTA() {
               Veja em <span className="gradient-text">20 minutos</span> se serve para você
             </h2>
             <p className="mt-3 text-sm text-[var(--muted-foreground)]">
-              Sem slide de vendas. Você manda 2-3 pagamentos reais e a gente
-              monta a primeira run ao vivo no seu sandbox.
+              Sem apresentação de vendas. A gente te mostra o sistema funcionando
+              ao vivo com seus dados — você decide se faz sentido.
             </p>
           </div>
 
@@ -1052,7 +1052,7 @@ function Footer() {
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--border)] pt-6 text-[11px] text-[var(--muted-foreground)] md:flex-row">
           <p>© {new Date().getFullYear()} Double Three Tecnologia · CNPJ 33.720.345/0001-79</p>
-          <p>Construído com Go · Next.js · Postgres</p>
+          <p>Feito pela doublethree · Curitiba, PR</p>
         </div>
       </div>
     </footer>
