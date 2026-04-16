@@ -96,27 +96,23 @@ export function MarketingFooter() {
             </address>
           </div>
           <FooterCol title="Produto" links={[
-            ["Funcionalidades", "/#features"],
+            ["Como funciona", "/#features"],
             ["Preços", "/#pricing"],
-            ["Changelog", "/changelog"],
-            ["Status", "/status"],
+            ["Perguntas frequentes", "/#faq"],
           ]} />
           <FooterCol title="Empresa" links={[
-            ["Sobre", "/about"],
+            ["Sobre a doublethree", "/about"],
             ["Blog", "/blog"],
             ["Contato", "/contact"],
-            ["Carreiras", "/careers"],
           ]} />
-          <FooterCol title="Recursos" links={[
-            ["Documentação API", "/docs"],
-            ["FAQ", "/#faq"],
-            ["LGPD", "/about#lgpd"],
-            ["Termos", "/about#termos"],
+          <FooterCol title="Legal" links={[
+            ["Política de privacidade", "/about#lgpd"],
+            ["Termos de uso", "/about#termos"],
           ]} />
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--border)] pt-6 text-[11px] text-[var(--muted-foreground)] md:flex-row">
           <p>© {new Date().getFullYear()} Double Three Tecnologia · CNPJ 33.720.345/0001-79</p>
-          <p>Construído com Go · Next.js · Postgres</p>
+          <p>Feito pela doublethree · Curitiba, PR</p>
         </div>
       </div>
     </footer>
