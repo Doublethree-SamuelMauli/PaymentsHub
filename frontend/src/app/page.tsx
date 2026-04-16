@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { ScrollReveal, Parallax, StaggerChildren } from "@/components/motion/scroll-reveal";
 
 export default function LandingPage() {
   return (
@@ -133,8 +134,8 @@ function NavMenu({ label, items }: { label: string; items: [string, string][] })
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="glow-orb left-[-10%] top-[10%] h-[480px] w-[480px] bg-[#1e4ea8]" />
-      <div className="glow-orb right-[-15%] top-[-5%] h-[520px] w-[520px] bg-[#3b82f6]" />
+      <Parallax speed={-0.08}><div className="glow-orb left-[-10%] top-[10%] h-[480px] w-[480px] bg-[#1e4ea8]" /></Parallax>
+      <Parallax speed={0.06}><div className="glow-orb right-[-15%] top-[-5%] h-[520px] w-[520px] bg-[#3b82f6]" /></Parallax>
       <div className="noise" />
 
       <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28">
@@ -198,21 +199,29 @@ function Hero() {
             <div className="absolute bottom-[2%] left-[22%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(-5deg)" }} />
             <div className="absolute bottom-[0%] right-[18%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(5deg)" }} />
 
-            {/* Phone esquerdo — foreground, maior, inclinado -5deg */}
-            <div
-              className="absolute left-[5%] top-[4%] z-20 sm:left-[10%]"
-              style={{ transform: "rotate(-5deg) translateY(0px)", transformOrigin: "center bottom" }}
-            >
-              <PhoneMockup variant="list" size="lg" />
-            </div>
+            {/* Phone esquerdo — foreground */}
+            <Parallax speed={0.04}>
+              <div
+                className="absolute left-[5%] top-[4%] z-20 sm:left-[10%]"
+                style={{ transform: "rotate(-5deg)", transformOrigin: "center bottom" }}
+              >
+                <ScrollReveal direction="left" delay={300} duration={900}>
+                  <PhoneMockup variant="list" size="lg" />
+                </ScrollReveal>
+              </div>
+            </Parallax>
 
-            {/* Phone direito — background, overlapping, inclinado +5deg */}
-            <div
-              className="absolute right-[2%] top-[0%] z-10 sm:right-[8%]"
-              style={{ transform: "rotate(5deg) translateY(-10px)", transformOrigin: "center bottom" }}
-            >
-              <PhoneMockup variant="approve" size="lg" />
-            </div>
+            {/* Phone direito — background */}
+            <Parallax speed={-0.03}>
+              <div
+                className="absolute right-[2%] top-[0%] z-10 sm:right-[8%]"
+                style={{ transform: "rotate(5deg) translateY(-10px)", transformOrigin: "center bottom" }}
+              >
+                <ScrollReveal direction="right" delay={500} duration={900}>
+                  <PhoneMockup variant="approve" size="lg" />
+                </ScrollReveal>
+              </div>
+            </Parallax>
           </div>
         </div>
       </div>
@@ -394,109 +403,167 @@ function PhoneMockup({ variant, size = "lg" }: { variant: "list" | "approve"; si
 
 function PhoneListContent() {
   return (
-    <>
-      <div className="mb-2.5 flex items-center justify-between">
-        <div>
-          <p className="text-[9px] font-bold text-[var(--foreground)]">Lote do Dia</p>
-          <p className="text-[6.5px] text-[var(--muted-foreground)]">16/abr · 14 pagamentos</p>
+    <div className="flex h-full flex-col">
+      {/* App header */}
+      <div className="mb-2 flex items-center gap-1.5">
+        <div className="flex h-[16px] w-[16px] items-center justify-center rounded-md bg-gradient-to-br from-[#143573] to-[#1e4ea8]">
+          <Check size={8} className="text-white" />
         </div>
-        <div className="rounded-full bg-[#143573]/10 px-1.5 py-0.5 text-[5.5px] font-bold text-[#1e4ea8]">ABERTO</div>
+        <span className="text-[8px] font-bold tracking-tight text-[var(--foreground)]">PaymentsHub</span>
       </div>
-      <div className="mb-2.5 grid grid-cols-3 gap-1">
+      {/* Page title */}
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-bold text-[var(--foreground)]">Lote do Dia</p>
+          <p className="text-[6px] text-[var(--muted-foreground)]">16 abr · 14 pagamentos</p>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[5px] font-bold text-emerald-600">ABERTO</span>
+        </div>
+      </div>
+      {/* Stats */}
+      <div className="mb-2 grid grid-cols-3 gap-[3px]">
         {[
           ["R$ 65k", "Volume", "from-[#143573] to-[#1e4ea8]"],
-          ["10", "PIX", "from-emerald-500 to-teal-600"],
-          ["4", "TED", "from-amber-500 to-orange-600"],
+          ["10", "PIX", "from-emerald-500 to-emerald-700"],
+          ["4", "TED", "from-amber-500 to-amber-700"],
         ].map(([v, l, g], i) => (
-          <div key={i} className={`rounded-lg bg-gradient-to-br ${g} px-1.5 py-1.5 text-white`}>
-            <div className="text-[5px] font-medium uppercase tracking-wider opacity-80">{l}</div>
-            <div className="text-[10px] font-bold leading-tight">{v}</div>
+          <div key={i} className={`overflow-hidden rounded-lg bg-gradient-to-br ${g} p-[5px] text-white`}>
+            <div className="text-[4.5px] font-semibold uppercase tracking-wider opacity-75">{l}</div>
+            <div className="text-[10px] font-extrabold leading-none">{v}</div>
           </div>
         ))}
       </div>
-      <div className="space-y-[3px]">
+      {/* Payments list */}
+      <div className="flex-1 space-y-[2px]">
         {[
-          ["NF-005", "Tech Supply LTDA", "R$ 2.500", "PIX", true],
-          ["NF-007", "Logística Norte SA", "R$ 1.250", "PIX", true],
-          ["NF-006", "Infra Corp ME", "R$ 7.800", "TED", false],
-          ["NF-012", "Marketing Plus", "R$ 9.500", "PIX", true],
-          ["NF-020", "Metal BR Ind.", "R$ 5.600", "TED", false],
-          ["NF-009", "Cloud Services", "R$ 18.000", "TED", false],
-        ].map(([id, name, val, type, isPix], i) => (
-          <div key={i} className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-2 py-[5px]">
-            <div className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-md text-[5px] font-bold text-white ${isPix ? "bg-emerald-500" : "bg-amber-500"}`}>
-              {isPix ? "P" : "T"}
+          ["NF-005", "Tech Supply LTDA", "2.500,00", true, "approved"],
+          ["NF-007", "Logística Norte", "1.250,00", true, "pending"],
+          ["NF-006", "Infra Corp ME", "7.800,00", false, "approved"],
+          ["NF-012", "Marketing Plus", "9.500,00", true, "review"],
+          ["NF-020", "Metal BR Ind.", "5.600,00", false, "pending"],
+          ["NF-009", "Cloud Services BR", "18.000,00", false, "pending"],
+        ].map(([id, name, val, isPix, status], i) => (
+          <div key={i} className="flex items-center gap-[5px] rounded-[6px] border border-[var(--border)] bg-[var(--card)] p-[4px]">
+            {/* Checkbox */}
+            <div className={`flex h-[10px] w-[10px] shrink-0 items-center justify-center rounded-[3px] border ${i < 3 ? "border-[#1e4ea8] bg-[#1e4ea8]" : "border-[var(--border)]"}`}>
+              {i < 3 && <Check size={6} className="text-white" />}
             </div>
+            {/* Type badge */}
+            <div className={`flex h-[12px] w-[12px] shrink-0 items-center justify-center rounded-[3px] text-[4.5px] font-extrabold text-white ${isPix ? "bg-emerald-500" : "bg-amber-500"}`}>
+              {isPix ? "₱" : "T"}
+            </div>
+            {/* Info */}
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1">
-                <span className="font-mono text-[6.5px] font-semibold text-[#1e4ea8]">{id}</span>
-              </div>
-              <div className="truncate text-[6px] text-[var(--muted-foreground)]">{name}</div>
+              <p className="truncate font-mono text-[6px] font-bold text-[#1e4ea8]">{id}</p>
+              <p className="truncate text-[5px] text-[var(--muted-foreground)]">{name}</p>
             </div>
-            <span className="text-[7.5px] font-bold tabular-nums text-[var(--foreground)]">{val}</span>
+            {/* Amount + status */}
+            <div className="text-right">
+              <p className="text-[6.5px] font-bold tabular-nums text-[var(--foreground)]">R$ {val}</p>
+              <div className={`mt-[1px] rounded-full px-1 py-[0.5px] text-center text-[3.5px] font-bold ${
+                status === "approved" ? "bg-emerald-500/15 text-emerald-600" :
+                status === "review" ? "bg-amber-500/15 text-amber-600" :
+                "bg-[var(--muted)] text-[var(--muted-foreground)]"
+              }`}>
+                {status === "approved" ? "Aprovado" : status === "review" ? "Revisão" : "Pendente"}
+              </div>
+            </div>
           </div>
         ))}
       </div>
-      <div className="mt-2 rounded-lg bg-gradient-to-r from-[#143573]/8 to-[#1e4ea8]/8 px-2 py-1.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[6px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Total do lote</span>
-          <span className="text-[9px] font-bold text-[var(--foreground)]">R$ 65.000,50</span>
+      {/* Total bar */}
+      <div className="mt-1.5 overflow-hidden rounded-lg border border-[var(--border)]">
+        <div className="flex items-center justify-between bg-gradient-to-r from-[#143573]/8 to-[#1e4ea8]/8 px-2 py-[5px]">
+          <span className="text-[5.5px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Total · 14 pgtos</span>
+          <span className="text-[8.5px] font-extrabold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
         </div>
       </div>
-    </>
+      {/* Bottom nav */}
+      <div className="mt-2 flex items-center justify-around rounded-xl bg-[var(--muted)]/60 px-1 py-[5px]">
+        {[
+          ["Dashboard", false], ["Lote", true], ["Pgtos", false], ["Config", false],
+        ].map(([label, active], i) => (
+          <div key={i} className="flex flex-col items-center gap-[1px]">
+            <div className={`h-[3px] w-[3px] rounded-full ${active ? "bg-[#1e4ea8]" : "bg-transparent"}`} />
+            <span className={`text-[4.5px] font-semibold ${active ? "text-[#1e4ea8]" : "text-[var(--muted-foreground)]"}`}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
 function PhoneApproveContent() {
   return (
-    <>
-      <div className="mb-3 text-center">
-        <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#143573] to-[#1e4ea8] shadow-[0_4px_16px_-4px_rgba(20,53,115,0.5)]">
-          <Check size={20} className="text-white" />
+    <div className="flex h-full flex-col">
+      {/* Back nav */}
+      <div className="mb-2 flex items-center gap-1">
+        <ArrowRight size={7} className="rotate-180 text-[#1e4ea8]" />
+        <span className="text-[6px] font-semibold text-[#1e4ea8]">Voltar</span>
+      </div>
+      {/* Hero icon */}
+      <div className="mb-2 text-center">
+        <div className="mx-auto mb-1.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#143573] to-[#1e4ea8] shadow-[0_4px_12px_-3px_rgba(20,53,115,0.5)]">
+          <ShieldCheck size={18} className="text-white" />
         </div>
         <p className="text-[10px] font-bold text-[var(--foreground)]">Aprovar Lote</p>
-        <p className="text-[6.5px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
+        <p className="text-[6px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
       </div>
-      <div className="mb-2.5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
-        <div className="divide-y divide-[var(--border)]">
-          {[
-            ["Pagamentos", "14"],
-            ["PIX (10)", "R$ 48.320,50"],
-            ["TED (4)", "R$ 16.680,00"],
-          ].map(([l, v], i) => (
-            <div key={i} className="flex items-center justify-between px-2.5 py-[5px]">
-              <span className="text-[6.5px] text-[var(--muted-foreground)]">{l}</span>
-              <span className="text-[7px] font-semibold tabular-nums text-[var(--foreground)]">{v}</span>
+      {/* Summary card */}
+      <div className="mb-2 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
+        {[
+          ["Pagamentos", "14", null],
+          ["PIX", "10", "R$ 48.320,50"],
+          ["TED", "4", "R$ 16.680,00"],
+        ].map(([l, count, val], i) => (
+          <div key={i} className="flex items-center justify-between border-b border-[var(--border)] px-2 py-[4px] last:border-b-0">
+            <div className="flex items-center gap-1.5">
+              <div className={`h-[6px] w-[6px] rounded-full ${i === 0 ? "bg-[#1e4ea8]" : i === 1 ? "bg-emerald-500" : "bg-amber-500"}`} />
+              <span className="text-[6px] text-[var(--muted-foreground)]">{l}</span>
             </div>
-          ))}
-        </div>
-        <div className="border-t-2 border-[var(--border)] bg-gradient-to-r from-[#143573]/5 to-[#1e4ea8]/5 px-2.5 py-[6px]">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[6.5px] font-bold tabular-nums text-[var(--foreground)]">{count}</span>
+              {val && <span className="text-[5.5px] tabular-nums text-[var(--muted-foreground)]">{val}</span>}
+            </div>
+          </div>
+        ))}
+        <div className="bg-gradient-to-r from-[#143573]/6 to-[#1e4ea8]/6 px-2 py-[5px]">
           <div className="flex items-center justify-between">
-            <span className="text-[6.5px] font-bold text-[var(--foreground)]">Volume total</span>
-            <span className="text-[9px] font-bold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
+            <span className="text-[6px] font-extrabold uppercase tracking-wider text-[var(--foreground)]">Volume total</span>
+            <span className="text-[9px] font-extrabold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
           </div>
         </div>
       </div>
-      <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950/40">
-        <p className="text-[6px] font-bold text-amber-700 dark:text-amber-400">⚠ Atenção</p>
-        <p className="mt-0.5 text-[5.5px] leading-relaxed text-amber-600 dark:text-amber-400">Os pagamentos serão enviados ao banco. Esta ação não pode ser desfeita.</p>
-      </div>
-      <div className="space-y-1.5">
-        <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-[8px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)]">
-          <Check size={10} /> Confirmar aprovação
-        </button>
-        <button className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] py-2 text-[7px] font-semibold text-[var(--muted-foreground)]">
-          Voltar
-        </button>
-      </div>
-      <div className="mt-2.5 flex items-center gap-2 rounded-lg bg-[var(--muted)] p-2">
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[6px] font-bold text-white">SM</div>
+      {/* Warning */}
+      <div className="mb-2 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 p-[6px] dark:border-amber-800 dark:bg-amber-950/40">
+        <div className="mt-[1px] text-[7px] text-amber-600">⚠</div>
         <div>
-          <p className="text-[6.5px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
-          <p className="text-[5.5px] text-[var(--muted-foreground)]">admin@doublethree.com.br</p>
+          <p className="text-[5.5px] font-bold text-amber-700 dark:text-amber-400">Ação irreversível</p>
+          <p className="text-[5px] leading-relaxed text-amber-600 dark:text-amber-400">Os pagamentos serão submetidos ao banco imediatamente.</p>
         </div>
       </div>
-    </>
+      {/* Actions */}
+      <div className="space-y-[5px]">
+        <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-[8px] text-[7.5px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.5)]">
+          <Check size={9} strokeWidth={3} /> Confirmar aprovação
+        </button>
+        <button className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] py-[6px] text-[6.5px] font-semibold text-[var(--muted-foreground)]">
+          Cancelar
+        </button>
+      </div>
+      {/* Approver */}
+      <div className="mt-auto pt-2">
+        <div className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/60 p-[6px]">
+          <div className="flex h-[16px] w-[16px] items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[5px] font-bold text-white">SM</div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[6px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
+            <p className="truncate text-[5px] text-[var(--muted-foreground)]">Administrador</p>
+          </div>
+          <div className="h-[5px] w-[5px] rounded-full bg-emerald-500" />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -526,7 +593,7 @@ function ProblemSolution() {
   return (
     <section id="solutions" className="mx-auto max-w-6xl px-6 py-24">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-        <div>
+        <ScrollReveal direction="left">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">O problema</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
             Você ainda envia<br />pagamentos um a um.
@@ -544,8 +611,8 @@ function ProblemSolution() {
               </li>
             ))}
           </ul>
-        </div>
-        <div>
+        </ScrollReveal>
+        <ScrollReveal direction="right" delay={200}>
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-500">A virada</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
             Um lote. Um clique.<br />Um relatório auditável.
@@ -565,7 +632,7 @@ function ProblemSolution() {
               </li>
             ))}
           </ul>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );
@@ -608,24 +675,28 @@ function Features() {
   return (
     <section id="features" className="border-t border-[var(--border)] bg-[var(--card)] py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Funcionalidades</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Construído para times de finanças sérios
-          </h2>
-          <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-            Não é mais um portal de banco. É a camada de orquestração que falta entre seu ERP e o sistema bancário.
-          </p>
-        </div>
+        <ScrollReveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Funcionalidades</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
+              Construído para times de finanças sérios
+            </h2>
+            <p className="mt-4 text-sm text-[var(--muted-foreground)]">
+              Não é mais um portal de banco. É a camada de orquestração que falta entre seu ERP e o sistema bancário.
+            </p>
+          </div>
+        </ScrollReveal>
         <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <div key={f.title} className="group bg-[var(--card)] p-6 transition hover:bg-[var(--background)]">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] transition group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white">
-                {f.icon}
+          {features.map((f, i) => (
+            <ScrollReveal key={f.title} delay={i * 100} distance={20}>
+              <div className="group bg-[var(--card)] p-6 transition hover:bg-[var(--background)]">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] transition group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white">
+                  {f.icon}
+                </div>
+                <h3 className="mt-4 text-sm font-semibold text-[var(--foreground)]">{f.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted-foreground)]">{f.desc}</p>
               </div>
-              <h3 className="mt-4 text-sm font-semibold text-[var(--foreground)]">{f.title}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted-foreground)]">{f.desc}</p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -720,7 +791,7 @@ function Testimonials() {
         </div>
         <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
           {items.map((t, i) => (
-            <figure
+            <ScrollReveal key={i} delay={i * 150} distance={25}><figure
               key={i}
               className="relative rounded-2xl border border-[var(--border)] bg-[var(--background)] p-6"
             >
@@ -737,7 +808,7 @@ function Testimonials() {
                   <p className="text-[11px] text-[var(--muted-foreground)]">{t.role}</p>
                 </div>
               </figcaption>
-            </figure>
+            </figure></ScrollReveal>
           ))}
         </div>
       </div>

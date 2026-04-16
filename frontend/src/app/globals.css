@@ -176,4 +176,20 @@
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
+
+  .float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .float-slow-alt {
+    animation: float-slow-alt 7s ease-in-out infinite;
+  }
+  @keyframes float-slow-alt {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
 }
