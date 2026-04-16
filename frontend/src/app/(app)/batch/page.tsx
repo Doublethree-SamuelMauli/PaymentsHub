@@ -261,10 +261,15 @@ function BatchContent() {
                 </span>
               </div>
 
-              {/* Tabela de pagamentos */}
+              {/* Tabela de pagamentos agrupada por fornecedor */}
               <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]">
-                <div className="border-b border-[var(--border)] px-4 py-3">
+                <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
                   <h2 className="text-sm font-semibold text-[var(--foreground)]">Pagamentos do lote</h2>
+                  {payments && payments.length > 0 && (
+                    <span className="text-xs text-[var(--muted-foreground)]">
+                      {payments.length} pagamentos · <strong className="text-[var(--foreground)]">{formatBRL(payments.reduce((s, p) => s + p.amount_cents, 0))}</strong>
+                    </span>
+                  )}
                 </div>
                 {!payments ? (
                   <div className="p-6"><LoadingBlock label="Carregando..." /></div>
@@ -273,60 +278,104 @@ function BatchContent() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
-                      <thead className="text-left text-[10.5px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                      <thead className="sticky top-0 text-left text-[10.5px] uppercase tracking-wider text-[var(--muted-foreground)] bg-[var(--card)]">
                         <tr>
                           <th className="px-4 py-2 font-medium">External ID</th>
                           <th className="px-4 py-2 font-medium">Tipo</th>
                           <th className="px-4 py-2 font-medium">Beneficiário</th>
-                          <th className="px-4 py-2 font-medium">Valor</th>
+                          <th className="px-4 py-2 font-medium text-right">Valor</th>
                           <th className="px-4 py-2 font-medium">Status</th>
                           {canOperate && <th className="px-4 py-2 font-medium text-right">Ações</th>}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[var(--border)]">
-                        {payments.map((p) => (
-                          <tr key={p.id} className="transition hover:bg-[var(--muted)]">
-                            <td className="px-4 py-2.5 font-mono text-xs text-[var(--brand-accent)]">{p.external_id || p.id.slice(0, 8)}</td>
-                            <td className="px-4 py-2.5 text-xs uppercase tracking-wide text-[var(--muted-foreground)]">{p.type}</td>
-                            <td className="px-4 py-2.5 text-xs text-[var(--foreground)]">{p.payee?.name || p.payee?.legal_name || "—"}</td>
-                            <td className="px-4 py-2.5 font-semibold text-[var(--foreground)]">{formatBRL(p.amount_cents)}</td>
-                            <td className="px-4 py-2.5"><StatusPill status={p.status} /></td>
-                            {canOperate && (
-                              <td className="px-4 py-2.5">
-                                <div className="flex items-center justify-end gap-1">
-                                  {["RECEIVED", "VALIDATED_LOCAL", "PREVALIDATED", "UNDER_REVIEW"].includes(p.status) && (
-                                    <button
-                                      onClick={() => setAction({ kind: "hold", payment: p })}
-                                      className="rounded-md p-1.5 text-amber-600 transition hover:bg-amber-50 dark:hover:bg-amber-950/40"
-                                      title="Pausar"
-                                    >
-                                      <Pause size={13} />
-                                    </button>
+                      <tbody>
+                        {(() => {
+                          // Agrupa por beneficiário
+                          const groups = new Map<string, Payment[]>();
+                          for (const p of payments) {
+                            const key = p.payee?.name || p.payee?.legal_name || p.payee?.key_value || "Sem beneficiário";
+                            if (!groups.has(key)) groups.set(key, []);
+                            groups.get(key)!.push(p);
+                          }
+                          const rows: React.ReactNode[] = [];
+                          let idx = 0;
+                          for (const [beneficiary, items] of groups) {
+                            const subtotal = items.reduce((s, p) => s + p.amount_cents, 0);
+                            // Header do grupo (se mais de 1 fornecedor)
+                            if (groups.size > 1 && items.length > 1) {
+                              rows.push(
+                                <tr key={`gh-${idx}`} className="bg-[var(--muted)]/50">
+                                  <td colSpan={canOperate ? 6 : 5} className="px-4 py-1.5">
+                                    <span className="text-[11px] font-semibold text-[var(--foreground)]">{beneficiary}</span>
+                                    <span className="ml-2 text-[11px] text-[var(--muted-foreground)]">{items.length} pagamentos</span>
+                                  </td>
+                                </tr>
+                              );
+                            }
+                            for (const p of items) {
+                              rows.push(
+                                <tr key={p.id} className="border-t border-[var(--border)] transition hover:bg-[var(--muted)]">
+                                  <td className="px-4 py-2.5 font-mono text-xs text-[var(--brand-accent)]">{p.external_id || p.id.slice(0, 8)}</td>
+                                  <td className="px-4 py-2.5">
+                                    <span className={cn("rounded px-1.5 py-0.5 text-[9px] font-bold uppercase", p.type === "PIX" ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600")}>
+                                      {p.type}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-2.5 text-xs text-[var(--foreground)]">{p.payee?.name || p.payee?.legal_name || "—"}</td>
+                                  <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-[var(--foreground)]">{formatBRL(p.amount_cents)}</td>
+                                  <td className="px-4 py-2.5"><StatusPill status={p.status} /></td>
+                                  {canOperate && (
+                                    <td className="px-4 py-2.5">
+                                      <div className="flex items-center justify-end gap-1">
+                                        {["RECEIVED", "VALIDATED_LOCAL", "PREVALIDATED", "UNDER_REVIEW"].includes(p.status) && (
+                                          <button onClick={() => setAction({ kind: "hold", payment: p })} className="rounded-md p-1.5 text-amber-600 transition hover:bg-amber-50 dark:hover:bg-amber-950/40" title="Pausar"><Pause size={13} /></button>
+                                        )}
+                                        {["RECEIVED", "VALIDATED_LOCAL", "PREVALIDATED", "UNDER_REVIEW", "ON_HOLD"].includes(p.status) && (
+                                          <>
+                                            <button onClick={() => setAction({ kind: "reschedule", payment: p })} className="rounded-md p-1.5 text-blue-600 transition hover:bg-blue-50 dark:hover:bg-blue-950/40" title="Reagendar"><CalendarDays size={13} /></button>
+                                            <button onClick={() => setAction({ kind: "reject", payment: p })} className="rounded-md p-1.5 text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/40" title="Rejeitar"><XCircle size={13} /></button>
+                                          </>
+                                        )}
+                                      </div>
+                                    </td>
                                   )}
-                                  {["RECEIVED", "VALIDATED_LOCAL", "PREVALIDATED", "UNDER_REVIEW", "ON_HOLD"].includes(p.status) && (
-                                    <>
-                                      <button
-                                        onClick={() => setAction({ kind: "reschedule", payment: p })}
-                                        className="rounded-md p-1.5 text-blue-600 transition hover:bg-blue-50 dark:hover:bg-blue-950/40"
-                                        title="Reagendar"
-                                      >
-                                        <CalendarDays size={13} />
-                                      </button>
-                                      <button
-                                        onClick={() => setAction({ kind: "reject", payment: p })}
-                                        className="rounded-md p-1.5 text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/40"
-                                        title="Rejeitar"
-                                      >
-                                        <XCircle size={13} />
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
+                                </tr>
+                              );
+                            }
+                            // Subtotal do grupo (se mais de 1 item por fornecedor)
+                            if (items.length > 1) {
+                              rows.push(
+                                <tr key={`sub-${idx}`} className="border-t border-[var(--border)] bg-[var(--muted)]/30">
+                                  <td colSpan={3} className="px-4 py-1.5 text-right text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                                    Subtotal · {beneficiary}
+                                  </td>
+                                  <td className="px-4 py-1.5 text-right text-xs font-bold tabular-nums text-[var(--foreground)]">
+                                    {formatBRL(subtotal)}
+                                  </td>
+                                  <td colSpan={canOperate ? 2 : 1} />
+                                </tr>
+                              );
+                            }
+                            idx++;
+                          }
+                          return rows;
+                        })()}
                       </tbody>
+                      {/* Total geral */}
+                      <tfoot className="border-t-2 border-[var(--border)] bg-gradient-to-r from-[#143573]/5 to-[#1e4ea8]/5">
+                        <tr>
+                          <td colSpan={3} className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[var(--foreground)]">
+                            Total geral
+                          </td>
+                          <td className="px-4 py-3 text-right text-sm font-bold tabular-nums text-[var(--foreground)]">
+                            {formatBRL(payments.reduce((s, p) => s + p.amount_cents, 0))}
+                          </td>
+                          <td className="px-4 py-3 text-[11px] text-[var(--muted-foreground)]">
+                            {payments.length} pgtos
+                          </td>
+                          {canOperate && <td />}
+                        </tr>
+                      </tfoot>
                     </table>
                   </div>
                 )}

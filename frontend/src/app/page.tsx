@@ -156,7 +156,7 @@ function Hero() {
               <span className="relative z-10 text-white">planilha</span>
               <span className="absolute inset-x-[-4px] inset-y-[-2px] -z-0 -rotate-1 rounded-md bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
             </span>
-            {" "}de pagamentos da segunda-feira
+            {" "}de pagamentos do dia a dia
           </h1>
 
           <p className="text-pretty mx-auto mt-6 max-w-xl text-base leading-relaxed text-[var(--muted-foreground)] sm:text-lg">
