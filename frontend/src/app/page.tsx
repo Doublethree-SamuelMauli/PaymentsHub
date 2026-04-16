@@ -773,7 +773,7 @@ function Pricing() {
     {
       name: "Grátis",
       price: "R$ 0",
-      cadence: "para sempre",
+      cadence: "por 5 dias",
       desc: "Tudo que você precisa para testar e começar a operar. Sem compromisso.",
       features: [
         "Até 100 pagamentos/mês",
@@ -781,7 +781,7 @@ function Pricing() {
         "PIX e TED automáticos",
         "Aprovação pelo celular",
         "Suporte por e-mail",
-        "Implantação: R$ 990",
+        "Implantação: R$ 4.900",
       ],
       cta: "Criar conta grátis",
       ctaLink: "#demo",
