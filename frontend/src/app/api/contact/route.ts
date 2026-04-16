@@ -3,13 +3,15 @@ import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  port: 465,
+  secure: true,
   auth: {
-    user: "contato@doublethree.com.br",
-    pass: "lczo qral ctwg idpe",
+    user: process.env.SMTP_USER || "contato@doublethree.com.br",
+    pass: process.env.SMTP_PASS || "lczo qral ctwg idpe",
   },
 });
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {

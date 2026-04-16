@@ -1,38 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sans = Inter({
   subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const mono = JetBrains_Mono({
   subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "PaymentsHub - Pagamentos corporativos simplificados",
-  description: "Centralize PIX e TED da sua empresa em uma unica plataforma.",
+  title: "PaymentsHub",
+  description: "One platform to payments benefits",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/favicon.svg",
     apple: "/favicon.svg",
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
-    >
-      <body className="min-h-full flex flex-col bg-white">{children}</body>
+    <html lang="pt-BR" className={`${sans.variable} ${mono.variable} h-full antialiased scroll-smooth`} suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground font-sans">
+        {children}
+      </body>
     </html>
   );
 }
