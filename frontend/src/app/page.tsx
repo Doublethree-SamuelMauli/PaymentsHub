@@ -191,17 +191,28 @@ function Hero() {
           <ProductMockup />
         </div>
 
-        {/* 2 celulares flutuando — estilo Behance mockup */}
-        <div className="relative mx-auto mt-12 h-[420px] w-full max-w-2xl sm:h-[480px] md:h-[540px]">
-          {/* Sombra no chão */}
-          <div className="absolute bottom-0 left-1/2 h-12 w-[70%] -translate-x-1/2 rounded-[50%] bg-[#143573]/15 blur-2xl" />
-          {/* Phone esquerdo — inclinado pra esquerda */}
-          <div className="absolute left-[8%] top-[5%] z-10 origin-bottom-left sm:left-[12%]" style={{ transform: "rotate(-8deg)" }}>
-            <PhoneMockup variant="list" />
-          </div>
-          {/* Phone direito — inclinado pra direita */}
-          <div className="absolute right-[8%] top-[0%] z-20 origin-bottom-right sm:right-[12%]" style={{ transform: "rotate(6deg)" }}>
-            <PhoneMockup variant="approve" />
+        {/* 2 phones flutuando — product photography style */}
+        <div className="relative mx-auto mt-14 flex justify-center px-4">
+          <div className="relative h-[440px] w-full max-w-[560px] sm:h-[520px] md:h-[580px]">
+            {/* Sombras difusas no chão */}
+            <div className="absolute bottom-[2%] left-[22%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(-5deg)" }} />
+            <div className="absolute bottom-[0%] right-[18%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(5deg)" }} />
+
+            {/* Phone esquerdo — foreground, maior, inclinado -5deg */}
+            <div
+              className="absolute left-[5%] top-[4%] z-20 sm:left-[10%]"
+              style={{ transform: "rotate(-5deg) translateY(0px)", transformOrigin: "center bottom" }}
+            >
+              <PhoneMockup variant="list" size="lg" />
+            </div>
+
+            {/* Phone direito — background, overlapping, inclinado +5deg */}
+            <div
+              className="absolute right-[2%] top-[0%] z-10 sm:right-[8%]"
+              style={{ transform: "rotate(5deg) translateY(-10px)", transformOrigin: "center bottom" }}
+            >
+              <PhoneMockup variant="approve" size="lg" />
+            </div>
           </div>
         </div>
       </div>
@@ -296,79 +307,83 @@ function ProductMockup() {
 }
 
 /* ---------- Phone Mockup ---------- */
-function PhoneMockup({ variant }: { variant: "list" | "approve" }) {
+function PhoneMockup({ variant, size = "lg" }: { variant: "list" | "approve"; size?: "md" | "lg" }) {
+  // Aspect ratio iPhone 15 Pro: 71.6 x 146.6 mm ≈ 1:2.05
+  const w = size === "lg" ? "w-[220px] sm:w-[240px] md:w-[260px]" : "w-[190px] sm:w-[210px] md:w-[230px]";
   return (
-    <div className="w-[200px] shrink-0 sm:w-[220px] md:w-[240px]">
-      {/* === iPhone frame — navy body like Behance reference === */}
-      <div className="relative">
-        {/* Shadow underneath the device */}
-        <div className="absolute -bottom-4 left-[10%] right-[10%] h-8 rounded-[50%] bg-black/20 blur-xl" />
+    <div className={`${w} shrink-0`} style={{ aspectRatio: "1 / 2.05" }}>
+      <div
+        className="relative h-full w-full overflow-hidden"
+        style={{
+          borderRadius: "18% / 8.8%",
+          background: "linear-gradient(165deg, #2e3f65 0%, #1C2B45 25%, #15203a 55%, #1a2a4a 100%)",
+          boxShadow:
+            "0 30px 60px -15px rgba(0,0,0,0.35), " +
+            "0 15px 30px -10px rgba(20,53,115,0.25), " +
+            "inset 0 0.5px 0 rgba(255,255,255,0.12), " +
+            "inset 0 -0.5px 0 rgba(0,0,0,0.3)",
+          padding: "2.8%",
+        }}
+      >
+        {/* Side buttons — left (action + vol up + vol down) */}
+        <div className="absolute -left-[2px] top-[16%] h-[5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
+        <div className="absolute -left-[2px] top-[24%] h-[8.5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
+        <div className="absolute -left-[2px] top-[35%] h-[8.5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
+        {/* Side button — right (power) */}
+        <div className="absolute -right-[2px] top-[27%] h-[11%] w-[2.5px] rounded-r-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
 
-        {/* Device body — thick navy frame */}
-        <div className="relative overflow-visible">
-          {/* Side buttons — left */}
-          <div className="absolute -left-[3px] top-[18%] z-30 h-[6%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
-          <div className="absolute -left-[3px] top-[28%] z-30 h-[9%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
-          <div className="absolute -left-[3px] top-[40%] z-30 h-[9%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
-          {/* Side button — right */}
-          <div className="absolute -right-[3px] top-[30%] z-30 h-[12%] w-[3px] rounded-r-sm bg-[#2a3a5c]" />
-
-          {/* Outer frame — navy aluminum */}
+        {/* Screen — black bezel then display */}
+        <div
+          className="relative h-full w-full overflow-hidden bg-black"
+          style={{ borderRadius: "16% / 7.8%", padding: "1.5px" }}
+        >
           <div
-            className="relative overflow-hidden rounded-[42px] p-[5px] sm:rounded-[46px] sm:p-[6px]"
-            style={{
-              background: "linear-gradient(160deg, #3d4f7c 0%, #1e2d52 30%, #162244 60%, #1a2844 100%)",
-              boxShadow: "0 25px 60px -12px rgba(20,53,115,0.35), 0 8px 20px -8px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.08)",
-            }}
+            className="relative h-full w-full overflow-hidden bg-[var(--background)]"
+            style={{ borderRadius: "15.5% / 7.5%" }}
           >
-            {/* Screen bezel — thin black inner ring */}
-            <div className="relative overflow-hidden rounded-[37px] bg-black p-[2px] sm:rounded-[40px]">
-              {/* Actual screen */}
-              <div className="relative overflow-hidden rounded-[35px] bg-[var(--background)] sm:rounded-[38px]">
-
-                {/* Status bar with Dynamic Island */}
-                <div className="relative flex items-end justify-between px-6 pb-1 pt-3">
-                  <span className="text-[8px] font-semibold text-[var(--foreground)]">9:41</span>
-                  {/* Dynamic Island */}
-                  <div className="absolute left-1/2 top-[6px] -translate-x-1/2">
-                    <div className="h-[14px] w-[60px] rounded-full bg-black sm:w-[68px]" />
-                  </div>
-                  {/* Right indicators */}
-                  <div className="flex items-center gap-[3px]">
-                    {/* Signal bars */}
-                    <svg width="12" height="8" viewBox="0 0 16 12" fill="currentColor" className="text-[var(--foreground)]">
-                      <rect x="0" y="9" width="2.5" height="3" rx="0.5"/>
-                      <rect x="4" y="6" width="2.5" height="6" rx="0.5"/>
-                      <rect x="8" y="3" width="2.5" height="9" rx="0.5"/>
-                      <rect x="12" y="0" width="2.5" height="12" rx="0.5"/>
-                    </svg>
-                    {/* WiFi */}
-                    <svg width="10" height="8" viewBox="0 0 15 12" fill="currentColor" className="text-[var(--foreground)]">
-                      <path d="M7.5 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
-                      <path d="M4.2 9a4.5 4.5 0 0 1 6.6 0" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round"/>
-                      <path d="M1.5 6a8 8 0 0 1 12 0" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                    {/* Battery */}
-                    <div className="flex items-center">
-                      <div className="flex h-[8px] w-[18px] items-center rounded-[2.5px] border-[1.2px] border-[var(--foreground)]/40 px-[1.5px]">
-                        <div className="h-[4px] w-[12px] rounded-[1px] bg-emerald-500" />
-                      </div>
-                      <div className="h-[3px] w-[1.5px] rounded-r-sm bg-[var(--foreground)]/40" />
-                    </div>
-                  </div>
+            {/* Dynamic Island */}
+            <div className="absolute left-1/2 top-[1.5%] z-10 -translate-x-1/2">
+              <div className="h-[3.2%] rounded-full bg-black" style={{ width: "28%", minWidth: 56, minHeight: 12 }}>
+                <div className="flex h-full items-center justify-end pr-[4px]">
+                  <div className="h-[6px] w-[6px] rounded-full bg-[#1a1a2e]/60" />
                 </div>
-
-                {/* === Screen content === */}
-                <div className="px-3 pb-6 pt-2 sm:px-3.5">
-                  {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
-                </div>
-
-                {/* Home indicator bar */}
-                <div className="flex justify-center pb-2">
-                  <div className="h-[4px] w-[50px] rounded-full bg-[var(--foreground)]/15 sm:w-[56px]" />
-                </div>
-
               </div>
+            </div>
+
+            {/* Status bar */}
+            <div className="relative flex items-center justify-between px-[10%] pt-[4%]">
+              <span className="text-[8px] font-semibold tracking-tight text-[var(--foreground)]">9:41</span>
+              <div className="flex items-center gap-1">
+                {/* Signal */}
+                <div className="flex items-end gap-[1.5px]">
+                  {[3, 5, 7, 9].map((h, i) => (
+                    <div key={i} className="w-[2px] rounded-[0.5px] bg-[var(--foreground)]" style={{ height: h }} />
+                  ))}
+                </div>
+                {/* WiFi dots */}
+                <div className="flex items-end gap-[1px]">
+                  <div className="h-[3px] w-[3px] rounded-full bg-[var(--foreground)]" />
+                  <div className="h-[5px] w-[2px] rounded-t-full bg-[var(--foreground)]" />
+                  <div className="h-[7px] w-[2px] rounded-t-full bg-[var(--foreground)]" />
+                </div>
+                {/* Battery */}
+                <div className="flex items-center">
+                  <div className="flex h-[7px] w-[16px] items-center rounded-[2px] border border-[var(--foreground)]/40 px-[1px]">
+                    <div className="h-[4px] flex-1 rounded-[1px] bg-emerald-500" />
+                  </div>
+                  <div className="h-[3px] w-[1px] rounded-r-full bg-[var(--foreground)]/40" />
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="px-[6%] pb-[8%] pt-[3%]">
+              {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
+            </div>
+
+            {/* Home indicator */}
+            <div className="absolute bottom-[1.5%] left-1/2 -translate-x-1/2">
+              <div className="h-[4px] w-[44px] rounded-full bg-[var(--foreground)]/15" />
             </div>
           </div>
         </div>
