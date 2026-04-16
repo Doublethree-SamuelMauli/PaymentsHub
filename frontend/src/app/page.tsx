@@ -900,7 +900,7 @@ function FAQ() {
     },
     {
       q: "Funciona no celular?",
-      a: "Sim. O aprovador pode ver os pagamentos do dia e aprovar o lote direto pelo celular, de qualquer lugar. O sistema é 100% web, não precisa instalar nada.",
+      a: "Sim. O aprovador pode ver os pagamentos do dia e aprovar direto pelo celular, de qualquer lugar. O sistema é 100% web, não precisa instalar nada.",
     },
     {
       q: "Como funciona a aprovação?",
@@ -908,7 +908,7 @@ function FAQ() {
     },
     {
       q: "Posso cancelar quando quiser?",
-      a: "Sim. No Starter e Business não tem contrato de fidelidade. Você cancela quando quiser. Só o Enterprise tem contrato anual.",
+      a: "Sem fidelidade nos planos Grátis e Business: cancele quando desejar. Compromisso anual apenas no plano Enterprise.",
     },
   ];
   const [open, setOpen] = useState<number | null>(0);
