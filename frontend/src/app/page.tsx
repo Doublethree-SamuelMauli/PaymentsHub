@@ -768,9 +768,8 @@ function Pricing() {
       name: "Grátis",
       price: "R$ 0",
       cadence: "para sempre",
-      desc: "Conheça o sistema por dentro. 1 usuário, sem compromisso.",
+      desc: "Conheça o sistema por dentro. Sem compromisso.",
       features: [
-        "1 usuário",
         "Até 100 pagamentos/mês",
         "1 banco conectado",
         "PIX e TED automáticos",
@@ -786,7 +785,7 @@ function Pricing() {
       cadence: "/usuário/mês",
       desc: "Para começar a operar de verdade. Até 5 pessoas na equipe.",
       features: [
-        "Até 5 usuários com permissões",
+        "Adicione quantos usuários quiser · R$ 97/cada",
         "Até 100 pagamentos/mês",
         "1 banco conectado",
         "PIX e TED automáticos",
@@ -804,7 +803,7 @@ function Pricing() {
       cadence: "/usuário/mês",
       desc: "Para quem paga fornecedor todo dia. Vários bancos, sua marca, equipe inteira.",
       features: [
-        "Usuários ilimitados · R$ 97 cada",
+        "Adicione quantos usuários quiser · R$ 97/cada",
         "Até 5.000 pagamentos/mês",
         "Vários bancos (Itaú, Inter, Bradesco, Caixa)",
         "Sua marca, suas cores, seu endereço",
