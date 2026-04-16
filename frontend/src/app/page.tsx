@@ -692,11 +692,11 @@ function Features() {
               <div className={cn(
                 "group relative p-6 transition hover:bg-[var(--background)]",
                 f.highlight
-                  ? "bg-gradient-to-br from-[#143573]/[0.04] to-[#1e4ea8]/[0.04]"
+                  ? "bg-[linear-gradient(to_bottom_right,rgba(20,53,115,0.04),rgba(30,78,168,0.04))]"
                   : "bg-[var(--card)]"
               )}>
                 {f.highlight && (
-                  <div className="absolute right-3 top-3 rounded-full bg-[#143573]/8 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#1e4ea8]">
+                  <div className="absolute right-3 top-3 rounded-full bg-[#143573]/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#1e4ea8]">
                     FEBRABAN
                   </div>
                 )}
