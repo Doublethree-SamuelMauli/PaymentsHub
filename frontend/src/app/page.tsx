@@ -595,14 +595,14 @@ function ProblemSolution() {
         <ScrollReveal direction="left">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">O problema</p>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Você ainda envia<br />pagamentos um a um.
+            Você ainda aprova<br />pagamentos um a um.
           </h2>
           <ul className="mt-6 space-y-3 text-sm text-[var(--muted-foreground)]">
             {[
-              "Planilhas voando entre financeiro e diretoria",
+              "Planilhas entre financeiro e diretoria",
               "Aprovação por WhatsApp, sem trilha de auditoria",
-              "Erro de digitação custou R$ 18mil mês passado",
-              "Cada banco tem um portal, um leiaute, uma dor",
+              "Erro de digitação já te custou algo?",
+              "Cada banco tem um portal",
             ].map((p) => (
               <li key={p} className="flex items-start gap-2.5">
                 <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">×</span>
@@ -618,10 +618,10 @@ function ProblemSolution() {
           </h2>
           <ul className="mt-6 space-y-3 text-sm text-[var(--muted-foreground)]">
             {[
-              "Ingestão automática via API ou planilha",
-              "Workflow RBAC: operador → aprovador → admin",
+              "Ingestão automática com seu ERP",
+              "Workflow permissionado por níveis",
               "Validação de PIX/TED antes de tocar o banco",
-              "Webhooks de confirmação e timeline por evento",
+              "Atualizações em tempo real",
             ].map((p) => (
               <li key={p} className="flex items-start gap-2.5">
                 <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
