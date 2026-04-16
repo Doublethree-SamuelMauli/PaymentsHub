@@ -573,7 +573,7 @@ function LogosBar() {
     <section className="border-y border-[var(--border)] bg-[var(--card)] py-10">
       <div className="mx-auto max-w-6xl px-6">
         <p className="mb-6 text-center text-[11px] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-          Compatível com os principais bancos brasileiros
+          Integra com os principais bancos brasileiros
         </p>
         <div className="flex items-center justify-center gap-x-10 gap-y-4 flex-wrap opacity-70">
           {logos.map((l) => (
@@ -678,7 +678,7 @@ function Features() {
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Funcionalidades</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-              Construído para times de finanças sérios
+              Construído para times de finanças.<br />Vamos facilitar a vida de seus aprovadores?
             </h2>
             <p className="mt-4 text-sm text-[var(--muted-foreground)]">
               Não é mais um portal de banco. É a camada de orquestração que falta entre seu ERP e o sistema bancário.
