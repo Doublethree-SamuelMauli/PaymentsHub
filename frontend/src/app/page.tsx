@@ -185,19 +185,17 @@ function Hero() {
           </p>
         </div>
 
-        {/* Mockup desktop + 2 celulares */}
-        <div className="relative mx-auto mt-16 max-w-6xl">
+        {/* Desktop mockup */}
+        <div className="relative mx-auto mt-16 max-w-5xl">
           <div className="absolute inset-x-10 -top-4 h-12 rounded-full bg-gradient-to-r from-[#143573]/40 to-[#1e4ea8]/40 blur-2xl" />
-          <div className="relative flex items-end justify-center gap-4 sm:gap-6">
-            {/* Desktop */}
-            <div className="hidden flex-1 md:block">
-              <ProductMockup />
-            </div>
-            {/* Phone 1 — Lista de pagamentos */}
-            <PhoneMockup title="Lote do Dia" variant="list" />
-            {/* Phone 2 — Aprovação */}
-            <PhoneMockup title="Aprovar Lote" variant="approve" />
-          </div>
+          <ProductMockup />
+        </div>
+
+        {/* 2 celulares embaixo */}
+        <div className="relative mx-auto mt-10 flex items-start justify-center gap-5 sm:gap-8 md:gap-12">
+          <div className="absolute inset-x-20 top-8 h-16 rounded-full bg-[#143573]/20 blur-3xl" />
+          <PhoneMockup variant="list" />
+          <PhoneMockup variant="approve" />
         </div>
       </div>
     </section>
@@ -291,126 +289,164 @@ function ProductMockup() {
 }
 
 /* ---------- Phone Mockup ---------- */
-function PhoneMockup({ title, variant }: { title: string; variant: "list" | "approve" }) {
+function PhoneMockup({ variant }: { variant: "list" | "approve" }) {
   return (
-    <div className="relative w-[180px] shrink-0 sm:w-[200px]">
-      {/* Phone frame */}
-      <div className="relative overflow-hidden rounded-[28px] border-[3px] border-[#1a1a2e] bg-[#1a1a2e] shadow-2xl shadow-[#143573]/20">
-        {/* Notch */}
-        <div className="relative z-10 mx-auto h-6 w-20 rounded-b-2xl bg-[#1a1a2e]" />
-        {/* Screen */}
-        <div className="relative bg-[var(--background)] px-2.5 pb-4 pt-1">
-          {variant === "list" ? (
-            <>
-              {/* Header */}
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <p className="text-[8px] font-bold text-[var(--foreground)]">Lote do Dia · 16/abr</p>
-                  <p className="text-[6px] text-[var(--muted-foreground)]">14 pagamentos pendentes</p>
+    <div className="relative w-[160px] shrink-0 sm:w-[185px] md:w-[210px]">
+      {/* iPhone 15 Pro frame — titanium style */}
+      <div className="relative">
+        {/* Outer shell — titanium border */}
+        <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-b from-[#848489] via-[#6e6e73] to-[#48484a] p-[2.5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)]">
+          {/* Inner bezel — deep black */}
+          <div className="relative overflow-hidden rounded-[34px] bg-[#1d1d1f]">
+
+            {/* Side buttons (visual only) */}
+            <div className="absolute -left-[1px] top-[52px] h-[18px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
+            <div className="absolute -left-[1px] top-[78px] h-[28px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
+            <div className="absolute -left-[1px] top-[110px] h-[28px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
+            <div className="absolute -right-[1px] top-[80px] h-[36px] w-[2px] rounded-l-sm bg-[#6e6e73]" />
+
+            {/* Screen area with inner bezel gap */}
+            <div className="m-[3px] overflow-hidden rounded-[31px]">
+
+              {/* Status bar */}
+              <div className="relative flex items-center justify-between bg-[var(--background)] px-5 pb-0.5 pt-2">
+                <span className="text-[7px] font-semibold text-[var(--foreground)]">9:41</span>
+                {/* Dynamic Island */}
+                <div className="absolute left-1/2 top-1 -translate-x-1/2">
+                  <div className="h-[11px] w-[52px] rounded-full bg-[#1d1d1f]" />
                 </div>
-                <div className="rounded bg-emerald-500/15 px-1 py-0.5 text-[5px] font-bold text-emerald-600">ABERTO</div>
-              </div>
-              {/* Stats mini */}
-              <div className="mb-2 grid grid-cols-3 gap-1">
-                {[
-                  ["R$ 65k", "Volume", "from-[#143573] to-[#1e4ea8]"],
-                  ["10", "PIX", "from-emerald-400 to-teal-500"],
-                  ["4", "TED", "from-amber-400 to-orange-500"],
-                ].map(([v, l, g], i) => (
-                  <div key={i} className={`rounded bg-gradient-to-br ${g} p-1.5 text-white`}>
-                    <div className="text-[5px] uppercase opacity-80">{l}</div>
-                    <div className="text-[9px] font-bold leading-tight">{v}</div>
+                <div className="flex items-center gap-0.5">
+                  <svg width="10" height="7" viewBox="0 0 16 12" fill="currentColor" className="text-[var(--foreground)]"><path d="M1 8h2v4H1zM5 5h2v7H5zM9 3h2v9H9zM13 0h2v12h-2z"/></svg>
+                  <svg width="8" height="7" viewBox="0 0 12 12" fill="currentColor" className="text-[var(--foreground)]"><path d="M6 2.5A5.5 5.5 0 0 1 11.5 8H10A4 4 0 0 0 6 4V2.5z"/><path d="M6 5.5A2.5 2.5 0 0 1 8.5 8H7a1 1 0 0 0-1-1V5.5z"/><circle cx="6" cy="8" r="1"/></svg>
+                  <div className="ml-0.5 flex h-[7px] w-[16px] items-center rounded-[2px] border border-[var(--foreground)]/30 px-[1px]">
+                    <div className="h-[4px] w-[10px] rounded-[1px] bg-emerald-500" />
                   </div>
-                ))}
-              </div>
-              {/* Payment rows */}
-              <div className="space-y-1">
-                {[
-                  ["NF-005", "Tech Supply", "R$ 2.500", "PIX", "Aprovado"],
-                  ["NF-007", "Log Norte", "R$ 1.250", "PIX", "Pre-valid."],
-                  ["NF-006", "Infra Corp", "R$ 7.800", "TED", "Aprovado"],
-                  ["NF-012", "Mkt Plus", "R$ 9.500", "PIX", "Revisão"],
-                  ["NF-020", "Metal BR", "R$ 5.600", "TED", "Recebido"],
-                ].map(([id, name, val, type, st], i) => (
-                  <div key={i} className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-1">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1">
-                        <span className="font-mono text-[6px] text-[#1e4ea8]">{id}</span>
-                        <span className={`rounded px-0.5 text-[4px] font-bold ${type === "PIX" ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600"}`}>{type}</span>
-                      </div>
-                      <div className="truncate text-[6px] text-[var(--muted-foreground)]">{name}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[7px] font-semibold text-[var(--foreground)]">{val}</div>
-                      <div className="text-[5px] text-[var(--muted-foreground)]">{st}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Total */}
-              <div className="mt-2 rounded-md bg-gradient-to-r from-[#143573]/10 to-[#1e4ea8]/10 px-1.5 py-1">
-                <div className="flex justify-between">
-                  <span className="text-[6px] font-bold uppercase text-[var(--muted-foreground)]">Total</span>
-                  <span className="text-[8px] font-bold text-[var(--foreground)]">R$ 65.000,50</span>
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              {/* Approve screen */}
-              <div className="mb-3 text-center">
-                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8]">
-                  <Check size={18} className="text-white" />
-                </div>
-                <p className="text-[9px] font-bold text-[var(--foreground)]">Aprovar Lote</p>
-                <p className="text-[6px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
+
+              {/* App content */}
+              <div className="bg-[var(--background)] px-3 pb-5 pt-1.5">
+                {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
               </div>
-              {/* Summary */}
-              <div className="mb-2 rounded-lg border border-[var(--border)] bg-[var(--card)] p-2">
-                <div className="space-y-1.5">
-                  {[
-                    ["Pagamentos", "14"],
-                    ["PIX", "10 · R$ 48.320,50"],
-                    ["TED", "4 · R$ 16.680,00"],
-                    ["Volume total", "R$ 65.000,50"],
-                  ].map(([l, v], i) => (
-                    <div key={i} className="flex justify-between">
-                      <span className="text-[6px] text-[var(--muted-foreground)]">{l}</span>
-                      <span className="text-[7px] font-semibold text-[var(--foreground)]">{v}</span>
-                    </div>
-                  ))}
-                </div>
+
+              {/* Home indicator */}
+              <div className="flex justify-center bg-[var(--background)] pb-2 pt-0.5">
+                <div className="h-[3px] w-[48px] rounded-full bg-[var(--foreground)]/20" />
               </div>
-              {/* Approve action */}
-              <div className="space-y-1.5">
-                <div className="rounded-md bg-amber-50 p-1.5 dark:bg-amber-950/40">
-                  <p className="text-[5px] font-semibold text-amber-700 dark:text-amber-400">Atenção</p>
-                  <p className="text-[5px] text-amber-600 dark:text-amber-400">Esta ação é irreversível. Os pagamentos serão enviados ao banco.</p>
-                </div>
-                <button className="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 py-2 text-[8px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.6)]">
-                  Confirmar aprovação
-                </button>
-                <button className="w-full rounded-lg border border-[var(--border)] bg-[var(--card)] py-1.5 text-[7px] font-semibold text-[var(--foreground)]">
-                  Cancelar
-                </button>
-              </div>
-              {/* Approved by */}
-              <div className="mt-2 flex items-center gap-1.5 rounded-md bg-[var(--muted)] p-1.5">
-                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[5px] font-bold text-white">SM</div>
-                <div>
-                  <p className="text-[6px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
-                  <p className="text-[5px] text-[var(--muted-foreground)]">admin · agora</p>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-        {/* Home indicator */}
-        <div className="flex justify-center bg-[var(--background)] pb-1.5 pt-1">
-          <div className="h-1 w-10 rounded-full bg-[var(--muted-foreground)]/30" />
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function PhoneListContent() {
+  return (
+    <>
+      <div className="mb-2.5 flex items-center justify-between">
+        <div>
+          <p className="text-[9px] font-bold text-[var(--foreground)]">Lote do Dia</p>
+          <p className="text-[6.5px] text-[var(--muted-foreground)]">16/abr · 14 pagamentos</p>
+        </div>
+        <div className="rounded-full bg-[#143573]/10 px-1.5 py-0.5 text-[5.5px] font-bold text-[#1e4ea8]">ABERTO</div>
+      </div>
+      <div className="mb-2.5 grid grid-cols-3 gap-1">
+        {[
+          ["R$ 65k", "Volume", "from-[#143573] to-[#1e4ea8]"],
+          ["10", "PIX", "from-emerald-500 to-teal-600"],
+          ["4", "TED", "from-amber-500 to-orange-600"],
+        ].map(([v, l, g], i) => (
+          <div key={i} className={`rounded-lg bg-gradient-to-br ${g} px-1.5 py-1.5 text-white`}>
+            <div className="text-[5px] font-medium uppercase tracking-wider opacity-80">{l}</div>
+            <div className="text-[10px] font-bold leading-tight">{v}</div>
+          </div>
+        ))}
+      </div>
+      <div className="space-y-[3px]">
+        {[
+          ["NF-005", "Tech Supply LTDA", "R$ 2.500", "PIX", true],
+          ["NF-007", "Logística Norte SA", "R$ 1.250", "PIX", true],
+          ["NF-006", "Infra Corp ME", "R$ 7.800", "TED", false],
+          ["NF-012", "Marketing Plus", "R$ 9.500", "PIX", true],
+          ["NF-020", "Metal BR Ind.", "R$ 5.600", "TED", false],
+          ["NF-009", "Cloud Services", "R$ 18.000", "TED", false],
+        ].map(([id, name, val, type, isPix], i) => (
+          <div key={i} className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-2 py-[5px]">
+            <div className={`flex h-[14px] w-[14px] shrink-0 items-center justify-center rounded-md text-[5px] font-bold text-white ${isPix ? "bg-emerald-500" : "bg-amber-500"}`}>
+              {isPix ? "P" : "T"}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1">
+                <span className="font-mono text-[6.5px] font-semibold text-[#1e4ea8]">{id}</span>
+              </div>
+              <div className="truncate text-[6px] text-[var(--muted-foreground)]">{name}</div>
+            </div>
+            <span className="text-[7.5px] font-bold tabular-nums text-[var(--foreground)]">{val}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 rounded-lg bg-gradient-to-r from-[#143573]/8 to-[#1e4ea8]/8 px-2 py-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[6px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Total do lote</span>
+          <span className="text-[9px] font-bold text-[var(--foreground)]">R$ 65.000,50</span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PhoneApproveContent() {
+  return (
+    <>
+      <div className="mb-3 text-center">
+        <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#143573] to-[#1e4ea8] shadow-[0_4px_16px_-4px_rgba(20,53,115,0.5)]">
+          <Check size={20} className="text-white" />
+        </div>
+        <p className="text-[10px] font-bold text-[var(--foreground)]">Aprovar Lote</p>
+        <p className="text-[6.5px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
+      </div>
+      <div className="mb-2.5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
+        <div className="divide-y divide-[var(--border)]">
+          {[
+            ["Pagamentos", "14"],
+            ["PIX (10)", "R$ 48.320,50"],
+            ["TED (4)", "R$ 16.680,00"],
+          ].map(([l, v], i) => (
+            <div key={i} className="flex items-center justify-between px-2.5 py-[5px]">
+              <span className="text-[6.5px] text-[var(--muted-foreground)]">{l}</span>
+              <span className="text-[7px] font-semibold tabular-nums text-[var(--foreground)]">{v}</span>
+            </div>
+          ))}
+        </div>
+        <div className="border-t-2 border-[var(--border)] bg-gradient-to-r from-[#143573]/5 to-[#1e4ea8]/5 px-2.5 py-[6px]">
+          <div className="flex items-center justify-between">
+            <span className="text-[6.5px] font-bold text-[var(--foreground)]">Volume total</span>
+            <span className="text-[9px] font-bold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
+          </div>
+        </div>
+      </div>
+      <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950/40">
+        <p className="text-[6px] font-bold text-amber-700 dark:text-amber-400">⚠ Atenção</p>
+        <p className="mt-0.5 text-[5.5px] leading-relaxed text-amber-600 dark:text-amber-400">Os pagamentos serão enviados ao banco. Esta ação não pode ser desfeita.</p>
+      </div>
+      <div className="space-y-1.5">
+        <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-2.5 text-[8px] font-bold text-white shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)]">
+          <Check size={10} /> Confirmar aprovação
+        </button>
+        <button className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] py-2 text-[7px] font-semibold text-[var(--muted-foreground)]">
+          Voltar
+        </button>
+      </div>
+      <div className="mt-2.5 flex items-center gap-2 rounded-lg bg-[var(--muted)] p-2">
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[6px] font-bold text-white">SM</div>
+        <div>
+          <p className="text-[6.5px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
+          <p className="text-[5.5px] text-[var(--muted-foreground)]">admin@doublethree.com.br</p>
+        </div>
+      </div>
+    </>
   );
 }
 
