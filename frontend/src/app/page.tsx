@@ -185,10 +185,19 @@ function Hero() {
           </p>
         </div>
 
-        {/* Mockup */}
-        <div className="relative mx-auto mt-16 max-w-5xl">
+        {/* Mockup desktop + 2 celulares */}
+        <div className="relative mx-auto mt-16 max-w-6xl">
           <div className="absolute inset-x-10 -top-4 h-12 rounded-full bg-gradient-to-r from-[#143573]/40 to-[#1e4ea8]/40 blur-2xl" />
-          <ProductMockup />
+          <div className="relative flex items-end justify-center gap-4 sm:gap-6">
+            {/* Desktop */}
+            <div className="hidden flex-1 md:block">
+              <ProductMockup />
+            </div>
+            {/* Phone 1 — Lista de pagamentos */}
+            <PhoneMockup title="Lote do Dia" variant="list" />
+            {/* Phone 2 — Aprovação */}
+            <PhoneMockup title="Aprovar Lote" variant="approve" />
+          </div>
         </div>
       </div>
     </section>
@@ -275,6 +284,130 @@ function ProductMockup() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Phone Mockup ---------- */
+function PhoneMockup({ title, variant }: { title: string; variant: "list" | "approve" }) {
+  return (
+    <div className="relative w-[180px] shrink-0 sm:w-[200px]">
+      {/* Phone frame */}
+      <div className="relative overflow-hidden rounded-[28px] border-[3px] border-[#1a1a2e] bg-[#1a1a2e] shadow-2xl shadow-[#143573]/20">
+        {/* Notch */}
+        <div className="relative z-10 mx-auto h-6 w-20 rounded-b-2xl bg-[#1a1a2e]" />
+        {/* Screen */}
+        <div className="relative bg-[var(--background)] px-2.5 pb-4 pt-1">
+          {variant === "list" ? (
+            <>
+              {/* Header */}
+              <div className="mb-2 flex items-center justify-between">
+                <div>
+                  <p className="text-[8px] font-bold text-[var(--foreground)]">Lote do Dia · 16/abr</p>
+                  <p className="text-[6px] text-[var(--muted-foreground)]">14 pagamentos pendentes</p>
+                </div>
+                <div className="rounded bg-emerald-500/15 px-1 py-0.5 text-[5px] font-bold text-emerald-600">ABERTO</div>
+              </div>
+              {/* Stats mini */}
+              <div className="mb-2 grid grid-cols-3 gap-1">
+                {[
+                  ["R$ 65k", "Volume", "from-[#143573] to-[#1e4ea8]"],
+                  ["10", "PIX", "from-emerald-400 to-teal-500"],
+                  ["4", "TED", "from-amber-400 to-orange-500"],
+                ].map(([v, l, g], i) => (
+                  <div key={i} className={`rounded bg-gradient-to-br ${g} p-1.5 text-white`}>
+                    <div className="text-[5px] uppercase opacity-80">{l}</div>
+                    <div className="text-[9px] font-bold leading-tight">{v}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Payment rows */}
+              <div className="space-y-1">
+                {[
+                  ["NF-005", "Tech Supply", "R$ 2.500", "PIX", "Aprovado"],
+                  ["NF-007", "Log Norte", "R$ 1.250", "PIX", "Pre-valid."],
+                  ["NF-006", "Infra Corp", "R$ 7.800", "TED", "Aprovado"],
+                  ["NF-012", "Mkt Plus", "R$ 9.500", "PIX", "Revisão"],
+                  ["NF-020", "Metal BR", "R$ 5.600", "TED", "Recebido"],
+                ].map(([id, name, val, type, st], i) => (
+                  <div key={i} className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--card)] px-1.5 py-1">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className="font-mono text-[6px] text-[#1e4ea8]">{id}</span>
+                        <span className={`rounded px-0.5 text-[4px] font-bold ${type === "PIX" ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600"}`}>{type}</span>
+                      </div>
+                      <div className="truncate text-[6px] text-[var(--muted-foreground)]">{name}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[7px] font-semibold text-[var(--foreground)]">{val}</div>
+                      <div className="text-[5px] text-[var(--muted-foreground)]">{st}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Total */}
+              <div className="mt-2 rounded-md bg-gradient-to-r from-[#143573]/10 to-[#1e4ea8]/10 px-1.5 py-1">
+                <div className="flex justify-between">
+                  <span className="text-[6px] font-bold uppercase text-[var(--muted-foreground)]">Total</span>
+                  <span className="text-[8px] font-bold text-[var(--foreground)]">R$ 65.000,50</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Approve screen */}
+              <div className="mb-3 text-center">
+                <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8]">
+                  <Check size={18} className="text-white" />
+                </div>
+                <p className="text-[9px] font-bold text-[var(--foreground)]">Aprovar Lote</p>
+                <p className="text-[6px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
+              </div>
+              {/* Summary */}
+              <div className="mb-2 rounded-lg border border-[var(--border)] bg-[var(--card)] p-2">
+                <div className="space-y-1.5">
+                  {[
+                    ["Pagamentos", "14"],
+                    ["PIX", "10 · R$ 48.320,50"],
+                    ["TED", "4 · R$ 16.680,00"],
+                    ["Volume total", "R$ 65.000,50"],
+                  ].map(([l, v], i) => (
+                    <div key={i} className="flex justify-between">
+                      <span className="text-[6px] text-[var(--muted-foreground)]">{l}</span>
+                      <span className="text-[7px] font-semibold text-[var(--foreground)]">{v}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Approve action */}
+              <div className="space-y-1.5">
+                <div className="rounded-md bg-amber-50 p-1.5 dark:bg-amber-950/40">
+                  <p className="text-[5px] font-semibold text-amber-700 dark:text-amber-400">Atenção</p>
+                  <p className="text-[5px] text-amber-600 dark:text-amber-400">Esta ação é irreversível. Os pagamentos serão enviados ao banco.</p>
+                </div>
+                <button className="w-full rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 py-2 text-[8px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.6)]">
+                  Confirmar aprovação
+                </button>
+                <button className="w-full rounded-lg border border-[var(--border)] bg-[var(--card)] py-1.5 text-[7px] font-semibold text-[var(--foreground)]">
+                  Cancelar
+                </button>
+              </div>
+              {/* Approved by */}
+              <div className="mt-2 flex items-center gap-1.5 rounded-md bg-[var(--muted)] p-1.5">
+                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[5px] font-bold text-white">SM</div>
+                <div>
+                  <p className="text-[6px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
+                  <p className="text-[5px] text-[var(--muted-foreground)]">admin · agora</p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        {/* Home indicator */}
+        <div className="flex justify-center bg-[var(--background)] pb-1.5 pt-1">
+          <div className="h-1 w-10 rounded-full bg-[var(--muted-foreground)]/30" />
         </div>
       </div>
     </div>
