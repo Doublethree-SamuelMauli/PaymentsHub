@@ -191,11 +191,18 @@ function Hero() {
           <ProductMockup />
         </div>
 
-        {/* 2 celulares embaixo */}
-        <div className="relative mx-auto mt-10 flex items-start justify-center gap-5 sm:gap-8 md:gap-12">
-          <div className="absolute inset-x-20 top-8 h-16 rounded-full bg-[#143573]/20 blur-3xl" />
-          <PhoneMockup variant="list" />
-          <PhoneMockup variant="approve" />
+        {/* 2 celulares flutuando — estilo Behance mockup */}
+        <div className="relative mx-auto mt-12 h-[420px] w-full max-w-2xl sm:h-[480px] md:h-[540px]">
+          {/* Sombra no chão */}
+          <div className="absolute bottom-0 left-1/2 h-12 w-[70%] -translate-x-1/2 rounded-[50%] bg-[#143573]/15 blur-2xl" />
+          {/* Phone esquerdo — inclinado pra esquerda */}
+          <div className="absolute left-[8%] top-[5%] z-10 origin-bottom-left sm:left-[12%]" style={{ transform: "rotate(-8deg)" }}>
+            <PhoneMockup variant="list" />
+          </div>
+          {/* Phone direito — inclinado pra direita */}
+          <div className="absolute right-[8%] top-[0%] z-20 origin-bottom-right sm:right-[12%]" style={{ transform: "rotate(6deg)" }}>
+            <PhoneMockup variant="approve" />
+          </div>
         </div>
       </div>
     </section>
@@ -291,49 +298,77 @@ function ProductMockup() {
 /* ---------- Phone Mockup ---------- */
 function PhoneMockup({ variant }: { variant: "list" | "approve" }) {
   return (
-    <div className="relative w-[160px] shrink-0 sm:w-[185px] md:w-[210px]">
-      {/* iPhone 15 Pro frame — titanium style */}
+    <div className="w-[200px] shrink-0 sm:w-[220px] md:w-[240px]">
+      {/* === iPhone frame — navy body like Behance reference === */}
       <div className="relative">
-        {/* Outer shell — titanium border */}
-        <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-b from-[#848489] via-[#6e6e73] to-[#48484a] p-[2.5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)]">
-          {/* Inner bezel — deep black */}
-          <div className="relative overflow-hidden rounded-[34px] bg-[#1d1d1f]">
+        {/* Shadow underneath the device */}
+        <div className="absolute -bottom-4 left-[10%] right-[10%] h-8 rounded-[50%] bg-black/20 blur-xl" />
 
-            {/* Side buttons (visual only) */}
-            <div className="absolute -left-[1px] top-[52px] h-[18px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
-            <div className="absolute -left-[1px] top-[78px] h-[28px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
-            <div className="absolute -left-[1px] top-[110px] h-[28px] w-[2px] rounded-r-sm bg-[#6e6e73]" />
-            <div className="absolute -right-[1px] top-[80px] h-[36px] w-[2px] rounded-l-sm bg-[#6e6e73]" />
+        {/* Device body — thick navy frame */}
+        <div className="relative overflow-visible">
+          {/* Side buttons — left */}
+          <div className="absolute -left-[3px] top-[18%] z-30 h-[6%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
+          <div className="absolute -left-[3px] top-[28%] z-30 h-[9%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
+          <div className="absolute -left-[3px] top-[40%] z-30 h-[9%] w-[3px] rounded-l-sm bg-[#2a3a5c]" />
+          {/* Side button — right */}
+          <div className="absolute -right-[3px] top-[30%] z-30 h-[12%] w-[3px] rounded-r-sm bg-[#2a3a5c]" />
 
-            {/* Screen area with inner bezel gap */}
-            <div className="m-[3px] overflow-hidden rounded-[31px]">
+          {/* Outer frame — navy aluminum */}
+          <div
+            className="relative overflow-hidden rounded-[42px] p-[5px] sm:rounded-[46px] sm:p-[6px]"
+            style={{
+              background: "linear-gradient(160deg, #3d4f7c 0%, #1e2d52 30%, #162244 60%, #1a2844 100%)",
+              boxShadow: "0 25px 60px -12px rgba(20,53,115,0.35), 0 8px 20px -8px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.08)",
+            }}
+          >
+            {/* Screen bezel — thin black inner ring */}
+            <div className="relative overflow-hidden rounded-[37px] bg-black p-[2px] sm:rounded-[40px]">
+              {/* Actual screen */}
+              <div className="relative overflow-hidden rounded-[35px] bg-[var(--background)] sm:rounded-[38px]">
 
-              {/* Status bar */}
-              <div className="relative flex items-center justify-between bg-[var(--background)] px-5 pb-0.5 pt-2">
-                <span className="text-[7px] font-semibold text-[var(--foreground)]">9:41</span>
-                {/* Dynamic Island */}
-                <div className="absolute left-1/2 top-1 -translate-x-1/2">
-                  <div className="h-[11px] w-[52px] rounded-full bg-[#1d1d1f]" />
-                </div>
-                <div className="flex items-center gap-0.5">
-                  <svg width="10" height="7" viewBox="0 0 16 12" fill="currentColor" className="text-[var(--foreground)]"><path d="M1 8h2v4H1zM5 5h2v7H5zM9 3h2v9H9zM13 0h2v12h-2z"/></svg>
-                  <svg width="8" height="7" viewBox="0 0 12 12" fill="currentColor" className="text-[var(--foreground)]"><path d="M6 2.5A5.5 5.5 0 0 1 11.5 8H10A4 4 0 0 0 6 4V2.5z"/><path d="M6 5.5A2.5 2.5 0 0 1 8.5 8H7a1 1 0 0 0-1-1V5.5z"/><circle cx="6" cy="8" r="1"/></svg>
-                  <div className="ml-0.5 flex h-[7px] w-[16px] items-center rounded-[2px] border border-[var(--foreground)]/30 px-[1px]">
-                    <div className="h-[4px] w-[10px] rounded-[1px] bg-emerald-500" />
+                {/* Status bar with Dynamic Island */}
+                <div className="relative flex items-end justify-between px-6 pb-1 pt-3">
+                  <span className="text-[8px] font-semibold text-[var(--foreground)]">9:41</span>
+                  {/* Dynamic Island */}
+                  <div className="absolute left-1/2 top-[6px] -translate-x-1/2">
+                    <div className="h-[14px] w-[60px] rounded-full bg-black sm:w-[68px]" />
+                  </div>
+                  {/* Right indicators */}
+                  <div className="flex items-center gap-[3px]">
+                    {/* Signal bars */}
+                    <svg width="12" height="8" viewBox="0 0 16 12" fill="currentColor" className="text-[var(--foreground)]">
+                      <rect x="0" y="9" width="2.5" height="3" rx="0.5"/>
+                      <rect x="4" y="6" width="2.5" height="6" rx="0.5"/>
+                      <rect x="8" y="3" width="2.5" height="9" rx="0.5"/>
+                      <rect x="12" y="0" width="2.5" height="12" rx="0.5"/>
+                    </svg>
+                    {/* WiFi */}
+                    <svg width="10" height="8" viewBox="0 0 15 12" fill="currentColor" className="text-[var(--foreground)]">
+                      <path d="M7.5 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+                      <path d="M4.2 9a4.5 4.5 0 0 1 6.6 0" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round"/>
+                      <path d="M1.5 6a8 8 0 0 1 12 0" stroke="currentColor" fill="none" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    {/* Battery */}
+                    <div className="flex items-center">
+                      <div className="flex h-[8px] w-[18px] items-center rounded-[2.5px] border-[1.2px] border-[var(--foreground)]/40 px-[1.5px]">
+                        <div className="h-[4px] w-[12px] rounded-[1px] bg-emerald-500" />
+                      </div>
+                      <div className="h-[3px] w-[1.5px] rounded-r-sm bg-[var(--foreground)]/40" />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* App content */}
-              <div className="bg-[var(--background)] px-3 pb-5 pt-1.5">
-                {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
-              </div>
+                {/* === Screen content === */}
+                <div className="px-3 pb-6 pt-2 sm:px-3.5">
+                  {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
+                </div>
 
-              {/* Home indicator */}
-              <div className="flex justify-center bg-[var(--background)] pb-2 pt-0.5">
-                <div className="h-[3px] w-[48px] rounded-full bg-[var(--foreground)]/20" />
-              </div>
+                {/* Home indicator bar */}
+                <div className="flex justify-center pb-2">
+                  <div className="h-[4px] w-[50px] rounded-full bg-[var(--foreground)]/15 sm:w-[56px]" />
+                </div>
 
+              </div>
             </div>
           </div>
         </div>
