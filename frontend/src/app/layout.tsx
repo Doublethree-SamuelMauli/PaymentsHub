@@ -108,8 +108,7 @@ const JSONLD_STRING = JSON.stringify({
   },
   offers: [
     { "@type": "Offer", name: "Grátis", price: "0", priceCurrency: "BRL" },
-    { "@type": "Offer", name: "Starter", price: "97", priceCurrency: "BRL", priceSpecification: { "@type": "UnitPriceSpecification", unitText: "por usuário/mês" } },
-    { "@type": "Offer", name: "Business", price: "97", priceCurrency: "BRL", priceSpecification: { "@type": "UnitPriceSpecification", unitText: "por usuário/mês" } },
+    { "@type": "Offer", name: "Business", price: "97", priceCurrency: "BRL", priceSpecification: { "@type": "UnitPriceSpecification", unitText: "por usuário/mês" }, description: "Multi-banco, marca própria, NF-e. R$ 97/usuário/mês + implantação R$ 4.900." },
   ],
 });
 

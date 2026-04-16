@@ -768,24 +768,8 @@ function Pricing() {
       name: "Grátis",
       price: "R$ 0",
       cadence: "para sempre",
-      desc: "Conheça o sistema por dentro. Sem compromisso.",
+      desc: "Tudo que você precisa para testar e começar a operar. Sem compromisso.",
       features: [
-        "Até 100 pagamentos/mês",
-        "1 banco conectado",
-        "PIX e TED automáticos",
-        "Aprovação pelo celular",
-      ],
-      cta: "Criar conta grátis",
-      ctaLink: "#demo",
-      featured: false,
-    },
-    {
-      name: "Starter",
-      price: "R$ 97",
-      cadence: "/usuário/mês",
-      desc: "Para começar a operar de verdade. Até 5 pessoas na equipe.",
-      features: [
-        "Adicione quantos usuários quiser · R$ 97/cada",
         "Até 100 pagamentos/mês",
         "1 banco conectado",
         "PIX e TED automáticos",
@@ -793,7 +777,7 @@ function Pricing() {
         "Suporte por e-mail",
         "Implantação: R$ 990",
       ],
-      cta: "Começar agora",
+      cta: "Criar conta grátis",
       ctaLink: "#demo",
       featured: false,
     },
@@ -846,7 +830,7 @@ function Pricing() {
             Sem letra miúda, sem taxa por transação. O preço escala com volume, não com susto.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-3">
           {plans.map((p) => (
             <div
               key={p.name}
