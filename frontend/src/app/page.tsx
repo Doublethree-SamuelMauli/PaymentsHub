@@ -639,7 +639,7 @@ function ProblemSolution() {
 
 /* ---------- Features ---------- */
 function Features() {
-  const features: { icon: React.ReactNode; title: string; desc: string; highlight?: boolean }[] = [
+  const features = [
     {
       icon: <Layers size={20} />,
       title: "Aprovação em lote",
@@ -664,7 +664,6 @@ function Features() {
       icon: <Lock size={20} />,
       title: "Segurança de banco",
       desc: "Criptografia em todas as etapas. Seus dados protegidos com o padrão FEBRABAN.",
-      highlight: true,
     },
     {
       icon: <Play size={20} />,
@@ -689,13 +688,8 @@ function Features() {
         <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <ScrollReveal key={f.title} delay={i * 100} distance={20}>
-              <div className={`group relative p-6 transition hover:bg-[var(--background)] ${f.highlight ? "bg-blue-50/50 dark:bg-blue-950/20" : "bg-[var(--card)]"}`}>
-                {f.highlight && (
-                  <div className="absolute right-3 top-3 rounded-full bg-[#143573]/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-[#1e4ea8]">
-                    FEBRABAN
-                  </div>
-                )}
-                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl transition ${f.highlight ? "bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-white shadow-md shadow-[#143573]/20" : "bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white"}`}>
+              <div className="group bg-[var(--card)] p-6 transition hover:bg-[var(--background)]">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] transition group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white">
                   {f.icon}
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-[var(--foreground)]">{f.title}</h3>
