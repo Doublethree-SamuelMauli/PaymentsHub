@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, Filter, Receipt } from "lucide-react";
+import { Search, Filter, Receipt, Plus } from "lucide-react";
 
 import { api, type Payment } from "@/lib/api";
 import { formatBRL, formatRelative } from "@/lib/format";
@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/ui-custom/page-header";
 import { StatusPill } from "@/components/ui-custom/status-pill";
 import { LoadingBlock } from "@/components/ui-custom/loading";
 import { EmptyState } from "@/components/ui-custom/empty-state";
+import { CreatePaymentModal } from "@/components/payments/create-payment-modal";
 import { cn } from "@/lib/utils";
 
 const STATUSES = [
@@ -30,13 +31,16 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[] | null>(null);
   const [q, setQ] = useState("");
   const [err, setErr] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const canWrite = api.roleCovers("operator");
 
   useEffect(() => {
     setPayments(null);
     api.listPayments(status)
       .then((p) => setPayments(p || []))
       .catch((e) => setErr(e instanceof Error ? e.message : "Erro"));
-  }, [status]);
+  }, [status, reloadKey]);
 
   const filtered = useMemo(() => {
     if (!payments) return [];
@@ -56,6 +60,14 @@ export default function PaymentsPage() {
       <PageHeader
         title="Pagamentos"
         description="Todos os pagamentos ingeridos pelo sistema."
+        actions={canWrite && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-3 py-2 text-xs font-semibold text-white shadow-[0_6px_16px_-6px_rgba(20,53,115,0.5)] transition hover:shadow-[0_8px_24px_-8px_rgba(20,53,115,0.7)]"
+          >
+            <Plus size={14} /> Novo pagamento
+          </button>
+        )}
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -139,6 +151,13 @@ export default function PaymentsPage() {
             {filtered.length} {filtered.length === 1 ? "pagamento" : "pagamentos"}
           </div>
         </div>
+      )}
+
+      {showCreate && (
+        <CreatePaymentModal
+          onClose={() => setShowCreate(false)}
+          onCreated={() => { setShowCreate(false); setReloadKey((k) => k + 1); }}
+        />
       )}
     </div>
   );

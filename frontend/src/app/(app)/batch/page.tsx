@@ -11,6 +11,7 @@ import {
   CalendarDays,
   Plus,
   AlertCircle,
+  Link2,
 } from "lucide-react";
 
 import { api, type Run, type Payment } from "@/lib/api";
@@ -20,6 +21,8 @@ import { StatCard } from "@/components/ui-custom/stat-card";
 import { StatusPill } from "@/components/ui-custom/status-pill";
 import { LoadingBlock } from "@/components/ui-custom/loading";
 import { EmptyState } from "@/components/ui-custom/empty-state";
+import { CreatePaymentModal } from "@/components/payments/create-payment-modal";
+import { AttachPaymentsModal } from "@/components/payments/attach-payments-modal";
 import { cn } from "@/lib/utils";
 
 type ActionKind = "hold" | "reject" | "reschedule" | null;
@@ -33,6 +36,8 @@ export default function BatchPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showAttach, setShowAttach] = useState(false);
 
   const [action, setAction] = useState<{ kind: ActionKind; payment: Payment | null }>({ kind: null, payment: null });
 
@@ -119,14 +124,21 @@ export default function BatchPage() {
         title="Lote do Dia"
         description="Aprovação consolidada de pagamentos e envio ao banco."
         actions={canOperate && (
-          <button
-            onClick={handleCreateToday}
-            disabled={busy}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
-          >
-            <Plus size={14} />
-            Novo lote (hoje)
-          </button>
+          <>
+            <button
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-2 text-xs font-semibold text-[var(--foreground)] transition hover:border-[#1e4ea8]/50 hover:bg-[var(--muted)]"
+            >
+              <Plus size={14} /> Novo pagamento
+            </button>
+            <button
+              onClick={handleCreateToday}
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-3 py-2 text-xs font-semibold text-white shadow-[0_6px_16px_-6px_rgba(20,53,115,0.5)] transition hover:shadow-[0_8px_24px_-8px_rgba(20,53,115,0.7)] disabled:opacity-60"
+            >
+              <CalendarDays size={14} /> Novo lote (hoje)
+            </button>
+          </>
         )}
       />
 
@@ -207,11 +219,19 @@ export default function BatchPage() {
 
               {/* Ações do lote */}
               <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--card)] p-3">
+                {canOperate && selected.status === "OPEN" && (
+                  <button
+                    onClick={() => setShowAttach(true)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 text-xs font-semibold text-[var(--foreground)] transition hover:border-[#1e4ea8]/50 hover:bg-[var(--muted)]"
+                  >
+                    <Link2 size={14} /> Anexar pagamentos
+                  </button>
+                )}
                 {canApprove && selected.status === "OPEN" && (
                   <button
                     onClick={handleApprove}
                     disabled={busy}
-                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white shadow-[0_6px_16px_-6px_rgba(5,150,105,0.5)] transition hover:brightness-110 disabled:opacity-60"
                   >
                     <CheckCircle2 size={14} /> Aprovar lote
                   </button>
@@ -220,7 +240,7 @@ export default function BatchPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={busy}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-3 py-2 text-xs font-semibold text-white shadow-[0_6px_16px_-6px_rgba(20,53,115,0.6)] transition hover:brightness-110 disabled:opacity-60"
                   >
                     <Send size={14} /> Submeter ao banco
                   </button>
@@ -313,6 +333,29 @@ export default function BatchPage() {
           onDone={async (msg) => {
             flash(msg);
             setAction({ kind: null, payment: null });
+            await reload();
+          }}
+        />
+      )}
+
+      {showCreate && (
+        <CreatePaymentModal
+          onClose={() => setShowCreate(false)}
+          onCreated={async (n) => {
+            flash(`${n} pagamento${n !== 1 ? "s" : ""} criado${n !== 1 ? "s" : ""}`);
+            setShowCreate(false);
+            await reload();
+          }}
+        />
+      )}
+
+      {showAttach && selected && (
+        <AttachPaymentsModal
+          runId={selected.id}
+          onClose={() => setShowAttach(false)}
+          onDone={async (n) => {
+            flash(`${n} pagamento${n !== 1 ? "s" : ""} anexado${n !== 1 ? "s" : ""} ao lote`);
+            setShowAttach(false);
             await reload();
           }}
         />

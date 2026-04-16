@@ -120,7 +120,7 @@ export const api = new ApiClient();
 
 // --- Types ---
 export interface UserItem { id: string; email: string; name: string; role: string; active: boolean; last_login_at: string; created_at: string; }
-export interface CreatePaymentInput { external_id?: string; type: string; amount_cents: number; payer_account_id: string; beneficiary_id?: string; payee_method: string; payee: Record<string, string>; description?: string; }
+export interface CreatePaymentInput { external_id?: string; type: "PIX" | "TED"; amount_cents: number; payer_account_id: string; beneficiary_id?: string; payee_method: "PIX_KEY" | "BANK_ACCOUNT"; payee: Record<string, string>; description?: string; scheduled_for?: string; }
 export interface PayerAccount { id: string; bank_code: string; agency: string; account_number: string; account_digit: string; label: string; active: boolean; }
 export interface Beneficiary {
   id: string; kind: string; legal_name: string; document_type: string; document_number: string; active: boolean;
