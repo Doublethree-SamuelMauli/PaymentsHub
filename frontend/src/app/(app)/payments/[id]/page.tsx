@@ -9,6 +9,37 @@ import { PageHeader } from "@/components/ui-custom/page-header";
 import { StatusPill } from "@/components/ui-custom/status-pill";
 import { LoadingBlock } from "@/components/ui-custom/loading";
 
+const PAYEE_LABELS: Record<string, string> = {
+  key_type: "Tipo de chave",
+  key_value: "Chave PIX",
+  name: "Nome",
+  legal_name: "Razão social",
+  bank_code: "Banco",
+  agency: "Agência",
+  account_number: "Conta",
+  account_digit: "Dígito",
+  account_type: "Tipo de conta",
+  document_number: "Documento",
+};
+
+const ACCOUNT_TYPE_LABELS: Record<string, string> = {
+  CC: "Conta Corrente",
+  CP: "Conta Poupança",
+};
+
+const KEY_TYPE_LABELS: Record<string, string> = {
+  CPF: "CPF",
+  CNPJ: "CNPJ",
+  EMAIL: "E-mail",
+  PHONE: "Telefone",
+  EVP: "Chave aleatória",
+};
+
+const METHOD_LABELS: Record<string, string> = {
+  PIX_KEY: "PIX",
+  BANK_ACCOUNT: "Transferência bancária (TED)",
+};
+
 export default function PaymentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [data, setData] = useState<PaymentDetail | null>(null);
@@ -36,41 +67,54 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
 
       <PageHeader
         title={payment.external_id || payment.id.slice(0, 8)}
-        description={payment.description || "—"}
+        description={payment.description || "Sem descrição"}
         actions={<StatusPill status={payment.status} />}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          <Card title="Resumo" icon={<FileText size={14} />}>
-            <Field label="Valor"><span className="text-lg font-bold text-[var(--foreground)]">{formatBRL(payment.amount_cents)}</span></Field>
-            <Field label="Tipo">{payment.type}</Field>
-            <Field label="Método">{payment.payee_method}</Field>
-            <Field label="Moeda">{payment.currency || "BRL"}</Field>
-            <Field label="Bank Reference">{payment.bank_reference || "—"}</Field>
-            <Field label="Idempotency Key" mono>{payment.idempotency_key}</Field>
+          {/* Resumo */}
+          <Card title="Resumo do pagamento" icon={<FileText size={14} />}>
+            <Field label="Valor">
+              <span className="text-lg font-bold text-[var(--foreground)]">{formatBRL(payment.amount_cents)}</span>
+            </Field>
+            <Field label="Tipo">{payment.type === "PIX" ? "PIX" : "TED"}</Field>
+            <Field label="Forma de envio">{METHOD_LABELS[payment.payee_method] || payment.payee_method}</Field>
+            <Field label="Moeda">{payment.currency || "Real (BRL)"}</Field>
+            {payment.bank_reference && (
+              <Field label="Comprovante do banco">{payment.bank_reference}</Field>
+            )}
           </Card>
 
-          <Card title="Beneficiário" icon={<User size={14} />}>
-            {Object.entries(payment.payee || {}).map(([k, v]) => (
-              <Field key={k} label={k}>{String(v)}</Field>
-            ))}
+          {/* Destinatário */}
+          <Card title="Quem recebe" icon={<User size={14} />}>
+            {Object.entries(payment.payee || {}).map(([k, v]) => {
+              const label = PAYEE_LABELS[k] || k;
+              let display = String(v);
+              if (k === "account_type") display = ACCOUNT_TYPE_LABELS[display] || display;
+              if (k === "key_type") display = KEY_TYPE_LABELS[display] || display;
+              if (k === "bank_code") display = `${display} — ${bankName(display)}`;
+              if (!display || display === "undefined") return null;
+              return <Field key={k} label={label}>{display}</Field>;
+            })}
           </Card>
 
-          <Card title="Pagador" icon={<Building size={14} />}>
-            <Field label="Conta pagadora ID" mono>{payment.payer_account_id}</Field>
+          {/* Conta de origem */}
+          <Card title="Conta de origem" icon={<Building size={14} />}>
+            <Field label="Identificador da conta" mono>{payment.payer_account_id}</Field>
           </Card>
         </div>
 
+        {/* Histórico */}
         <div>
-          <Card title="Timeline" icon={<Clock size={14} />}>
+          <Card title="Histórico" icon={<Clock size={14} />}>
             {timeline.length === 0 ? (
-              <p className="text-xs text-[var(--muted-foreground)]">Sem eventos.</p>
+              <p className="text-xs text-[var(--muted-foreground)]">Nenhum evento registrado.</p>
             ) : (
               <ol className="space-y-3">
                 {timeline.map((e, i) => (
-                  <li key={i} className="relative border-l border-[var(--border)] pl-4">
-                    <span className="absolute -left-[5px] top-1 h-2.5 w-2.5 rounded-full bg-[var(--brand-accent)]" />
+                  <li key={i} className="relative border-l-2 border-[var(--brand-accent)]/30 pl-4">
+                    <span className="absolute -left-[5px] top-1 h-2.5 w-2.5 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
                     <p className="text-[11px] text-[var(--muted-foreground)]">{formatDate(e.at)}</p>
                     <p className="text-xs font-semibold text-[var(--foreground)]">
                       {statusLabel(e.from_status)} → {statusLabel(e.to_status)}
@@ -88,6 +132,14 @@ export default function PaymentDetailPage({ params }: { params: Promise<{ id: st
   );
 }
 
+function bankName(code: string): string {
+  const map: Record<string, string> = {
+    "341": "Itaú", "237": "Bradesco", "033": "Santander", "001": "Banco do Brasil",
+    "104": "Caixa", "077": "Inter", "756": "Sicoob", "208": "BTG Pactual",
+  };
+  return map[code] || `Banco ${code}`;
+}
+
 function Card({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--card)]">
@@ -103,8 +155,8 @@ function Card({ title, icon, children }: { title: string; icon: React.ReactNode;
 function Field({ label, children, mono = false }: { label: string; children: React.ReactNode; mono?: boolean }) {
   return (
     <div className="flex items-start justify-between gap-3 border-b border-[var(--border)]/50 py-1.5 last:border-b-0">
-      <span className="text-[11px] uppercase tracking-wide text-[var(--muted-foreground)]">{label}</span>
-      <span className={mono ? "font-mono text-[11px] text-[var(--foreground)] break-all text-right" : "text-xs text-[var(--foreground)] text-right"}>{children}</span>
+      <span className="text-[11px] text-[var(--muted-foreground)]">{label}</span>
+      <span className={mono ? "font-mono text-[11px] text-[var(--foreground)] break-all text-right" : "text-xs font-medium text-[var(--foreground)] text-right"}>{children}</span>
     </div>
   );
 }

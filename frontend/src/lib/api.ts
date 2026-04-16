@@ -197,8 +197,12 @@ export interface ValidationResult {
 }
 
 export const SUPPORTED_BANKS = [
-  { code: "341", name: "Itaú Unibanco", auth: "OAUTH2_MTLS", hasSFTP: true, logo: "itau" },
-  { code: "077", name: "Banco Inter", auth: "OAUTH2_CERT", hasSFTP: false, logo: "inter" },
-  { code: "237", name: "Bradesco", auth: "OAUTH2_CERT", hasSFTP: true, logo: "bradesco" },
-  { code: "104", name: "Caixa Econômica", auth: "CERTIFICATE_A1", hasSFTP: true, logo: "caixa" },
+  { code: "341", name: "Itaú Unibanco", auth: "OAUTH2_MTLS", hasSFTP: true },
+  { code: "237", name: "Bradesco", auth: "OAUTH2_CERT", hasSFTP: true },
+  { code: "033", name: "Santander", auth: "OAUTH2_CERT", hasSFTP: true },
+  { code: "001", name: "Banco do Brasil", auth: "OAUTH2_CERT", hasSFTP: true },
+  { code: "104", name: "Caixa Econômica", auth: "CERTIFICATE_A1", hasSFTP: true },
+  { code: "077", name: "Banco Inter", auth: "OAUTH2_CERT", hasSFTP: false },
+  { code: "756", name: "Sicoob", auth: "OAUTH2_CERT", hasSFTP: true },
+  { code: "208", name: "BTG Pactual", auth: "OAUTH2_CERT", hasSFTP: false },
 ] as const;

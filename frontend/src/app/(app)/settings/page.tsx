@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Palette, Building, KeyRound, Link2, Plus, X, Copy, Check, Shield, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Mail } from "lucide-react";
+import { Palette, Building, KeyRound, Link2, Plus, X, Copy, Check, Shield, AlertTriangle, CheckCircle2, RefreshCw, Trash2, Mail, Upload } from "lucide-react";
 import { api, type PayerAccount, type BankConnection, type Branding, SUPPORTED_BANKS } from "@/lib/api";
 import { PageHeader } from "@/components/ui-custom/page-header";
 import { LoadingBlock } from "@/components/ui-custom/loading";
@@ -81,6 +81,7 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
   const [slug, setSlug] = useState("");
   const [primary, setPrimary] = useState("#143573");
   const [accent, setAccent] = useState("#1e4ea8");
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -101,17 +102,65 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
 
   if (!branding) return <LoadingBlock label="Carregando..." />;
 
+  function handleLogoUpload() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg,image/svg+xml,image/webp";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { alert("A logo deve ter no máximo 2MB"); return; }
+      const reader = new FileReader();
+      reader.onload = () => setLogoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
   return (
     <div className="max-w-lg space-y-5">
-      <Card title="Identidade visual" icon={<Palette size={14} />}>
-        <Field label="Subdomínio">
-          <div className="flex items-center gap-0">
-            <input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className={inputCls + " rounded-r-none"} placeholder="minha-empresa" />
-            <span className="inline-flex items-center rounded-r-lg border border-l-0 border-[var(--border)] bg-[var(--muted)] px-3 py-2 text-[11px] text-[var(--muted-foreground)]">.paymentshub.doublethree.com.br</span>
+      <Card title="Sua marca" icon={<Palette size={14} />}>
+        {/* Logo */}
+        <Field label="Logo da empresa">
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--muted)]">
+              {logoPreview ? (
+                <img src={logoPreview} alt="Logo" className="h-full w-full object-contain p-1" />
+              ) : (
+                <Upload size={16} className="text-[var(--muted-foreground)]" />
+              )}
+            </div>
+            <div>
+              <button onClick={handleLogoUpload} className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-1.5 text-xs font-semibold text-[var(--foreground)] hover:bg-[var(--muted)]">
+                {logoPreview ? "Trocar logo" : "Enviar logo"}
+              </button>
+              <p className="mt-1 text-[10px] text-[var(--muted-foreground)]">PNG, JPG, SVG ou WebP · Até 2MB</p>
+            </div>
           </div>
         </Field>
+
+        {/* Preview da sidebar com logo */}
+        {logoPreview && (
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)] p-3">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Preview na sidebar</p>
+            <div className="flex items-center gap-2">
+              <img src={logoPreview} alt="Logo" className="h-7 w-7 rounded-md object-contain" />
+              <span className="text-sm font-semibold text-[var(--foreground)]">Sua Empresa</span>
+            </div>
+          </div>
+        )}
+
+        {/* Subdomínio */}
+        <Field label="Endereço do sistema">
+          <div className="flex items-center gap-0">
+            <input value={slug} onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className={inputCls + " rounded-r-none"} placeholder="minha-empresa" />
+            <span className="inline-flex items-center rounded-r-lg border border-l-0 border-[var(--border)] bg-[var(--muted)] px-2 py-2 text-[10px] text-[var(--muted-foreground)]">.paymentshub.doublethree.com.br</span>
+          </div>
+        </Field>
+
+        {/* Cores */}
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Cor primária">
+          <Field label="Cor principal">
             <div className="flex items-center gap-2">
               <input type="color" value={primary} onChange={(e) => setPrimary(e.target.value)} className="h-9 w-9 cursor-pointer rounded-lg border border-[var(--border)]" />
               <input value={primary} onChange={(e) => setPrimary(e.target.value)} className={inputCls} />
@@ -124,13 +173,23 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
             </div>
           </Field>
         </div>
-        <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--muted)] p-3">
-          <p className="text-[11px] text-[var(--muted-foreground)]">Preview do endereço:</p>
-          <p className="mt-1 font-mono text-sm font-semibold" style={{ color: primary }}>
-            {slug || "slug"}.paymentshub.doublethree.com.br
-          </p>
+
+        {/* Preview */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)] p-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Preview</p>
+          <div className="mt-2 flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full" style={{ background: primary }} />
+            <span className="font-mono text-xs font-semibold" style={{ color: primary }}>
+              {slug || "slug"}.paymentshub.doublethree.com.br
+            </span>
+          </div>
+          <div className="mt-1.5 flex gap-2">
+            <div className="rounded-md px-3 py-1 text-[10px] font-bold text-white" style={{ background: primary }}>Botão primário</div>
+            <div className="rounded-md px-3 py-1 text-[10px] font-bold text-white" style={{ background: accent }}>Botão destaque</div>
+          </div>
         </div>
-        <button onClick={save} disabled={busy} className="mt-3 rounded-lg bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-4 py-2 text-xs font-semibold text-white disabled:opacity-60">
+
+        <button onClick={save} disabled={busy} className="mt-3 w-full rounded-lg bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-60">
           {busy ? "Salvando..." : "Salvar marca"}
         </button>
       </Card>
