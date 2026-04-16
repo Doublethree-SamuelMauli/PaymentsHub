@@ -756,7 +756,7 @@ function Pricing() {
     {
       name: "Grátis",
       price: "R$ 0",
-      cadence: "por 5 dias",
+      cadence: "por 30 dias",
       desc: "Tudo que você precisa para testar e começar a operar. Sem compromisso.",
       features: [
         "Até 100 pagamentos/mês",
