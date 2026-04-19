@@ -1,4 +1,5 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const MOCK_MODE = API_BASE === "mock" || process.env.NEXT_PUBLIC_MOCK === "1";
 
 export type Role = "admin" | "approver" | "operator" | "viewer";
 
@@ -43,6 +44,13 @@ class ApiClient {
   }
 
   private async request<T>(method: string, path: string, body?: unknown, extra?: Record<string, string>): Promise<T> {
+    if (MOCK_MODE) {
+      // Writes in mock mode: acknowledge and return a plausible shape without
+      // hitting a backend. GET requests in mock mode go through the dedicated
+      // listX/getX methods that import ./mock directly.
+      await new Promise((r) => setTimeout(r, 300 + Math.random() * 400));
+      return { id: `mock-${Date.now()}`, ok: true } as unknown as T;
+    }
     const headers: Record<string, string> = { "Content-Type": "application/json", ...extra };
     const token = this.getToken();
     if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -66,6 +74,25 @@ class ApiClient {
   delete<T>(p: string) { return this.request<T>("DELETE", p); }
 
   async login(email: string, password: string) {
+    if (MOCK_MODE) {
+      const role: Role = email.startsWith("admin")
+        ? "admin"
+        : email.startsWith("approver")
+        ? "approver"
+        : email.startsWith("operator")
+        ? "operator"
+        : "viewer";
+      const user: User = {
+        id: "mock-user",
+        email,
+        name: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        role,
+        client_id: "mock-tenant",
+      };
+      this.setToken(`mock-token-${Date.now()}`);
+      this.setUser(user);
+      return { token: this.getToken()!, user };
+    }
     const res = await this.request<{ token: string; user: User }>("POST", "/v1/auth/login", { email, password });
     this.setToken(res.token); this.setUser(res.user);
     return res;
@@ -76,11 +103,23 @@ class ApiClient {
   }
 
   // Payments
-  listPayments(status?: string) {
+  async listPayments(status?: string): Promise<Payment[]> {
+    if (MOCK_MODE) {
+      const { mockPayments } = await import("./mock");
+      const all = mockPayments();
+      if (status && status !== "ALL") return all.filter((p) => p.status === status);
+      return all;
+    }
     const q = status && status !== "ALL" ? `?status=${status}&limit=200` : "?limit=200";
     return this.get<Payment[]>(`/v1/payments${q}`);
   }
-  getPayment(id: string) { return this.get<PaymentDetail>(`/v1/payments/${id}`); }
+  async getPayment(id: string): Promise<PaymentDetail> {
+    if (MOCK_MODE) {
+      const { mockPaymentDetail } = await import("./mock");
+      return mockPaymentDetail(id);
+    }
+    return this.get<PaymentDetail>(`/v1/payments/${id}`);
+  }
   createPayment(data: CreatePaymentInput) {
     return this.post<Payment>("/v1/payments", data, { "Idempotency-Key": crypto.randomUUID() });
   }
@@ -90,7 +129,13 @@ class ApiClient {
   reschedulePayment(id: string, new_date: string, reason: string) { return this.post(`/v1/payments/${id}/reschedule`, { new_date, reason }); }
 
   // Runs
-  listRuns() { return this.get<Run[]>("/v1/runs"); }
+  async listRuns(): Promise<Run[]> {
+    if (MOCK_MODE) {
+      const { mockRuns } = await import("./mock");
+      return mockRuns();
+    }
+    return this.get<Run[]>("/v1/runs");
+  }
   getRun(id: string) { return this.get<Run>(`/v1/runs/${id}`); }
   listRunPayments(id: string) { return this.get<Payment[]>(`/v1/runs/${id}/payments`); }
   createRun(run_date: string) { return this.post<Run>("/v1/runs", { run_date }); }
@@ -99,20 +144,44 @@ class ApiClient {
   submitRun(id: string) { return this.post(`/v1/runs/${id}/submit-to-bank`); }
 
   // Admin
-  listPayerAccounts() { return this.get<PayerAccount[]>("/v1/admin/payer-accounts"); }
-  listBeneficiaries() { return this.get<Beneficiary[]>("/v1/admin/beneficiaries"); }
+  async listPayerAccounts(): Promise<PayerAccount[]> {
+    if (MOCK_MODE) {
+      const { mockPayerAccounts } = await import("./mock");
+      return mockPayerAccounts();
+    }
+    return this.get<PayerAccount[]>("/v1/admin/payer-accounts");
+  }
+  async listBeneficiaries(): Promise<Beneficiary[]> {
+    if (MOCK_MODE) {
+      const { mockBeneficiaries } = await import("./mock");
+      return mockBeneficiaries();
+    }
+    return this.get<Beneficiary[]>("/v1/admin/beneficiaries");
+  }
   createBeneficiary(data: Record<string, unknown>) { return this.post<{ id: string }>("/v1/admin/beneficiaries", data); }
   addPixKey(benId: string, data: Record<string, unknown>) { return this.post(`/v1/admin/beneficiaries/${benId}/pix-keys`, data); }
   createPayerAccount(data: Record<string, unknown>) { return this.post<{ id: string }>("/v1/admin/payer-accounts", data); }
   createApiKey(label: string, scopes: string[]) { return this.post<{ id: string; token: string }>("/v1/admin/api-keys", { label, scopes }); }
 
   // Settings — branding
-  getBranding() { return this.get<Branding>("/v1/settings/branding"); }
+  async getBranding(): Promise<Branding> {
+    if (MOCK_MODE) {
+      const { mockBranding } = await import("./mock");
+      return mockBranding();
+    }
+    return this.get<Branding>("/v1/settings/branding");
+  }
   updateBranding(data: Partial<Branding>) { return this.patch("/v1/settings/branding", data); }
   completeOnboarding() { return this.post("/v1/settings/onboarding/complete", {}); }
 
   // Settings — bank connections
-  listBankConnections() { return this.get<BankConnection[]>("/v1/settings/bank-connections"); }
+  async listBankConnections(): Promise<BankConnection[]> {
+    if (MOCK_MODE) {
+      const { mockBankConnections } = await import("./mock");
+      return mockBankConnections();
+    }
+    return this.get<BankConnection[]>("/v1/settings/bank-connections");
+  }
   createBankConnection(data: CreateBankConnectionInput) { return this.post<BankConnection>("/v1/settings/bank-connections", data); }
   getBankConnection(id: string) { return this.get<BankConnection>(`/v1/settings/bank-connections/${id}`); }
   updateBankConnection(id: string, data: CreateBankConnectionInput) { return this.patch(`/v1/settings/bank-connections/${id}`, data); }
@@ -120,7 +189,13 @@ class ApiClient {
   deleteBankConnection(id: string) { return this.delete(`/v1/settings/bank-connections/${id}`); }
 
   // Users (admin)
-  listUsers() { return this.get<UserItem[]>("/v1/users"); }
+  async listUsers(): Promise<UserItem[]> {
+    if (MOCK_MODE) {
+      const { mockUsers } = await import("./mock");
+      return mockUsers();
+    }
+    return this.get<UserItem[]>("/v1/users");
+  }
   createUser(data: { email: string; name: string; role: string; password: string }) {
     return this.post<{ id: string }>("/v1/users", data);
   }
