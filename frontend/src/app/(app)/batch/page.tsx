@@ -23,6 +23,8 @@ import { LoadingBlock } from "@/components/ui-custom/loading";
 import { EmptyState } from "@/components/ui-custom/empty-state";
 import { CreatePaymentModal } from "@/components/payments/create-payment-modal";
 import { AttachPaymentsModal } from "@/components/payments/attach-payments-modal";
+import { useToast } from "@/components/ui-custom/toast";
+import { useConfirm } from "@/components/ui-custom/confirm-dialog";
 import { cn } from "@/lib/utils";
 
 type ActionKind = "hold" | "reject" | "reschedule" | null;
@@ -38,12 +40,13 @@ export default function BatchPage() {
 function BatchContent() {
   const sp = useSearchParams();
   const initialRun = sp.get("run");
+  const toast = useToast();
+  const confirm = useConfirm();
   const [runs, setRuns] = useState<Run[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(initialRun);
   const [payments, setPayments] = useState<Payment[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showAttach, setShowAttach] = useState(false);
 
@@ -76,11 +79,6 @@ function BatchContent() {
   const canSubmit = api.roleCovers("approver");
   const canOperate = api.roleCovers("operator");
 
-  function flash(msg: string) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  }
-
   async function reload() {
     await loadRuns();
     if (selectedId) {
@@ -91,26 +89,58 @@ function BatchContent() {
 
   async function handleApprove() {
     if (!selected) return;
+    const ok = await confirm({
+      title: "Aprovar este lote?",
+      description: (
+        <>
+          Você vai aprovar <strong className="text-[var(--foreground)]">{selected.total_items}</strong>{" "}
+          pagamentos (<strong className="text-[var(--foreground)]">{formatCompactBRL(selected.total_amount_cents)}</strong>).
+          Após a aprovação o lote fica pronto para envio ao banco.
+        </>
+      ),
+      confirmLabel: "Aprovar lote",
+      tone: "success",
+    });
+    if (!ok) return;
     setBusy(true); setErr(null);
     try {
       await api.approveRun(selected.id);
-      flash("Lote aprovado com sucesso");
+      toast.success("Lote aprovado", `${selected.total_items} pagamentos prontos para envio.`);
       await reload();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Falha ao aprovar");
+      const msg = e instanceof Error ? e.message : "Falha ao aprovar";
+      setErr(msg);
+      toast.error("Falha ao aprovar", msg);
     } finally { setBusy(false); }
   }
 
   async function handleSubmit() {
     if (!selected) return;
-    if (!confirm("Submeter este lote ao banco? Esta ação é irreversível.")) return;
+    const ok = await confirm({
+      title: "Enviar este lote ao banco?",
+      description: (
+        <>
+          Esta ação é <strong className="text-red-300">irreversível</strong>. O PaymentsHub vai disparar PIX via REST
+          e TED via CNAB 240 para <strong className="text-[var(--foreground)]">{selected.total_items}</strong> pagamentos
+          totalizando <strong className="text-[var(--foreground)]">{formatCompactBRL(selected.total_amount_cents)}</strong>.
+          <br /><br />
+          Depois do envio, cancelamentos dependem do banco e do horário do SPI/SPB.
+        </>
+      ),
+      confirmLabel: "Enviar ao banco",
+      tone: "destructive",
+      typeToConfirm: "ENVIAR",
+    });
+    if (!ok) return;
     setBusy(true); setErr(null);
     try {
       await api.submitRun(selected.id);
-      flash("Lote submetido ao banco");
+      toast.success("Lote enviado ao banco", "Você vai receber webhooks conforme os retornos chegarem.");
       await reload();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Falha ao submeter");
+      const msg = e instanceof Error ? e.message : "Falha ao enviar";
+      setErr(msg);
+      toast.error("Falha ao enviar", msg);
     } finally { setBusy(false); }
   }
 
@@ -119,11 +149,13 @@ function BatchContent() {
     try {
       const today = new Date().toISOString().slice(0, 10);
       const run = await api.createRun(today);
-      flash("Lote do dia criado");
+      toast.success("Lote do dia criado", "Agora anexe pagamentos PREVALIDATED a ele.");
       await loadRuns();
       setSelectedId(run.id);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Falha ao criar lote");
+      const msg = e instanceof Error ? e.message : "Falha ao criar lote";
+      setErr(msg);
+      toast.error("Falha ao criar lote", msg);
     } finally { setBusy(false); }
   }
 
@@ -153,13 +185,8 @@ function BatchContent() {
         )}
       />
 
-      {toast && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400">
-          <CheckCircle2 size={14} /> {toast}
-        </div>
-      )}
       {err && (
-        <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400">
+        <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
           <AlertCircle size={14} className="mt-0.5" /> {err}
         </div>
       )}
@@ -391,7 +418,7 @@ function BatchContent() {
           payment={action.payment}
           onClose={() => setAction({ kind: null, payment: null })}
           onDone={async (msg) => {
-            flash(msg);
+            toast.success(msg);
             setAction({ kind: null, payment: null });
             await reload();
           }}
@@ -402,7 +429,7 @@ function BatchContent() {
         <CreatePaymentModal
           onClose={() => setShowCreate(false)}
           onCreated={async (n) => {
-            flash(`${n} pagamento${n !== 1 ? "s" : ""} criado${n !== 1 ? "s" : ""}`);
+            toast.success("Pagamentos criados", `${n} ${n !== 1 ? "itens adicionados" : "item adicionado"} ao sistema.`);
             setShowCreate(false);
             await reload();
           }}
@@ -414,7 +441,7 @@ function BatchContent() {
           runId={selected.id}
           onClose={() => setShowAttach(false)}
           onDone={async (n) => {
-            flash(`${n} pagamento${n !== 1 ? "s" : ""} anexado${n !== 1 ? "s" : ""} ao lote`);
+            toast.success("Pagamentos anexados", `${n} ${n !== 1 ? "itens foram" : "item foi"} anexados ao lote.`);
             setShowAttach(false);
             await reload();
           }}

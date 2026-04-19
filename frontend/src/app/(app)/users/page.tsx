@@ -6,6 +6,8 @@ import { api, type UserItem } from "@/lib/api";
 import { PageHeader } from "@/components/ui-custom/page-header";
 import { LoadingBlock } from "@/components/ui-custom/loading";
 import { EmptyState } from "@/components/ui-custom/empty-state";
+import { useToast } from "@/components/ui-custom/toast";
+import { useConfirm } from "@/components/ui-custom/confirm-dialog";
 import { formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +19,8 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export default function UsersPage() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [list, setList] = useState<UserItem[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -28,13 +32,34 @@ export default function UsersPage() {
   useEffect(load, []);
 
   async function changeRole(id: string, role: string) {
-    try { await api.updateUserRole(id, role); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Erro"); }
+    try {
+      await api.updateUserRole(id, role);
+      toast.success("Papel atualizado", `Agora este usuário é ${ROLE_LABEL[role] || role}.`);
+      load();
+    } catch (e) {
+      toast.error("Falha ao alterar papel", e instanceof Error ? e.message : "Erro");
+    }
   }
-  async function deactivate(id: string) {
-    if (!confirm("Desativar este usuário?")) return;
-    try { await api.deactivateUser(id); load(); }
-    catch (e) { alert(e instanceof Error ? e.message : "Erro"); }
+  async function deactivate(user: UserItem) {
+    const ok = await confirm({
+      title: "Desativar este usuário?",
+      description: (
+        <>
+          <strong className="text-[var(--foreground)]">{user.name}</strong> perderá acesso imediato.
+          Você pode reativar a conta depois.
+        </>
+      ),
+      confirmLabel: "Desativar",
+      tone: "destructive",
+    });
+    if (!ok) return;
+    try {
+      await api.deactivateUser(user.id);
+      toast.success("Usuário desativado", `${user.email} não poderá mais entrar no sistema.`);
+      load();
+    } catch (e) {
+      toast.error("Falha ao desativar", e instanceof Error ? e.message : "Erro");
+    }
   }
 
   return (
@@ -108,7 +133,7 @@ export default function UsersPage() {
                         </button>
                         {u.active && (
                           <button
-                            onClick={() => deactivate(u.id)}
+                            onClick={() => deactivate(u)}
                             className="rounded-md p-1.5 text-red-600 transition hover:bg-red-50 dark:hover:bg-red-950/40"
                             title="Desativar"
                           >
@@ -168,14 +193,21 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
 }
 
 function ResetPasswordModal({ user, onClose }: { user: UserItem; onClose: () => void }) {
+  const toast = useToast();
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   async function submit() {
     setBusy(true); setErr(null);
-    try { await api.resetUserPassword(user.id, pw); onClose(); alert("Senha alterada"); }
-    catch (e) { setErr(e instanceof Error ? e.message : "Erro"); }
+    try {
+      await api.resetUserPassword(user.id, pw);
+      toast.success("Senha alterada", `Avise ${user.name} para entrar com a nova senha.`);
+      onClose();
+    }
+    catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro");
+    }
     finally { setBusy(false); }
   }
   return (

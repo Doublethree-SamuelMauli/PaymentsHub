@@ -75,13 +75,13 @@ class ApiClient {
 
   async login(email: string, password: string) {
     if (MOCK_MODE) {
-      const role: Role = email.startsWith("admin")
-        ? "admin"
-        : email.startsWith("approver")
+      const role: Role = email.startsWith("approver")
         ? "approver"
         : email.startsWith("operator")
         ? "operator"
-        : "viewer";
+        : email.startsWith("viewer")
+        ? "viewer"
+        : "admin"; // default (demo@, admin@, any unknown) gets full access
       const user: User = {
         id: "mock-user",
         email,

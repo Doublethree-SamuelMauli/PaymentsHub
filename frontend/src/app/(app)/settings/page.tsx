@@ -5,6 +5,8 @@ import { Palette, Building, KeyRound, Link2, Plus, X, Copy, Check, Shield, Alert
 import { api, type PayerAccount, type BankConnection, type Branding, SUPPORTED_BANKS } from "@/lib/api";
 import { PageHeader } from "@/components/ui-custom/page-header";
 import { LoadingBlock } from "@/components/ui-custom/loading";
+import { useToast } from "@/components/ui-custom/toast";
+import { useConfirm } from "@/components/ui-custom/confirm-dialog";
 import { BankConnectionForm } from "@/components/settings/bank-connection-form";
 import { cn } from "@/lib/utils";
 
@@ -32,10 +34,6 @@ export default function SettingsPage() {
   const [branding, setBranding] = useState<Branding | null>(null);
   const [banks, setBanks] = useState<BankConnection[] | null>(null);
   const [accounts, setAccounts] = useState<PayerAccount[] | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
-
-  function flash(msg: string) { setToast(msg); setTimeout(() => setToast(null), 3000); }
 
   useEffect(() => {
     api.getBranding().then(setBranding).catch(() => {});
@@ -47,12 +45,6 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <PageHeader title="Configurações" description="Marca, conexões bancárias, contas pagadoras e chaves de API." />
 
-      {toast && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400">
-          <CheckCircle2 size={14} /> {toast}
-        </div>
-      )}
-
       <div className="flex gap-1 overflow-x-auto border-b border-[var(--border)] pb-px">
         {TABS.map((t) => (
           <button
@@ -60,7 +52,7 @@ export default function SettingsPage() {
             onClick={() => setTab(t.id)}
             className={cn(
               "inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2.5 text-xs font-semibold transition",
-              tab === t.id ? "border-[#1e4ea8] text-[var(--foreground)]" : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+              tab === t.id ? "border-[var(--brand-cyan)] text-[var(--foreground)]" : "border-transparent text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
             )}
           >
             {t.icon} {t.label}
@@ -68,16 +60,17 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {tab === "branding" && <BrandingTab branding={branding} onSaved={(b) => { setBranding(b); flash("Marca atualizada"); }} />}
-      {tab === "banks" && <BanksTab banks={banks} onRefresh={() => api.listBankConnections().then(setBanks)} flash={flash} />}
-      {tab === "accounts" && <AccountsTab accounts={accounts} onRefresh={() => api.listPayerAccounts().then(setAccounts)} flash={flash} />}
-      {tab === "apikeys" && <ApiKeysTab flash={flash} />}
+      {tab === "branding" && <BrandingTab branding={branding} onSaved={setBranding} />}
+      {tab === "banks" && <BanksTab banks={banks} onRefresh={() => api.listBankConnections().then(setBanks)} />}
+      {tab === "accounts" && <AccountsTab accounts={accounts} onRefresh={() => api.listPayerAccounts().then(setAccounts)} />}
+      {tab === "apikeys" && <ApiKeysTab />}
     </div>
   );
 }
 
 /* ─── Branding Tab ─── */
 function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved: (b: Branding) => void }) {
+  const logoToast = useToast();
   const [slug, setSlug] = useState("");
   const [primary, setPrimary] = useState("#143573");
   const [accent, setAccent] = useState("#1e4ea8");
@@ -97,7 +90,10 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
     try {
       await api.updateBranding({ slug, primary_color: primary, accent_color: accent });
       onSaved({ ...branding!, slug, primary_color: primary, accent_color: accent });
-    } catch {} finally { setBusy(false); }
+      logoToast.success("Marca salva", "Novo branding aplicado neste tenant.");
+    } catch (e) {
+      logoToast.error("Falha ao salvar", e instanceof Error ? e.message : "Tente novamente.");
+    } finally { setBusy(false); }
   }
 
   if (!branding) return <LoadingBlock label="Carregando..." />;
@@ -109,7 +105,7 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
     input.onchange = () => {
       const file = input.files?.[0];
       if (!file) return;
-      if (file.size > 2 * 1024 * 1024) { alert("A logo deve ter no máximo 2MB"); return; }
+      if (file.size > 2 * 1024 * 1024) { logoToast?.error("Logo muito grande", "Tamanho máximo: 2MB."); return; }
       const reader = new FileReader();
       reader.onload = () => setLogoPreview(reader.result as string);
       reader.readAsDataURL(file);
@@ -198,30 +194,51 @@ function BrandingTab({ branding, onSaved }: { branding: Branding | null; onSaved
 }
 
 /* ─── Banks Tab ─── */
-function BanksTab({ banks, onRefresh, flash }: { banks: BankConnection[] | null; onRefresh: () => void; flash: (m: string) => void }) {
+function BanksTab({ banks, onRefresh }: { banks: BankConnection[] | null; onRefresh: () => void; flash?: (m: string) => void }) {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [showAdd, setShowAdd] = useState(false);
   const [validating, setValidating] = useState<string | null>(null);
 
-  async function validate(id: string) {
-    setValidating(id);
+  async function validate(conn: BankConnection) {
+    setValidating(conn.id);
     try {
-      const res = await api.validateBankConnection(id);
-      if (res.status === "active") flash("Conexão bancária validada!");
-      else if (res.error === "max_attempts_reached") flash("Limite de tentativas — contate contato@doublethree.com.br");
-      else flash(res.message || res.error || "Falha na validação");
+      const res = await api.validateBankConnection(conn.id);
+      if (res.status === "active") {
+        toast.success("Conexão validada", `Handshake OAuth2 + mTLS com ${conn.bank_name} concluído.`);
+      } else if (res.error === "max_attempts_reached") {
+        toast.warning("Limite de tentativas", "Contate contato@doublethree.com.br para liberar.");
+      } else {
+        toast.error("Validação falhou", res.message || res.error || "Credenciais recusadas pelo banco.");
+      }
     } catch (e) {
-      flash(e instanceof Error ? e.message : "Erro na validação");
+      toast.error("Erro na validação", e instanceof Error ? e.message : "Erro desconhecido");
     } finally {
       setValidating(null);
       onRefresh();
     }
   }
 
-  async function remove(id: string) {
-    if (!confirm("Remover esta conexão bancária?")) return;
-    await api.deleteBankConnection(id);
-    onRefresh();
-    flash("Conexão removida");
+  async function remove(conn: BankConnection) {
+    const ok = await confirm({
+      title: "Remover conexão bancária?",
+      description: (
+        <>
+          Credenciais e certificados do <strong className="text-[var(--foreground)]">{conn.bank_name}</strong> ({conn.bank_code})
+          serão apagados. Pagamentos já enviados ao banco não são afetados.
+        </>
+      ),
+      confirmLabel: "Remover",
+      tone: "destructive",
+    });
+    if (!ok) return;
+    try {
+      await api.deleteBankConnection(conn.id);
+      toast.success("Conexão removida", `Credenciais do ${conn.bank_name} foram apagadas.`);
+      onRefresh();
+    } catch (e) {
+      toast.error("Falha ao remover", e instanceof Error ? e.message : "Erro");
+    }
   }
 
   if (!banks) return <LoadingBlock label="Carregando..." />;
@@ -264,10 +281,10 @@ function BanksTab({ banks, onRefresh, flash }: { banks: BankConnection[] | null;
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-bold", st.bg, st.text)}>{st.label}</span>
-                    <button onClick={() => validate(bc.id)} disabled={validating === bc.id} className="rounded-md p-1.5 text-[#1e4ea8] hover:bg-[var(--muted)]" title="Validar">
+                    <button onClick={() => validate(bc)} disabled={validating === bc.id} className="rounded-md p-1.5 text-[var(--brand-cyan)] hover:bg-[color-mix(in_srgb,var(--brand-cyan)_10%,transparent)]" title="Validar">
                       <RefreshCw size={13} className={validating === bc.id ? "animate-spin" : ""} />
                     </button>
-                    <button onClick={() => remove(bc.id)} className="rounded-md p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40" title="Remover">
+                    <button onClick={() => remove(bc)} className="rounded-md p-1.5 text-red-400 hover:bg-red-500/10" title="Remover">
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -293,7 +310,7 @@ function BanksTab({ banks, onRefresh, flash }: { banks: BankConnection[] | null;
       {showAdd && (
         <BankConnectionForm
           onClose={() => setShowAdd(false)}
-          onCreated={() => { setShowAdd(false); onRefresh(); flash("Banco adicionado — valide as credenciais."); }}
+          onCreated={() => { setShowAdd(false); onRefresh(); toast.info("Banco adicionado", "Clique em validar para testar as credenciais com o banco."); }}
         />
       )}
     </div>
@@ -301,7 +318,8 @@ function BanksTab({ banks, onRefresh, flash }: { banks: BankConnection[] | null;
 }
 
 /* ─── Accounts Tab ─── */
-function AccountsTab({ accounts, onRefresh, flash }: { accounts: PayerAccount[] | null; onRefresh: () => void; flash: (m: string) => void }) {
+function AccountsTab({ accounts, onRefresh }: { accounts: PayerAccount[] | null; onRefresh: () => void }) {
+  const toast = useToast();
   const [showCreate, setShowCreate] = useState(false);
 
   if (!accounts) return <LoadingBlock label="Carregando..." />;
@@ -331,13 +349,14 @@ function AccountsTab({ accounts, onRefresh, flash }: { accounts: PayerAccount[] 
           ))}
         </ul>
       )}
-      {showCreate && <CreateAccountModal onClose={() => setShowCreate(false)} onCreated={() => { setShowCreate(false); onRefresh(); flash("Conta criada"); }} />}
+      {showCreate && <CreateAccountModal onClose={() => setShowCreate(false)} onCreated={() => { setShowCreate(false); onRefresh(); toast.success("Conta criada", "Agora você pode selecioná-la ao criar pagamentos."); }} />}
     </div>
   );
 }
 
 /* ─── API Keys Tab ─── */
-function ApiKeysTab({ flash }: { flash: (m: string) => void }) {
+function ApiKeysTab() {
+  const toast = useToast();
   const [showCreate, setShowCreate] = useState(false);
   const [newToken, setNewToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -356,7 +375,7 @@ function ApiKeysTab({ flash }: { flash: (m: string) => void }) {
       {showCreate && (
         <CreateApiKeyModal
           onClose={() => setShowCreate(false)}
-          onCreated={(token) => { setNewToken(token); flash("Chave criada"); }}
+          onCreated={(token) => { setNewToken(token); toast.success("Chave criada", "Copie o token agora — ele não será mostrado novamente."); }}
           token={newToken}
           copied={copied}
           onCopy={() => { if (newToken) { navigator.clipboard.writeText(newToken); setCopied(true); setTimeout(() => setCopied(false), 2000); } }}
