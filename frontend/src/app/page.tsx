@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
   Check,
@@ -21,22 +21,151 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setLoaded(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
   return (
     <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] dark">
       <div className="backdrop-hero" aria-hidden />
-      <Header />
-      <main>
-        <Hero />
-        <StatsStrip />
-        <Pipeline />
-        <FeaturesBento />
-        <DashboardShowcase />
-        <SecurityBanner />
-        <Pricing />
-        <FAQ />
-        <CTA />
-      </main>
-      <Footer />
+      <PageLoader hidden={loaded} />
+      <ScrollProgress />
+      <div
+        className={`transition-opacity duration-700 ${loaded ? "opacity-100" : "opacity-0"}`}
+      >
+        <Header />
+        <main>
+          <Hero />
+          <Reveal><StatsStrip /></Reveal>
+          <Reveal><Pipeline /></Reveal>
+          <Reveal><FeaturesBento /></Reveal>
+          <Reveal><DashboardShowcase /></Reveal>
+          <Reveal><SecurityBanner /></Reveal>
+          <Reveal><Pricing /></Reveal>
+          <Reveal><FAQ /></Reveal>
+          <Reveal><CTA /></Reveal>
+        </main>
+        <Footer />
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────── Page loader ────────────────────────────── */
+function PageLoader({ hidden }: { hidden: boolean }) {
+  return (
+    <div
+      aria-hidden={hidden}
+      className={`fixed inset-0 z-[200] flex items-center justify-center bg-[var(--background)] transition-opacity duration-700 ${
+        hidden ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
+    >
+      <div className="backdrop-hero" />
+      <div className="relative flex flex-col items-center gap-6">
+        <div className="relative h-20 w-20">
+          <div className="absolute inset-0 rounded-full border-2 border-[var(--border)]" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[var(--brand-cyan)] border-r-[var(--brand-glow)] animate-spin" />
+          <div
+            className="absolute inset-2 rounded-full"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 30%, var(--brand-glow) 0%, var(--brand-primary) 55%, var(--brand-deep) 100%)",
+              boxShadow:
+                "0 0 40px -4px color-mix(in srgb, var(--brand-glow) 60%, transparent)",
+            }}
+          />
+          <svg viewBox="0 0 24 24" fill="none" className="absolute inset-6 text-white/95" aria-hidden>
+            <path
+              d="M6 12l4 4 8-10"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <div className="font-display text-[14px] font-medium tracking-wide text-[var(--muted-foreground)]">
+          <span className="gradient-text">Carregando PaymentsHub</span>
+          <span className="loader-dots" aria-hidden />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────── Scroll progress bar ────────────────────────────── */
+function ScrollProgress() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    function onScroll() {
+      const h = document.documentElement;
+      const scrolled = h.scrollTop;
+      const max = h.scrollHeight - h.clientHeight;
+      setPct(max > 0 ? (scrolled / max) * 100 : 0);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+  return (
+    <div
+      aria-hidden
+      className="fixed inset-x-0 top-0 z-[120] h-[2px] origin-left"
+      style={{
+        transform: `scaleX(${pct / 100})`,
+        background:
+          "linear-gradient(90deg, var(--brand-glow) 0%, var(--brand-cyan) 50%, var(--brand-emerald) 100%)",
+        boxShadow: "0 0 10px color-mix(in srgb, var(--brand-cyan) 60%, transparent)",
+        transition: "transform 0.12s ease-out",
+      }}
+    />
+  );
+}
+
+/* ────────────────────────────── Reveal on scroll ────────────────────────────── */
+function Reveal({
+  children,
+  delay = 0,
+  y = 28,
+}: {
+  children: ReactNode;
+  delay?: number;
+  y?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.unobserve(el);
+        }
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -80px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div
+      ref={ref}
+      style={{
+        transform: visible ? "translate3d(0,0,0)" : `translate3d(0,${y}px,0)`,
+        opacity: visible ? 1 : 0,
+        filter: visible ? "blur(0)" : "blur(6px)",
+        transition: `opacity 900ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 900ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, filter 700ms ease ${delay}ms`,
+        willChange: "opacity, transform, filter",
+      }}
+    >
+      {children}
     </div>
   );
 }
@@ -142,12 +271,7 @@ function Hero() {
       <div className="mx-auto max-w-7xl px-7">
         <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
           <div>
-            <Badge>
-              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--brand-cyan)] shadow-[0_0_8px_var(--brand-cyan)]" />
-              Live • SISPAG 341 + PIX DICT
-            </Badge>
-
-            <h1 className="mt-6 font-display text-[clamp(40px,6vw,76px)] font-semibold leading-[0.98] tracking-[-0.035em]">
+            <h1 className="font-display text-[clamp(40px,6vw,76px)] font-semibold leading-[0.98] tracking-[-0.035em]">
               <span className="line-through decoration-[2px] decoration-red-500/60 text-[var(--muted-foreground)]">
                 Aprovar no banco
               </span>
@@ -189,13 +313,6 @@ function Hero() {
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--brand-cyan)_25%,transparent)] bg-[color-mix(in_srgb,var(--brand-cyan)_8%,transparent)] px-3 py-1.5 font-mono text-[11px] font-medium tracking-[0.04em] text-[var(--brand-cyan)]">
-      {children}
-    </span>
-  );
-}
 function TrustRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2">
