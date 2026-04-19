@@ -61,11 +61,13 @@ func Decode(raw []byte) (*Return, error) {
 	return ret, nil
 }
 
-// OccurrenceVerdict maps an Itaú occurrence code to OK/REJECT/WARN.
+// OccurrenceVerdict maps an Itaú occurrence code to OK/REJECT/WARN using the
+// SISPAG occurrence table. Unknown codes fall through to REJECT so that the
+// caller always has a human-readable reason to surface to operators.
 func OccurrenceVerdict(codes string) (verdict, reason string) {
-	trimmed := strings.TrimSpace(codes)
-	if trimmed == "" || trimmed == "BD" || trimmed == "00" {
+	occ := LookupOccurrence(codes)
+	if occ.Verdict == "OK" {
 		return "OK", ""
 	}
-	return "REJECT", "occurrence=" + trimmed
+	return occ.Verdict, occ.Code + ": " + occ.Description
 }

@@ -5,686 +5,348 @@ import { useState } from "react";
 import {
   ArrowRight,
   Check,
-  ChevronDown,
-  Calendar,
   ShieldCheck,
+  Zap,
   Layers,
-  Sparkles,
   Lock,
-  Play,
+  Activity,
+  Users,
+  Building2,
+  FileText,
+  Bell,
+  ChevronDown,
+  GitBranch,
+  Fingerprint,
+  Radio,
 } from "lucide-react";
-import { Logo } from "@/components/brand/logo";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { ScrollReveal, Parallax, StaggerChildren } from "@/components/motion/scroll-reveal";
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[var(--background)]">
+    <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] dark">
+      <div className="backdrop-hero" aria-hidden />
       <Header />
-      <Hero />
-      <LogosBar />
-      <ProblemSolution />
-      <Features />
-      <DashboardPreview />
-      <Pricing />
-      <FAQ />
-      <CTA />
+      <main>
+        <Hero />
+        <StatsStrip />
+        <Pipeline />
+        <FeaturesBento />
+        <DashboardShowcase />
+        <SecurityBanner />
+        <Pricing />
+        <FAQ />
+        <CTA />
+      </main>
       <Footer />
     </div>
   );
 }
 
-/* ---------- Header ---------- */
+/* ────────────────────────────── Header ────────────────────────────── */
 function Header() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border)]/50 bg-[var(--background)]/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
-        <Logo size="md" />
+    <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_70%,transparent)] backdrop-blur-xl backdrop-saturate-150">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-7 py-3.5">
+        <Link href="/" className="inline-flex items-center gap-2.5 font-display font-semibold">
+          <BrandMark />
+          <span className="text-[15px] tracking-tight">
+            Payments<span className="text-[var(--brand-cyan)]">Hub</span>
+          </span>
+        </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          <NavMenu
-            label="Produto"
-            items={[
-              ["Funcionalidades", "#features"],
-              ["Para quem é", "#solutions"],
-              ["Segurança", "#security"],
-            ]}
-          />
-          <NavLink href="#pricing">Preços</NavLink>
+          <NavLink href="#produto">Produto</NavLink>
+          <NavLink href="#bancos">Bancos</NavLink>
+          <NavLink href="#preco">Preços</NavLink>
           <NavLink href="#faq">FAQ</NavLink>
           <NavLink href="/docs">API</NavLink>
-          <NavLink href="/about">Sobre</NavLink>
         </nav>
 
         <div className="flex items-center gap-2">
-          <ThemeToggle className="hidden sm:inline-flex" />
           <Link
             href="/login"
-            className="hidden rounded-full px-3 py-2 text-xs font-semibold text-[var(--muted-foreground)] transition hover:text-[var(--foreground)] sm:inline-flex"
+            className="hidden rounded-full px-3 py-2 text-[13px] font-medium text-[var(--muted-foreground)] transition hover:text-[var(--foreground)] sm:inline-flex"
           >
             Entrar
           </Link>
-          <Link
-            href="#demo"
-            className="group relative inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-4 py-2 text-xs font-semibold text-white shadow-[0_8px_24px_-8px_rgba(20,53,115,0.55)] transition hover:shadow-[0_8px_30px_-8px_rgba(20,53,115,0.75)]"
-          >
+          <Link href="#demo" className="btn-glow inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px]">
             Agendar demo
-            <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+            <ArrowRight size={14} />
           </Link>
           <button
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md md:hidden"
             onClick={() => setOpen((v) => !v)}
-            aria-label="Menu"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--foreground)] md:hidden"
+            aria-label="menu"
           >
-            <ChevronDown size={16} className={open ? "rotate-180 transition" : "transition"} />
+            <ChevronDown size={18} className={open ? "rotate-180 transition" : "transition"} />
           </button>
         </div>
       </div>
       {open && (
-        <div className="border-t border-[var(--border)] bg-[var(--card)] px-6 py-3 md:hidden">
-          <a href="#features" className="block py-1.5 text-sm text-[var(--foreground)]">Funcionalidades</a>
-          <a href="#pricing" className="block py-1.5 text-sm text-[var(--foreground)]">Preços</a>
-          <a href="#faq" className="block py-1.5 text-sm text-[var(--foreground)]">FAQ</a>
-          <Link href="/login" className="block py-1.5 text-sm text-[var(--foreground)]">Entrar</Link>
+        <div className="border-t border-[var(--border)] md:hidden">
+          <div className="mx-auto flex max-w-7xl flex-col gap-1 px-7 py-4">
+            <MobileLink href="#produto">Produto</MobileLink>
+            <MobileLink href="#bancos">Bancos</MobileLink>
+            <MobileLink href="#preco">Preços</MobileLink>
+            <MobileLink href="#faq">FAQ</MobileLink>
+            <MobileLink href="/docs">API</MobileLink>
+            <MobileLink href="/login">Entrar</MobileLink>
+          </div>
         </div>
       )}
     </header>
   );
 }
 
-function NavLink({ href, children, external }: { href: string; children: React.ReactNode; external?: boolean }) {
+function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <a
+    <Link
       href={href}
-      target={external ? "_blank" : undefined}
-      className="rounded-full px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+      className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[var(--muted-foreground)] transition hover:bg-[color-mix(in_srgb,var(--foreground)_5%,transparent)] hover:text-[var(--foreground)]"
     >
       {children}
-    </a>
+    </Link>
+  );
+}
+function MobileLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className="rounded-md px-3 py-2.5 text-[14px] font-medium text-[var(--foreground)]">
+      {children}
+    </Link>
   );
 }
 
-function NavMenu({ label, items }: { label: string; items: [string, string][] }) {
-  const [open, setOpen] = useState(false);
+function BrandMark() {
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-[var(--muted-foreground)] transition hover:bg-[var(--muted)] hover:text-[var(--foreground)]">
-        {label} <ChevronDown size={12} />
-      </button>
-      {open && (
-        <div className="absolute left-0 top-full w-56 rounded-xl border border-[var(--border)] bg-[var(--card)] p-2 shadow-xl">
-          {items.map(([l, h]) => (
-            <a key={l} href={h} className="block rounded-md px-3 py-2 text-xs text-[var(--foreground)] hover:bg-[var(--muted)]">
-              {l}
-            </a>
-          ))}
-        </div>
-      )}
+    <div className="relative h-8 w-8">
+      <div
+        className="absolute inset-0 rounded-[9px]"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, var(--brand-glow) 0%, var(--brand-primary) 55%, var(--brand-deep) 100%)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.25), 0 0 20px -4px color-mix(in srgb, var(--brand-glow) 40%, transparent)",
+        }}
+      />
+      <svg viewBox="0 0 24 24" fill="none" className="absolute inset-1 text-white/95" aria-hidden>
+        <path d="M6 12l4 4 8-10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </div>
   );
 }
 
-/* ---------- Hero ---------- */
+/* ────────────────────────────── Hero ────────────────────────────── */
 function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      <Parallax speed={-0.08}><div className="glow-orb left-[-10%] top-[10%] h-[480px] w-[480px] bg-[#1e4ea8]" /></Parallax>
-      <Parallax speed={0.06}><div className="glow-orb right-[-15%] top-[-5%] h-[520px] w-[520px] bg-[#3b82f6]" /></Parallax>
-      <div className="noise" />
+    <section className="relative overflow-hidden pb-20 pt-20 md:pt-28">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+          <div>
+            <Badge>
+              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--brand-cyan)] shadow-[0_0_8px_var(--brand-cyan)]" />
+              Live • SISPAG 341 + PIX DICT
+            </Badge>
 
-      <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-balance mt-6 text-[28px] font-bold leading-[1.1] tracking-tight text-[var(--foreground)] sm:text-5xl md:text-6xl lg:text-7xl">
-            O fim da{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10 text-white">planilha</span>
-              <span className="absolute inset-x-[-4px] inset-y-[-2px] -z-0 -rotate-1 rounded-md bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
-            </span>
-            {" "}de pagamentos do dia a dia
-          </h1>
+            <h1 className="mt-6 font-display text-[clamp(40px,6vw,76px)] font-semibold leading-[0.98] tracking-[-0.035em]">
+              <span className="line-through decoration-[2px] decoration-red-500/60 text-[var(--muted-foreground)]">
+                Aprovar no banco
+              </span>
+              <br />
+              <span className="gradient-text">Orquestrar no hub.</span>
+            </h1>
 
-          <p className="text-pretty mx-auto mt-6 max-w-xl text-base leading-relaxed text-[var(--muted-foreground)] sm:text-lg">
-            Receba pagamentos do seu sistema, junte tudo em um lote diário,
-            aprove com 2 cliques e dispare PIX e TED para o banco — em uma única operação auditável.
-          </p>
+            <p className="mt-7 max-w-xl text-[17px] leading-[1.55] text-[var(--muted-foreground)]">
+              Envie, valide, aprove e envie ao banco —{" "}
+              <b className="font-semibold text-[var(--foreground)]">PIX, TED e lotes CNAB 240</b>, com assinatura
+              humana e retorno em tempo real. <b className="font-semibold text-[var(--foreground)]">Itaú, Bradesco, Santander, BB, Caixa, Inter, Sicoob, BTG.</b>
+            </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="#demo"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_-12px_rgba(20,53,115,0.65)] transition hover:shadow-[0_16px_40px_-12px_rgba(20,53,115,0.85)]"
-            >
-              Agendar demo de 20min
-              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
-            </a>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--card)] px-6 py-3.5 text-sm font-semibold text-[var(--foreground)] transition hover:border-[#1e4ea8]/50 hover:bg-[var(--muted)]"
-            >
-              <Play size={12} fill="currentColor" /> Ver ambiente demo
-            </Link>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="#demo" className="btn-glow inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14px]">
+                Começar grátis
+                <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/docs"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_60%,transparent)] px-6 py-3.5 text-[14px] font-semibold text-[var(--foreground)] transition hover:border-[var(--brand-cyan)] hover:text-[var(--brand-cyan)]"
+              >
+                Ver a API
+              </Link>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-6 border-t border-[var(--border)] pt-6 font-mono text-[12px] text-[var(--muted-foreground)]">
+              <TrustRow icon={<ShieldCheck size={14} />}>mTLS + OAuth2</TrustRow>
+              <TrustRow icon={<Lock size={14} />}>LGPD · FEBRABAN</TrustRow>
+              <TrustRow icon={<Radio size={14} />}>Webhooks HMAC</TrustRow>
+              <TrustRow icon={<Fingerprint size={14} />}>Auditoria imutável</TrustRow>
+            </div>
           </div>
 
-          <p className="mt-5 text-[11px] text-[var(--muted-foreground)]">
-            Sem cartão · Teste grátis em minutos · Funciona com o seu banco
-          </p>
-        </div>
-
-        {/* Desktop mockup */}
-        <div className="relative mx-auto mt-16 max-w-5xl">
-          <div className="absolute inset-x-10 -top-4 h-12 rounded-full bg-gradient-to-r from-[#143573]/40 to-[#1e4ea8]/40 blur-2xl" />
-          <ProductMockup />
-        </div>
-
-        {/* 2 phones flutuando — product photography style */}
-        <div className="relative mx-auto mt-14 flex justify-center px-4">
-          <div className="relative h-[440px] w-full max-w-[560px] sm:h-[520px] md:h-[580px]">
-            {/* Sombras difusas no chão */}
-            <div className="absolute bottom-[2%] left-[22%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(-5deg)" }} />
-            <div className="absolute bottom-[0%] right-[18%] h-[40px] w-[120px] rounded-[50%] bg-black/10 blur-xl sm:h-[50px] sm:w-[140px]" style={{ transform: "rotate(5deg)" }} />
-
-            {/* Phone esquerdo — foreground */}
-            <Parallax speed={0.04}>
-              <div
-                className="absolute left-[5%] top-[4%] z-20 sm:left-[10%]"
-                style={{ transform: "rotate(-5deg)", transformOrigin: "center bottom" }}
-              >
-                <ScrollReveal direction="left" delay={300} duration={900}>
-                  <PhoneMockup variant="list" size="lg" />
-                </ScrollReveal>
-              </div>
-            </Parallax>
-
-            {/* Phone direito — background */}
-            <Parallax speed={-0.03}>
-              <div
-                className="absolute right-[2%] top-[0%] z-10 sm:right-[8%]"
-                style={{ transform: "rotate(5deg) translateY(-10px)", transformOrigin: "center bottom" }}
-              >
-                <ScrollReveal direction="right" delay={500} duration={900}>
-                  <PhoneMockup variant="approve" size="lg" />
-                </ScrollReveal>
-              </div>
-            </Parallax>
-          </div>
+          <OrbitalFlow />
         </div>
       </div>
     </section>
   );
 }
 
-function ProductMockup() {
+function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-2 shadow-2xl shadow-[#143573]/10">
-      <div className="flex items-center gap-1.5 px-3 py-2">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-        <span className="ml-3 truncate text-[10px] text-[var(--muted-foreground)]">
-          paymentshub.app/batch
-        </span>
-      </div>
-      <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--background)]">
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
-          {/* fake sidebar */}
-          <div className="hidden border-r border-[var(--border)] bg-[var(--card)] p-3 sm:block">
-            <div className="mb-3 h-2.5 w-20 rounded bg-[var(--muted)]" />
-            {[
-              ["Dashboard", false],
-              ["Lote do Dia", true],
-              ["Pagamentos", false],
-              ["Beneficiários", false],
-              ["Relatórios", false],
-            ].map(([l, active], i) => (
-              <div
-                key={i}
-                className={`mb-1 flex items-center gap-2 rounded-md px-2 py-1.5 text-[10px] ${active
-                  ? "bg-gradient-to-r from-[#143573] to-[#1e4ea8] font-semibold text-white"
-                  : "text-[var(--muted-foreground)]"
-                  }`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${active ? "bg-white" : "bg-[var(--muted-foreground)]"}`} />
-                {l}
-              </div>
-            ))}
-          </div>
-          {/* fake content */}
-          <div className="p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-[var(--foreground)]">Lote do Dia · 15/abr</div>
-                <div className="mt-0.5 text-[10px] text-[var(--muted-foreground)]">42 pagamentos pendentes</div>
-              </div>
-              <div className="flex gap-1.5">
-                <span className="rounded-md bg-emerald-500/15 px-2 py-1 text-[9px] font-bold text-emerald-600">+ APROVAR LOTE</span>
-              </div>
-            </div>
-            <div className="mb-3 grid grid-cols-3 gap-2">
-              {[
-                ["Volume", "R$ 287k", "from-[#143573] to-[#1e4ea8]"],
-                ["PIX", "31", "from-emerald-400 to-teal-500"],
-                ["TED", "11", "from-amber-400 to-orange-500"],
-              ].map(([l, v, g], i) => (
-                <div key={i} className={`rounded-lg bg-gradient-to-br ${g} p-2 text-white`}>
-                  <div className="text-[8px] uppercase opacity-80">{l}</div>
-                  <div className="text-sm font-bold">{v}</div>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-1">
-              {[
-                ["INV-2841", "Tech Supply LTDA", "R$ 12.430,00", "PIX"],
-                ["INV-2842", "Logística Norte SA", "R$ 8.900,00", "TED"],
-                ["INV-2843", "Marketing Plus", "R$ 4.250,50", "PIX"],
-                ["INV-2844", "Cloud Services BR", "R$ 19.870,00", "PIX"],
-              ].map(([id, name, val, type], i) => (
-                <div key={i} className="flex items-center justify-between rounded-md border border-[var(--border)] bg-[var(--card)] px-2.5 py-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[9px] text-[#1e4ea8]">{id}</span>
-                    <span className="text-[10px] text-[var(--foreground)]">{name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-semibold text-[var(--foreground)]">{val}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[8px] font-bold ${type === "PIX" ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600"}`}>
-                      {type}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+    <span className="inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--brand-cyan)_25%,transparent)] bg-[color-mix(in_srgb,var(--brand-cyan)_8%,transparent)] px-3 py-1.5 font-mono text-[11px] font-medium tracking-[0.04em] text-[var(--brand-cyan)]">
+      {children}
+    </span>
+  );
+}
+function TrustRow({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[var(--brand-emerald)]">{icon}</span>
+      {children}
     </div>
   );
 }
 
-/* ---------- Phone Mockup ---------- */
-function PhoneMockup({ variant, size = "lg" }: { variant: "list" | "approve"; size?: "md" | "lg" }) {
-  // Aspect ratio iPhone 15 Pro: 71.6 x 146.6 mm ≈ 1:2.05
-  const w = size === "lg" ? "w-[220px] sm:w-[240px] md:w-[260px]" : "w-[190px] sm:w-[210px] md:w-[230px]";
+function OrbitalFlow() {
+  const banks = ["341 Itaú", "237 Bradesco", "001 BB", "033 Santander", "104 Caixa", "077 Inter"];
   return (
-    <div className={`${w} shrink-0`} style={{ aspectRatio: "1 / 2.05" }}>
+    <div className="relative ml-auto aspect-square w-full max-w-[560px]">
+      {/* Rings */}
+      <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[color-mix(in_srgb,var(--brand-glow)_22%,transparent)] orbit-rotate" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--border)]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-full -translate-x-1/2 -translate-y-1/2 rounded-full border border-dotted border-[var(--border)] orbit-rotate-slow" />
+
+      {/* Core */}
       <div
-        className="relative h-full w-full overflow-hidden"
+        className="absolute left-1/2 top-1/2 flex aspect-square w-[30%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
         style={{
-          borderRadius: "18% / 8.8%",
-          background: "linear-gradient(165deg, #2e3f65 0%, #1C2B45 25%, #15203a 55%, #1a2a4a 100%)",
+          background: "radial-gradient(circle at 30% 30%, #3b82f6 0%, #143573 55%, #0a1d44 100%)",
           boxShadow:
-            "0 30px 60px -15px rgba(0,0,0,0.35), " +
-            "0 15px 30px -10px rgba(20,53,115,0.25), " +
-            "inset 0 0.5px 0 rgba(255,255,255,0.12), " +
-            "inset 0 -0.5px 0 rgba(0,0,0,0.3)",
-          padding: "2.8%",
+            "0 0 0 1px rgba(96,165,250,0.3), 0 0 60px 12px rgba(59,130,246,0.35), inset 0 0 40px rgba(34,211,238,0.35), inset 0 2px 0 rgba(255,255,255,0.12)",
         }}
       >
-        {/* Side buttons — left (action + vol up + vol down) */}
-        <div className="absolute -left-[2px] top-[16%] h-[5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
-        <div className="absolute -left-[2px] top-[24%] h-[8.5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
-        <div className="absolute -left-[2px] top-[35%] h-[8.5%] w-[2.5px] rounded-l-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
-        {/* Side button — right (power) */}
-        <div className="absolute -right-[2px] top-[27%] h-[11%] w-[2.5px] rounded-r-[2px]" style={{ background: "linear-gradient(180deg, #3a4d73, #253756)" }} />
+        <svg viewBox="0 0 48 48" className="h-[52%] w-[52%] text-white/95" fill="none" aria-hidden>
+          <path
+            d="M8 24l8 8 24-28"
+            stroke="currentColor"
+            strokeWidth="4.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </svg>
+      </div>
 
-        {/* Screen — black bezel then display */}
-        <div
-          className="relative h-full w-full overflow-hidden bg-black"
-          style={{ borderRadius: "16% / 7.8%", padding: "1.5px" }}
-        >
+      {/* Bank nodes */}
+      {banks.map((bank, i) => {
+        const angle = (i / banks.length) * Math.PI * 2 - Math.PI / 2;
+        const r = 42;
+        const x = 50 + Math.cos(angle) * r;
+        const y = 50 + Math.sin(angle) * r;
+        return (
           <div
-            className="relative h-full w-full overflow-hidden bg-[var(--background)]"
-            style={{ borderRadius: "15.5% / 7.5%" }}
+            key={bank}
+            className="surface-glass absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full px-3.5 py-1.5 font-mono text-[11px] font-medium shadow-[0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+            style={{ left: `${x}%`, top: `${y}%` }}
           >
-            {/* Dynamic Island */}
-            <div className="absolute left-1/2 top-[1.5%] z-10 -translate-x-1/2">
-              <div className="h-[3.2%] rounded-full bg-black" style={{ width: "28%", minWidth: 56, minHeight: 12 }}>
-                <div className="flex h-full items-center justify-end pr-[4px]">
-                  <div className="h-[6px] w-[6px] rounded-full bg-[#1a1a2e]/60" />
-                </div>
-              </div>
-            </div>
-
-            {/* Status bar */}
-            <div className="relative flex items-center justify-between px-[10%] pt-[4%]">
-              <span className="text-[8px] font-semibold tracking-tight text-[var(--foreground)]">9:41</span>
-              <div className="flex items-center gap-1">
-                {/* Signal */}
-                <div className="flex items-end gap-[1.5px]">
-                  {[3, 5, 7, 9].map((h, i) => (
-                    <div key={i} className="w-[2px] rounded-[0.5px] bg-[var(--foreground)]" style={{ height: h }} />
-                  ))}
-                </div>
-                {/* WiFi dots */}
-                <div className="flex items-end gap-[1px]">
-                  <div className="h-[3px] w-[3px] rounded-full bg-[var(--foreground)]" />
-                  <div className="h-[5px] w-[2px] rounded-t-full bg-[var(--foreground)]" />
-                  <div className="h-[7px] w-[2px] rounded-t-full bg-[var(--foreground)]" />
-                </div>
-                {/* Battery */}
-                <div className="flex items-center">
-                  <div className="flex h-[7px] w-[16px] items-center rounded-[2px] border border-[var(--foreground)]/40 px-[1px]">
-                    <div className="h-[4px] flex-1 rounded-[1px] bg-emerald-500" />
-                  </div>
-                  <div className="h-[3px] w-[1px] rounded-r-full bg-[var(--foreground)]/40" />
-                </div>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="px-[6%] pb-[8%] pt-[3%]">
-              {variant === "list" ? <PhoneListContent /> : <PhoneApproveContent />}
-            </div>
-
-            {/* Home indicator */}
-            <div className="absolute bottom-[1.5%] left-1/2 -translate-x-1/2">
-              <div className="h-[4px] w-[44px] rounded-full bg-[var(--foreground)]/15" />
-            </div>
+            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[var(--brand-emerald)] shadow-[0_0_8px_var(--brand-emerald)]" />
+            <span className="text-[var(--brand-cyan)]">{bank.split(" ")[0]}</span>
+            <span className="ml-1.5 text-[var(--foreground)]">{bank.split(" ").slice(1).join(" ")}</span>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 }
 
-function PhoneListContent() {
+/* ────────────────────────────── Stats ────────────────────────────── */
+function StatsStrip() {
+  const stats = [
+    { k: "8", s: "bancos", l: "Integrações nativas" },
+    { k: "<120", s: "ms", l: "Latência média PIX" },
+    { k: "99.98", s: "%", l: "Uptime 90d" },
+    { k: "240", s: "", l: "Colunas CNAB FEBRABAN" },
+  ];
   return (
-    <div className="flex h-full flex-col">
-      {/* App header */}
-      <div className="mb-2 flex items-center gap-1.5">
-        <div className="flex h-[16px] w-[16px] items-center justify-center rounded-md bg-gradient-to-br from-[#143573] to-[#1e4ea8]">
-          <Check size={8} className="text-white" />
-        </div>
-        <span className="text-[8px] font-bold tracking-tight text-[var(--foreground)]">PaymentsHub</span>
-      </div>
-      {/* Page title */}
-      <div className="mb-2 flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-bold text-[var(--foreground)]">Lote do Dia</p>
-          <p className="text-[6px] text-[var(--muted-foreground)]">16 abr · 14 pagamentos</p>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[5px] font-bold text-emerald-600">ABERTO</span>
-        </div>
-      </div>
-      {/* Stats */}
-      <div className="mb-2 grid grid-cols-3 gap-[3px]">
-        {[
-          ["R$ 65k", "Volume", "from-[#143573] to-[#1e4ea8]"],
-          ["10", "PIX", "from-emerald-500 to-emerald-700"],
-          ["4", "TED", "from-amber-500 to-amber-700"],
-        ].map(([v, l, g], i) => (
-          <div key={i} className={`overflow-hidden rounded-lg bg-gradient-to-br ${g} p-[5px] text-white`}>
-            <div className="text-[4.5px] font-semibold uppercase tracking-wider opacity-75">{l}</div>
-            <div className="text-[10px] font-extrabold leading-none">{v}</div>
-          </div>
-        ))}
-      </div>
-      {/* Payments list */}
-      <div className="flex-1 space-y-[2px]">
-        {[
-          ["NF-005", "Tech Supply LTDA", "2.500,00", true, "approved"],
-          ["NF-007", "Logística Norte", "1.250,00", true, "pending"],
-          ["NF-006", "Infra Corp ME", "7.800,00", false, "approved"],
-          ["NF-012", "Marketing Plus", "9.500,00", true, "review"],
-          ["NF-020", "Metal BR Ind.", "5.600,00", false, "pending"],
-          ["NF-009", "Cloud Services BR", "18.000,00", false, "pending"],
-        ].map(([id, name, val, isPix, status], i) => (
-          <div key={i} className="flex items-center gap-[5px] rounded-[6px] border border-[var(--border)] bg-[var(--card)] p-[4px]">
-            {/* Checkbox */}
-            <div className={`flex h-[10px] w-[10px] shrink-0 items-center justify-center rounded-[3px] border ${i < 3 ? "border-[#1e4ea8] bg-[#1e4ea8]" : "border-[var(--border)]"}`}>
-              {i < 3 && <Check size={6} className="text-white" />}
+    <section className="mx-auto max-w-7xl px-7">
+      <div className="grid border-y border-[var(--border)] sm:grid-cols-2 md:grid-cols-4">
+        {stats.map((s, i) => (
+          <div
+            key={s.l}
+            className={`px-6 py-7 ${i !== stats.length - 1 ? "md:border-r" : ""} ${
+              i < 2 ? "border-b md:border-b-0" : ""
+            } border-[var(--border)]`}
+          >
+            <div className="font-display text-[44px] font-semibold leading-none tracking-[-0.03em]">
+              {s.k}
+              <span className="ml-1 text-[22px] text-[var(--brand-cyan)]">{s.s}</span>
             </div>
-            {/* Type badge */}
-            <div className={`flex h-[12px] w-[12px] shrink-0 items-center justify-center rounded-[3px] text-[4.5px] font-extrabold text-white ${isPix ? "bg-emerald-500" : "bg-amber-500"}`}>
-              {isPix ? "₱" : "T"}
-            </div>
-            {/* Info */}
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-mono text-[6px] font-bold text-[#1e4ea8]">{id}</p>
-              <p className="truncate text-[5px] text-[var(--muted-foreground)]">{name}</p>
-            </div>
-            {/* Amount + status */}
-            <div className="text-right">
-              <p className="text-[6.5px] font-bold tabular-nums text-[var(--foreground)]">R$ {val}</p>
-              <div className={`mt-[1px] rounded-full px-1 py-[0.5px] text-center text-[3.5px] font-bold ${
-                status === "approved" ? "bg-emerald-500/15 text-emerald-600" :
-                status === "review" ? "bg-amber-500/15 text-amber-600" :
-                "bg-[var(--muted)] text-[var(--muted-foreground)]"
-              }`}>
-                {status === "approved" ? "Aprovado" : status === "review" ? "Revisão" : "Pendente"}
-              </div>
+            <div className="mt-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]">
+              {s.l}
             </div>
           </div>
         ))}
-      </div>
-      {/* Total bar */}
-      <div className="mt-1.5 overflow-hidden rounded-lg border border-[var(--border)]">
-        <div className="flex items-center justify-between bg-gradient-to-r from-[#143573]/8 to-[#1e4ea8]/8 px-2 py-[5px]">
-          <span className="text-[5.5px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Total · 14 pgtos</span>
-          <span className="text-[8.5px] font-extrabold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
-        </div>
-      </div>
-      {/* Bottom nav */}
-      <div className="mt-2 flex items-center justify-around rounded-xl bg-[var(--muted)]/60 px-1 py-[5px]">
-        {[
-          ["Dashboard", false], ["Lote", true], ["Pgtos", false], ["Config", false],
-        ].map(([label, active], i) => (
-          <div key={i} className="flex flex-col items-center gap-[1px]">
-            <div className={`h-[3px] w-[3px] rounded-full ${active ? "bg-[#1e4ea8]" : "bg-transparent"}`} />
-            <span className={`text-[4.5px] font-semibold ${active ? "text-[#1e4ea8]" : "text-[var(--muted-foreground)]"}`}>{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PhoneApproveContent() {
-  return (
-    <div className="flex h-full flex-col">
-      {/* Back nav */}
-      <div className="mb-2 flex items-center gap-1">
-        <ArrowRight size={7} className="rotate-180 text-[#1e4ea8]" />
-        <span className="text-[6px] font-semibold text-[#1e4ea8]">Voltar</span>
-      </div>
-      {/* Hero icon */}
-      <div className="mb-2 text-center">
-        <div className="mx-auto mb-1.5 flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#143573] to-[#1e4ea8] shadow-[0_4px_12px_-3px_rgba(20,53,115,0.5)]">
-          <ShieldCheck size={18} className="text-white" />
-        </div>
-        <p className="text-[10px] font-bold text-[var(--foreground)]">Aprovar Lote</p>
-        <p className="text-[6px] text-[var(--muted-foreground)]">16 de abril de 2026</p>
-      </div>
-      {/* Summary card */}
-      <div className="mb-2 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
-        {[
-          ["Pagamentos", "14", null],
-          ["PIX", "10", "R$ 48.320,50"],
-          ["TED", "4", "R$ 16.680,00"],
-        ].map(([l, count, val], i) => (
-          <div key={i} className="flex items-center justify-between border-b border-[var(--border)] px-2 py-[4px] last:border-b-0">
-            <div className="flex items-center gap-1.5">
-              <div className={`h-[6px] w-[6px] rounded-full ${i === 0 ? "bg-[#1e4ea8]" : i === 1 ? "bg-emerald-500" : "bg-amber-500"}`} />
-              <span className="text-[6px] text-[var(--muted-foreground)]">{l}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[6.5px] font-bold tabular-nums text-[var(--foreground)]">{count}</span>
-              {val && <span className="text-[5.5px] tabular-nums text-[var(--muted-foreground)]">{val}</span>}
-            </div>
-          </div>
-        ))}
-        <div className="bg-gradient-to-r from-[#143573]/6 to-[#1e4ea8]/6 px-2 py-[5px]">
-          <div className="flex items-center justify-between">
-            <span className="text-[6px] font-extrabold uppercase tracking-wider text-[var(--foreground)]">Volume total</span>
-            <span className="text-[9px] font-extrabold tabular-nums text-[var(--foreground)]">R$ 65.000,50</span>
-          </div>
-        </div>
-      </div>
-      {/* Warning */}
-      <div className="mb-2 flex items-start gap-1.5 rounded-lg border border-amber-200 bg-amber-50 p-[6px] dark:border-amber-800 dark:bg-amber-950/40">
-        <div className="mt-[1px] text-[7px] text-amber-600">⚠</div>
-        <div>
-          <p className="text-[5.5px] font-bold text-amber-700 dark:text-amber-400">Ação irreversível</p>
-          <p className="text-[5px] leading-relaxed text-amber-600 dark:text-amber-400">Os pagamentos serão submetidos ao banco imediatamente.</p>
-        </div>
-      </div>
-      {/* Actions */}
-      <div className="space-y-[5px]">
-        <button className="flex w-full items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-[8px] text-[7.5px] font-bold text-white shadow-[0_4px_12px_-4px_rgba(16,185,129,0.5)]">
-          <Check size={9} strokeWidth={3} /> Confirmar aprovação
-        </button>
-        <button className="w-full rounded-xl border border-[var(--border)] bg-[var(--card)] py-[6px] text-[6.5px] font-semibold text-[var(--muted-foreground)]">
-          Cancelar
-        </button>
-      </div>
-      {/* Approver */}
-      <div className="mt-auto pt-2">
-        <div className="flex items-center gap-1.5 rounded-lg bg-[var(--muted)]/60 p-[6px]">
-          <div className="flex h-[16px] w-[16px] items-center justify-center rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8] text-[5px] font-bold text-white">SM</div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[6px] font-semibold text-[var(--foreground)]">Samuel Mauli</p>
-            <p className="truncate text-[5px] text-[var(--muted-foreground)]">Administrador</p>
-          </div>
-          <div className="h-[5px] w-[5px] rounded-full bg-emerald-500" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Logos bar ---------- */
-function LogosBar() {
-  const logos = ["Itaú", "Bradesco", "Santander", "BB", "Caixa", "Inter", "Sicoob", "BTG"];
-  return (
-    <section className="border-y border-[var(--border)] bg-[var(--card)] py-10">
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-6 text-center text-[11px] uppercase tracking-[0.2em] text-[var(--muted-foreground)]">
-          Integra com os principais bancos brasileiros
-        </p>
-        <div className="flex items-center justify-center gap-x-10 gap-y-4 flex-wrap opacity-70">
-          {logos.map((l) => (
-            <span key={l} className="text-xl font-bold tracking-tight text-[var(--muted-foreground)] grayscale transition hover:opacity-100 hover:text-[var(--foreground)]">
-              {l}
-            </span>
-          ))}
-        </div>
       </div>
     </section>
   );
 }
 
-/* ---------- Problem / Solution ---------- */
-function ProblemSolution() {
-  return (
-    <section id="solutions" className="mx-auto max-w-6xl px-6 py-24">
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-        <ScrollReveal direction="left">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">O problema</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Você ainda aprova<br />pagamentos um a um.
-          </h2>
-          <ul className="mt-6 space-y-3 text-sm text-[var(--muted-foreground)]">
-            {[
-              "Planilhas entre financeiro e diretoria",
-              "Aprovação por WhatsApp, sem trilha de auditoria",
-              "Erro de digitação já te custou algo?",
-              "Cada banco tem um portal — muito tempo gasto",
-            ].map((p) => (
-              <li key={p} className="flex items-start gap-2.5">
-                <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500">×</span>
-                {p}
-              </li>
-            ))}
-          </ul>
-        </ScrollReveal>
-        <ScrollReveal direction="right" delay={200}>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-500">A virada</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Um lote. Um clique.<br />Um relatório auditável.
-          </h2>
-          <ul className="mt-6 space-y-3 text-sm text-[var(--muted-foreground)]">
-            {[
-              "Nota fiscal, pedido de compra e quem aprovou — tudo junto",
-              "Workflow permissionado por níveis",
-              "Validação de PIX/TED antes de tocar o banco",
-              "Atualizações em tempo real",
-            ].map((p) => (
-              <li key={p} className="flex items-start gap-2.5">
-                <span className="mt-1 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
-                  <Check size={10} strokeWidth={3} />
-                </span>
-                {p}
-              </li>
-            ))}
-          </ul>
-        </ScrollReveal>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- Features ---------- */
-function Features() {
-  const features = [
+/* ────────────────────────────── Pipeline ────────────────────────────── */
+function Pipeline() {
+  const steps = [
     {
+      n: "01",
+      t: "Recebe do ERP",
+      d: "Ingressa PIX/TED via POST /v1/payments. Idempotency-Key. Validação local antes do DICT.",
+      icon: <FileText size={20} />,
+    },
+    {
+      n: "02",
+      t: "Pré-valida no banco",
+      d: "Consulta DICT (PIX) e contrato da conta (TED). Regras: lista suja, limite, duplicidade.",
       icon: <Layers size={20} />,
-      title: "Aprovação em lote",
-      desc: "Junte todos os pagamentos do dia e aprove de uma vez. Sem ficar clicando um por um no portal do banco.",
     },
     {
-      icon: <ShieldCheck size={20} />,
-      title: "Controle por perfil",
-      desc: "Quem cria não aprova. Quem aprova não configura. Cada pessoa com sua permissão, tudo registrado.",
+      n: "03",
+      t: "Humano aprova",
+      d: "Lote do dia com contagem, valor total e beneficiários. Aprovação com 2FA + auditoria imutável.",
+      icon: <Users size={20} />,
     },
     {
-      icon: <Sparkles size={20} />,
-      title: "PIX na hora",
-      desc: "Envia PIX direto do sistema e recebe confirmação em segundos. Sem precisar entrar no banco.",
-    },
-    {
-      icon: <Calendar size={20} />,
-      title: "TED sem complicação",
-      desc: "Acabou a era de gerar arquivo e fazer upload no portal. O sistema cuida de tudo pra você.",
-    },
-    {
-      icon: <Lock size={20} />,
-      title: "Segurança de banco",
-      desc: "Criptografia em todas as etapas. Seus dados protegidos com o padrão FEBRABAN.",
-    },
-    {
-      icon: <Play size={20} />,
-      title: "Teste antes de contratar",
-      desc: "Ambiente de demonstração pronto em minutos para você ver como funciona na prática.",
+      n: "04",
+      t: "Dispara ao banco",
+      d: "PIX por REST, TED/lote por CNAB 240 via SFTP. Callbacks + webhook HMAC para o seu ERP.",
+      icon: <Zap size={20} />,
     },
   ];
   return (
-    <section id="features" className="border-t border-[var(--border)] bg-[var(--card)] py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <ScrollReveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Funcionalidades</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-              Construído para times de finanças.<br />Vamos facilitar a vida de seus aprovadores?
-            </h2>
-            <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-              Chega de portal de banco. Seus pagamentos saem direto do sistema, com aprovação, rastreio e segurança.
-            </p>
-          </div>
-        </ScrollReveal>
-        <div className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--border)] sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f, i) => (
-            <ScrollReveal key={f.title} delay={i * 100} distance={20}>
-              <div className="group bg-[var(--card)] p-6 transition hover:bg-[var(--background)]">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8] transition group-hover:from-[#143573] group-hover:to-[#1e4ea8] group-hover:text-white">
-                  {f.icon}
-                </div>
-                <h3 className="mt-4 text-sm font-semibold text-[var(--foreground)]">{f.title}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted-foreground)]">{f.desc}</p>
+    <section id="produto" className="relative py-28">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="eyebrow mb-4">Como funciona</div>
+        <h2 className="font-display text-[clamp(32px,4vw,52px)] font-semibold leading-[1.05] tracking-[-0.03em]">
+          Do ERP ao banco,{" "}
+          <span className="gradient-cyan">quatro passos auditáveis.</span>
+        </h2>
+        <p className="mt-5 max-w-2xl text-[16px] leading-[1.6] text-[var(--muted-foreground)]">
+          Uma API limpa, regras declarativas, aprovação humana obrigatória. Tudo registrado e versionado.
+        </p>
+
+        <div className="relative mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="card-topline group relative overflow-hidden rounded-[18px] border border-[var(--border)] bg-gradient-to-b from-[color-mix(in_srgb,var(--card)_55%,transparent)] to-[color-mix(in_srgb,var(--background)_55%,transparent)] p-7 backdrop-blur-md"
+            >
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[12px] border border-[color-mix(in_srgb,var(--brand-glow)_25%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_18%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_12%,transparent)] text-[var(--brand-cyan)]">
+                {s.icon}
               </div>
-            </ScrollReveal>
+              <div className="font-mono text-[11px] tracking-[0.1em] text-[var(--brand-cyan)]">{s.n}</div>
+              <h3 className="mt-3 font-display text-[19px] font-semibold tracking-[-0.01em]">{s.t}</h3>
+              <p className="mt-2 text-[13px] leading-[1.55] text-[var(--muted-foreground)]">{s.d}</p>
+              {i < steps.length - 1 && (
+                <div className="absolute right-[-14px] top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--background)] text-[var(--brand-cyan)] lg:flex">
+                  <ArrowRight size={14} />
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -692,172 +354,545 @@ function Features() {
   );
 }
 
-/* ---------- Dashboard preview ---------- */
-function DashboardPreview() {
+/* ────────────────────────────── Features Bento ────────────────────────────── */
+function FeaturesBento() {
   return (
-    <section id="security" className="relative overflow-hidden py-24">
-      <div className="glow-orb right-[-10%] top-[20%] h-[400px] w-[400px] bg-[#1e4ea8] opacity-30" />
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Rastreio completo</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Informação sobre os acessos realizados no aplicativo
-          </h2>
-          <p className="mt-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
-            Cada pagamento tem um histórico completo: quem criou, quem aprovou,
-            quando foi enviado ao banco e quando caiu na conta. Tudo registrado
-            automaticamente — pronto para qualquer auditoria.
-          </p>
-          <ul className="mt-5 space-y-2 text-sm text-[var(--foreground)]">
-            {[
-              "Histórico completo de cada pagamento",
-              "Registro de quem aprovou e por quê",
-              "Dados protegidos com criptografia bancária",
-              "Relatórios prontos para auditoria e compliance",
-            ].map((p) => (
-              <li key={p} className="flex items-start gap-2"><Check size={14} className="mt-0.5 text-emerald-500" />{p}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-lg">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">Histórico</span>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-600">Pago</span>
-          </div>
-          <ol className="space-y-3">
-            {[
-              ["09:14", "Sistema", "Recebido", "pagamento chegou no sistema"],
-              ["09:14", "Sistema", "Validado", "dados conferidos automaticamente"],
-              ["09:32", "Carla Mendes", "Em revisão", "valor acima de R$ 10 mil"],
-              ["10:01", "Diretor financeiro", "Aprovado", "incluído no lote do dia"],
-              ["10:02", "Sistema", "Enviado ao banco", "PIX processado"],
-              ["10:02", "Banco", "Pago", "dinheiro na conta do fornecedor"],
-            ].map(([t, who, ev, note], i) => (
-              <li key={i} className="relative border-l-2 border-[#1e4ea8]/30 pl-4">
-                <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8]" />
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-semibold text-[var(--foreground)]">{ev}</span>
-                  <span className="text-[10px] text-[var(--muted-foreground)]">{t}</span>
-                </div>
-                <p className="text-[11px] text-[var(--muted-foreground)]">por {who} · {note}</p>
-              </li>
-            ))}
-          </ol>
+    <section id="bancos" className="relative py-24">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="eyebrow mb-4">Plataforma</div>
+        <h2 className="font-display text-[clamp(32px,4vw,52px)] font-semibold leading-[1.05] tracking-[-0.03em]">
+          <span className="gradient-cyan">Infra bancária</span>
+          <br />
+          pronta para produção.
+        </h2>
+
+        <div className="mt-14 grid auto-rows-[minmax(220px,auto)] grid-cols-2 gap-5 md:grid-cols-6">
+          {/* Live dashboard */}
+          <FeatureCard className="md:col-span-3 md:row-span-2">
+            <FeatureTag>Lote • lote-2026-04-19</FeatureTag>
+            <h3 className="mt-2 font-display text-[22px] font-semibold tracking-[-0.015em]">
+              Aprovação em tempo real
+            </h3>
+            <p className="text-[13px] leading-[1.6] text-[var(--muted-foreground)]">
+              Um só lote agrega PIX + TED. Aprove com um clique e monitore o retorno do banco linha a linha.
+            </p>
+            <MiniDashboard />
+          </FeatureCard>
+
+          {/* Latency */}
+          <FeatureCard className="md:col-span-3">
+            <FeatureTag>Latência · p95</FeatureTag>
+            <h3 className="mt-2 font-display text-[22px] font-semibold">118ms ponta a ponta</h3>
+            <p className="text-[13px] leading-[1.55] text-[var(--muted-foreground)]">
+              Retry exponencial, circuit breaker e token OAuth2 cache por pagador.
+            </p>
+            <LatencyWave />
+          </FeatureCard>
+
+          {/* Security */}
+          <FeatureCard className="md:col-span-3">
+            <FeatureTag>Segurança</FeatureTag>
+            <h3 className="mt-2 font-display text-[22px] font-semibold">Assinatura 2FA + mTLS</h3>
+            <p className="text-[13px] leading-[1.55] text-[var(--muted-foreground)]">
+              WebAuthn + TOTP nos operadores, mTLS nos bancos, HMAC nos webhooks.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2.5">
+              {["OAuth2", "mTLS", "HMAC", "WebAuthn", "LGPD", "FEBRABAN"].map((c) => (
+                <span
+                  key={c}
+                  className="rounded-lg border border-[color-mix(in_srgb,var(--brand-glow)_25%,transparent)] bg-[color-mix(in_srgb,var(--brand-glow)_8%,transparent)] px-3 py-1.5 font-mono text-[11px] font-medium text-[var(--brand-glow)]"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          </FeatureCard>
+
+          <FeatureCard className="md:col-span-2">
+            <FeatureIcon>
+              <GitBranch size={20} />
+            </FeatureIcon>
+            <FeatureTag>Webhooks</FeatureTag>
+            <h3 className="mt-1 font-display text-[18px] font-semibold">Eventos versionados</h3>
+            <p className="text-[12px] leading-[1.55] text-[var(--muted-foreground)]">
+              `payment.settled`, `batch.dispatched`, `webhook.retry` — HMAC + retries idempotentes.
+            </p>
+          </FeatureCard>
+
+          <FeatureCard className="md:col-span-2">
+            <FeatureIcon>
+              <Activity size={20} />
+            </FeatureIcon>
+            <FeatureTag>Observabilidade</FeatureTag>
+            <h3 className="mt-1 font-display text-[18px] font-semibold">Trace + audit imutável</h3>
+            <p className="text-[12px] leading-[1.55] text-[var(--muted-foreground)]">
+              Cada transição de estado vira evento append-only. Filtre por operador, banco ou retorno SISPAG.
+            </p>
+          </FeatureCard>
+
+          <FeatureCard className="md:col-span-2">
+            <FeatureIcon>
+              <Building2 size={20} />
+            </FeatureIcon>
+            <FeatureTag>Multi-tenant</FeatureTag>
+            <h3 className="mt-1 font-display text-[18px] font-semibold">Marca própria + SSO</h3>
+            <p className="text-[12px] leading-[1.55] text-[var(--muted-foreground)]">
+              Subdomínio customizado, branding, limites e políticas por cliente. SCIM + SSO (SAML/OIDC).
+            </p>
+          </FeatureCard>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------- Testimonials ---------- */
-/* ---------- Pricing ---------- */
+function FeatureCard({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-[20px] border border-[var(--border)] bg-gradient-to-b from-[color-mix(in_srgb,var(--card)_60%,transparent)] to-[color-mix(in_srgb,var(--background)_40%,transparent)] p-7 transition hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--foreground)_16%,transparent)] ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+function FeatureTag({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--brand-cyan)]">{children}</div>
+  );
+}
+function FeatureIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[12px] border border-[color-mix(in_srgb,var(--brand-glow)_25%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_20%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_14%,transparent)] text-[var(--brand-cyan)]">
+      {children}
+    </div>
+  );
+}
+
+function MiniDashboard() {
+  const rows = [
+    { code: "PAY-20281", name: "ACME Distribuidora", amount: "R$ 12.540,00", status: "SENT", variant: "sent" },
+    { code: "PAY-20280", name: "Cooperativa Agrária", amount: "R$ 8.900,00", status: "SETTLED", variant: "ok" },
+    { code: "PAY-20279", name: "Logística Atlas", amount: "R$ 3.420,18", status: "PENDING", variant: "wait" },
+    { code: "PAY-20278", name: "Gráfica Orion", amount: "R$ 1.960,00", status: "SETTLED", variant: "ok" },
+  ];
+  return (
+    <div className="mt-5 rounded-[14px] border border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_70%,transparent)] p-4 font-mono">
+      {rows.map((r, i) => (
+        <div
+          key={r.code}
+          className={`mt-1 flex items-center justify-between rounded-lg px-3 py-2.5 text-[12px] ${
+            i === 1
+              ? "border border-[color-mix(in_srgb,var(--brand-emerald)_25%,transparent)] bg-[color-mix(in_srgb,var(--brand-emerald)_8%,transparent)]"
+              : ""
+          }`}
+        >
+          <span className="text-[var(--brand-cyan)]">{r.code}</span>
+          <span className="truncate px-3 text-[var(--muted-foreground)]">{r.name}</span>
+          <span className="text-[var(--foreground)]">{r.amount}</span>
+          <StatusPill variant={r.variant as "ok" | "wait" | "sent"}>{r.status}</StatusPill>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StatusPill({ variant, children }: { variant: "ok" | "wait" | "sent"; children: React.ReactNode }) {
+  const cls = {
+    ok: "bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] text-[var(--brand-emerald)]",
+    wait: "bg-[color-mix(in_srgb,var(--brand-amber)_18%,transparent)] text-[var(--brand-amber)]",
+    sent: "bg-[color-mix(in_srgb,var(--brand-glow)_18%,transparent)] text-[var(--brand-glow)]",
+  }[variant];
+  return (
+    <span className={`ml-3 rounded-md px-2 py-0.5 text-[10px] font-semibold ${cls}`}>{children}</span>
+  );
+}
+
+function LatencyWave() {
+  // deterministic sparkline
+  const points = Array.from({ length: 40 }, (_, i) => {
+    const x = (i / 39) * 100;
+    const y = 50 + Math.sin(i * 0.6) * 14 + Math.cos(i * 0.25) * 6 - (i === 38 ? 12 : 0);
+    return `${x},${y}`;
+  }).join(" ");
+  return (
+    <div className="relative mt-5 h-28 overflow-hidden rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_60%,transparent)]">
+      <div className="pointer-events-none absolute inset-0 grid-bg opacity-50" />
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="wave-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--brand-cyan)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="var(--brand-cyan)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon
+          points={`0,100 ${points} 100,100`}
+          fill="url(#wave-grad)"
+        />
+        <polyline points={points} fill="none" stroke="var(--brand-cyan)" strokeWidth="1.2" />
+      </svg>
+      <div className="absolute left-3 top-3 flex gap-4 font-mono text-[10px] text-[var(--muted-foreground)]">
+        <span>
+          p50 <b className="font-medium text-[var(--brand-cyan)]">84ms</b>
+        </span>
+        <span>
+          p95 <b className="font-medium text-[var(--brand-cyan)]">118ms</b>
+        </span>
+        <span>
+          p99 <b className="font-medium text-[var(--brand-cyan)]">164ms</b>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ────────────────────────────── Dashboard showcase ────────────────────────────── */
+function DashboardShowcase() {
+  return (
+    <section id="demo" className="relative py-28">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
+          <div>
+            <div className="eyebrow mb-4">Console do tesoureiro</div>
+            <h2 className="font-display text-[clamp(32px,4vw,52px)] font-semibold leading-[1.05] tracking-[-0.03em]">
+              Um painel{" "}
+              <span className="gradient-cyan">que não é planilha.</span>
+            </h2>
+            <p className="mt-5 max-w-xl text-[16px] leading-[1.6] text-[var(--muted-foreground)]">
+              Veja o fluxo do dia, o total agregado, o status de cada pagamento. Aprove o lote, libere exceções, reconcilie o retorno. Tudo auditado.
+            </p>
+            <div className="mt-7 space-y-3">
+              {[
+                "Visão unificada PIX + TED + boleto",
+                "Filtros salvos por operador",
+                "Exportação CSV/Parquet e webhooks por estado",
+                "Timeline por pagamento, evento a evento",
+              ].map((f) => (
+                <div key={f} className="flex items-start gap-3 text-[14px] text-[var(--foreground)]">
+                  <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--brand-emerald)_18%,transparent)] text-[var(--brand-emerald)]">
+                    <Check size={12} />
+                  </span>
+                  {f}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DashboardMock />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DashboardMock() {
+  return (
+    <div
+      className="relative rounded-[24px] border border-[var(--border)] bg-gradient-to-b from-[color-mix(in_srgb,var(--brand-deep)_35%,transparent)] to-[color-mix(in_srgb,var(--background)_25%,transparent)] p-4 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6),0_0_120px_-40px_rgba(59,130,246,0.35)]"
+    >
+      <div className="flex items-center gap-3 px-3 pb-4 pt-2">
+        <div className="flex gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--border)]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--border)]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[var(--border)]" />
+        </div>
+        <div className="flex-1 rounded-lg border border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_60%,transparent)] px-3 py-1.5 text-center font-mono text-[11px] text-[var(--muted-foreground)]">
+          app.paymentshub.com.br/<b className="font-medium text-[var(--brand-cyan)]">runs/2026-04-19</b>
+        </div>
+      </div>
+
+      <div className="grid min-h-[520px] grid-cols-[220px_1fr] gap-4 rounded-[14px] border border-[var(--border)] bg-[var(--background)] p-4">
+        {/* Sidebar */}
+        <aside className="hidden text-[12px] md:block">
+          <div className="mb-4 flex items-center gap-2 border-b border-[var(--border)] pb-3 font-display font-semibold">
+            <BrandMark />
+            <span>
+              Payments<span className="text-[var(--brand-cyan)]">Hub</span>
+            </span>
+          </div>
+          <SideLabel>Operação</SideLabel>
+          <SideItem active icon={<Activity size={14} />}>Dashboard</SideItem>
+          <SideItem icon={<FileText size={14} />}>Pagamentos</SideItem>
+          <SideItem icon={<Layers size={14} />}>Lotes</SideItem>
+          <SideItem icon={<Users size={14} />}>Beneficiários</SideItem>
+          <SideLabel>Plataforma</SideLabel>
+          <SideItem icon={<Building2 size={14} />}>Bancos</SideItem>
+          <SideItem icon={<ShieldCheck size={14} />}>Auditoria</SideItem>
+          <SideItem icon={<Bell size={14} />}>Webhooks</SideItem>
+        </aside>
+
+        {/* Main */}
+        <main className="px-2">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h4 className="font-display text-[19px] font-semibold tracking-[-0.01em]">Lote do dia — 19 abr 2026</h4>
+              <p className="font-mono text-[11px] text-[var(--muted-foreground)]">
+                142 pagamentos · R$ 284.912,40 · 3 exigem revisão
+              </p>
+            </div>
+            <button className="btn-glow inline-flex items-center gap-2 rounded-full px-4 py-2 text-[12px]">
+              Aprovar lote <ArrowRight size={12} />
+            </button>
+          </div>
+
+          <div className="mb-4 grid grid-cols-2 gap-2.5 md:grid-cols-4">
+            <KPI label="PIX" value="98" delta="+12" />
+            <KPI label="TED" value="41" delta="+3" />
+            <KPI label="Revisão" value="3" delta="−2" highlight />
+            <KPI label="Total R$" value="284,9k" delta="+8.1%" />
+          </div>
+
+          <div className="mb-4 rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_30%,transparent)] p-4">
+            <div className="mb-2 flex gap-4 font-mono text-[10px] text-[var(--muted-foreground)]">
+              <LegendDot color="var(--brand-glow)">aprovados</LegendDot>
+              <LegendDot color="var(--brand-cyan)">enviados</LegendDot>
+              <LegendDot color="var(--brand-emerald)">liquidados</LegendDot>
+            </div>
+            <BarChart />
+          </div>
+
+          <div className="rounded-xl border border-[var(--border)] overflow-hidden">
+            <DashTableHeader />
+            <DashTableRow code="PAY-3102" who="ACME" bank="341" status="SETTLED" variant="ok" />
+            <DashTableRow code="PAY-3103" who="Cooperativa" bank="104" status="SENT" variant="sent" />
+            <DashTableRow code="PAY-3104" who="Orion" bank="077" status="REVIEW" variant="wait" />
+            <DashTableRow code="PAY-3105" who="Atlas" bank="237" status="APPROVED" variant="approved" />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+function SideLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="px-2 pb-1.5 pt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]/70">
+      {children}
+    </div>
+  );
+}
+function SideItem({
+  active,
+  icon,
+  children,
+}: {
+  active?: boolean;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`mb-0.5 flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[12px] ${
+        active
+          ? "border border-[color-mix(in_srgb,var(--brand-glow)_28%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,var(--brand-glow)_16%,transparent)] to-transparent text-[var(--foreground)]"
+          : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+      }`}
+    >
+      {icon}
+      {children}
+    </div>
+  );
+}
+function KPI({ label, value, delta, highlight }: { label: string; value: string; delta: string; highlight?: boolean }) {
+  return (
+    <div
+      className={`rounded-xl border p-3.5 ${
+        highlight
+          ? "border-[color-mix(in_srgb,var(--brand-glow)_35%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_15%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_10%,transparent)]"
+          : "border-[var(--border)] bg-gradient-to-b from-[color-mix(in_srgb,var(--card)_40%,transparent)] to-[color-mix(in_srgb,var(--background)_40%,transparent)]"
+      }`}
+    >
+      <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]">{label}</div>
+      <div className="mt-1 font-display text-[22px] font-semibold tracking-[-0.02em]">{value}</div>
+      <div className="mt-0.5 font-mono text-[10px] text-[var(--brand-emerald)]">{delta}</div>
+    </div>
+  );
+}
+function LegendDot({ color, children }: { color: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="h-2 w-2 rounded-sm" style={{ background: color }} />
+      {children}
+    </div>
+  );
+}
+function BarChart() {
+  const data = [40, 68, 56, 82, 72, 94, 78, 112, 96, 124, 108, 140];
+  const max = Math.max(...data);
+  return (
+    <div className="flex h-24 items-end gap-2">
+      {data.map((v, i) => (
+        <div key={i} className="flex-1 overflow-hidden rounded-sm" style={{ height: `${(v / max) * 100}%` }}>
+          <div className="h-full w-full bg-gradient-to-t from-[var(--brand-glow)] to-[var(--brand-cyan)] opacity-90" />
+        </div>
+      ))}
+    </div>
+  );
+}
+function DashTableHeader() {
+  return (
+    <div className="grid grid-cols-[1fr_1.2fr_60px_90px] items-center gap-3 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_25%,transparent)] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--muted-foreground)]">
+      <span>Código</span>
+      <span>Beneficiário</span>
+      <span>Banco</span>
+      <span>Status</span>
+    </div>
+  );
+}
+function DashTableRow({
+  code,
+  who,
+  bank,
+  status,
+  variant,
+}: {
+  code: string;
+  who: string;
+  bank: string;
+  status: string;
+  variant: "ok" | "sent" | "wait" | "approved";
+}) {
+  const cls = {
+    ok: "bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] text-[var(--brand-emerald)]",
+    sent: "bg-[color-mix(in_srgb,var(--brand-cyan)_15%,transparent)] text-[var(--brand-cyan)]",
+    wait: "bg-[color-mix(in_srgb,var(--brand-amber)_18%,transparent)] text-[var(--brand-amber)]",
+    approved: "bg-[color-mix(in_srgb,var(--brand-glow)_18%,transparent)] text-[var(--brand-glow)]",
+  }[variant];
+  return (
+    <div className="grid grid-cols-[1fr_1.2fr_60px_90px] items-center gap-3 border-b border-[var(--border)] px-4 py-2.5 font-mono text-[11.5px] last:border-b-0">
+      <span className="text-[var(--brand-cyan)]">{code}</span>
+      <span className="truncate text-[var(--foreground)]">{who}</span>
+      <span className="text-[var(--muted-foreground)]">{bank}</span>
+      <span className={`w-fit rounded-md px-2 py-0.5 text-[10px] font-semibold ${cls}`}>{status}</span>
+    </div>
+  );
+}
+
+/* ────────────────────────────── Security banner ────────────────────────────── */
+function SecurityBanner() {
+  return (
+    <section className="relative py-20">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="relative overflow-hidden rounded-[24px] border border-[var(--border)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-deep)_40%,transparent)] via-[color-mix(in_srgb,var(--background)_80%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_8%,transparent)] p-10 md:p-14">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[var(--brand-glow)] opacity-20 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[var(--brand-cyan)] opacity-15 blur-[100px]" />
+          <div className="relative grid gap-10 lg:grid-cols-[1fr_auto]">
+            <div>
+              <div className="eyebrow mb-4">Segurança primeiro</div>
+              <h3 className="max-w-2xl font-display text-[clamp(28px,3.4vw,42px)] font-semibold leading-[1.1] tracking-[-0.02em]">
+                Arquitetura zero-trust, auditoria imutável,{" "}
+                <span className="gradient-cyan">aprovação humana obrigatória.</span>
+              </h3>
+              <p className="mt-4 max-w-xl text-[15px] leading-[1.6] text-[var(--muted-foreground)]">
+                Separação de privilégios (operador × aprovador × admin), 2FA no envio, mTLS nos bancos e trilha de eventos append-only. Conformidade LGPD e melhores práticas FEBRABAN.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3 lg:grid-cols-2">
+              {["ISO 27001", "LGPD", "FEBRABAN", "PCI DSS", "SOC 2", "mTLS"].map((s) => (
+                <div
+                  key={s}
+                  className="flex aspect-square items-center justify-center rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_40%,transparent)] p-4 text-center font-mono text-[11px] font-medium text-[var(--muted-foreground)] backdrop-blur-sm"
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ────────────────────────────── Pricing ────────────────────────────── */
 function Pricing() {
   const plans = [
     {
       name: "Grátis",
       price: "R$ 0",
-      cadence: "por 30 dias",
-      desc: "Tudo que você precisa para testar e começar a operar. Sem compromisso.",
-      features: [
-        "Até 100 pagamentos/mês",
-        "1 banco conectado",
-        "PIX e TED automáticos",
-        "Aprovação pelo celular",
-        "Suporte por e-mail",
-        "Implantação: R$ 4.900",
-      ],
-      cta: "Criar conta grátis",
-      ctaLink: "#demo",
-      featured: false,
+      suffix: "/mês",
+      desc: "Para validar o fluxo. 30 dias sem cartão.",
+      cta: "Começar grátis",
+      features: ["Até 50 pagamentos/mês", "1 usuário", "1 banco conectado", "Auditoria básica"],
+      variant: "ghost",
     },
     {
       name: "Business",
       price: "R$ 97",
-      cadence: "/usuário/mês",
-      desc: "Para quem paga fornecedor todo dia. Vários bancos, sua marca, equipe inteira.",
+      suffix: "/usuário/mês",
+      desc: "Time financeiro completo. Setup R$ 4.900.",
+      cta: "Falar com vendas",
       features: [
-        "Adicione quantos usuários quiser · R$ 97/cada",
-        "Até 5.000 pagamentos/mês",
-        "Vários bancos (Itaú, Inter, Bradesco, Caixa)",
-        "Sua marca, suas cores, seu endereço",
-        "Recebe NF-e, pedidos, planilhas · Integrado ao seu ERP",
-        "Notificações em tempo real · Suporte 12h",
-        "Implantação: R$ 4.900",
+        "Pagamentos ilimitados",
+        "Multi-banco + CNAB 240",
+        "Aprovação com 2FA",
+        "Webhooks + API completa",
+        "SSO + SCIM",
+        "Suporte 9×5 em português",
       ],
-      cta: "Agendar demo",
-      ctaLink: "#demo",
-      featured: true,
+      variant: "featured",
     },
     {
       name: "Enterprise",
-      price: "Sob consulta",
-      cadence: "contrato anual",
-      desc: "Para grandes operações. Infraestrutura dedicada, suporte direto e integração sob medida.",
-      features: [
-        "Usuários ilimitados",
-        "Pagamentos ilimitados",
-        "Todos os bancos + integrações com seu sistema",
-        "Servidor exclusivo para sua empresa",
-        "Garantia de disponibilidade 99,95%",
-        "Gerente de conta dedicado",
-        "Implantação e migração sob consulta",
-      ],
-      cta: "Falar com vendas",
-      ctaLink: "#demo",
-      featured: false,
+      price: "Custom",
+      suffix: "",
+      desc: "SLA dedicado, marca própria, infra isolada.",
+      cta: "Conversar",
+      features: ["SLA 99.99%", "Infra dedicada", "Marca própria", "Suporte 24×7", "On-call + runbook"],
+      variant: "ghost",
     },
   ];
   return (
-    <section id="pricing" className="py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">Preços</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Planos que cabem na sua operação
-          </h2>
-          <p className="mt-4 text-sm text-[var(--muted-foreground)]">
-            Sem letra miúda, sem taxa por transação. O preço escala com volume, não com susto.
-          </p>
-        </div>
-        <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-3">
+    <section id="preco" className="relative py-24">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="eyebrow mb-4">Preços</div>
+        <h2 className="font-display text-[clamp(32px,4vw,52px)] font-semibold leading-[1.05] tracking-[-0.03em]">
+          Simples, <span className="gradient-cyan">por usuário</span>.
+        </h2>
+        <p className="mt-5 max-w-2xl text-[16px] leading-[1.6] text-[var(--muted-foreground)]">
+          Sem taxa por pagamento, sem taxa por banco. Você paga por quem usa o sistema.
+        </p>
+
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {plans.map((p) => (
             <div
               key={p.name}
-              className={`relative rounded-2xl border p-5 sm:p-7 ${
-                p.featured
-                  ? "border-[#1e4ea8] bg-gradient-to-b from-[#143573]/5 to-[#1e4ea8]/5 shadow-2xl shadow-[#1e4ea8]/10"
-                  : "border-[var(--border)] bg-[var(--card)]"
+              className={`card-topline relative overflow-hidden rounded-[22px] border p-7 ${
+                p.variant === "featured"
+                  ? "border-[color-mix(in_srgb,var(--brand-glow)_35%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_15%,transparent)] via-[color-mix(in_srgb,var(--card)_60%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_10%,transparent)]"
+                  : "border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_55%,transparent)]"
               }`}
             >
-              {p.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                  Mais escolhido
+              {p.variant === "featured" && (
+                <span className="absolute right-5 top-5 rounded-full bg-[var(--brand-cyan)] px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#05070d]">
+                  Popular
                 </span>
               )}
-              <h3 className="text-lg font-bold text-[var(--foreground)]">{p.name}</h3>
-              <p className="mt-1 text-xs text-[var(--muted-foreground)]">{p.desc}</p>
-              <div className="mt-5 flex items-baseline gap-1">
-                <span className="text-4xl font-bold tracking-tight text-[var(--foreground)]">{p.price}</span>
-                <span className="text-xs text-[var(--muted-foreground)]">{p.cadence}</span>
+              <div className="font-display text-[13px] uppercase tracking-[0.1em] text-[var(--muted-foreground)]">
+                {p.name}
               </div>
-              <Link
-                href={p.ctaLink}
-                className={`mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-semibold transition ${
-                  p.featured
-                    ? "bg-gradient-to-r from-[#143573] to-[#1e4ea8] text-white shadow-[0_8px_20px_-8px_rgba(20,53,115,0.55)] hover:shadow-[0_8px_28px_-8px_rgba(20,53,115,0.75)]"
-                    : "border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-[#1e4ea8]/50"
-                }`}
-              >
-                {p.cta} <ArrowRight size={12} />
-              </Link>
-              <ul className="mt-6 space-y-2.5 border-t border-[var(--border)] pt-5">
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="font-display text-[42px] font-semibold tracking-[-0.03em]">{p.price}</span>
+                <span className="text-[13px] text-[var(--muted-foreground)]">{p.suffix}</span>
+              </div>
+              <p className="mt-2 text-[13px] text-[var(--muted-foreground)]">{p.desc}</p>
+              <ul className="mt-6 space-y-2.5 text-[13.5px]">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs text-[var(--foreground)]">
-                    <Check size={13} className="mt-0.5 shrink-0 text-emerald-500" />
-                    {f}
+                  <li key={f} className="flex items-start gap-2.5">
+                    <Check size={14} className="mt-1 shrink-0 text-[var(--brand-emerald)]" />
+                    <span>{f}</span>
                   </li>
                 ))}
               </ul>
+              <Link
+                href="#demo"
+                className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-[13px] font-semibold transition ${
+                  p.variant === "featured"
+                    ? "btn-glow"
+                    : "border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_60%,transparent)] text-[var(--foreground)] hover:border-[var(--brand-cyan)] hover:text-[var(--brand-cyan)]"
+                }`}
+              >
+                {p.cta}
+                <ArrowRight size={13} />
+              </Link>
             </div>
           ))}
         </div>
@@ -866,199 +901,157 @@ function Pricing() {
   );
 }
 
-/* ---------- FAQ ---------- */
+/* ────────────────────────────── FAQ ────────────────────────────── */
 function FAQ() {
-  const items = [
+  const faqs = [
     {
-      q: "Como conecta com o meu banco?",
-      a: "Você coloca as credenciais do seu banco no sistema (certificado digital e chaves de acesso). Nós fazemos a verificação automática. Se algo der errado, nosso suporte te ajuda a configurar.",
+      q: "Quais bancos vocês integram?",
+      a: "Itaú (PIX REST + CNAB 240), Bradesco, Santander, Banco do Brasil, Caixa, Inter, Sicoob e BTG Pactual. Novos bancos entram a cada sprint conforme demanda dos clientes.",
     },
     {
-      q: "O dinheiro passa por vocês?",
-      a: "Não. O dinheiro sai direto da sua conta bancária para o fornecedor. O PaymentsHub só organiza e envia a instrução pro banco — nunca toca no dinheiro.",
+      q: "Preciso do CNAB 240 ou dá pra usar só PIX?",
+      a: "Os dois funcionam. PIX é a via rápida (REST síncrono). CNAB 240 é necessário para TED em lote e para bancos que ainda não oferecem PIX REST empresarial — o PaymentsHub gera e assina os arquivos automaticamente.",
     },
     {
-      q: "Quanto tempo leva para começar a usar?",
-      a: "O ambiente de teste fica pronto no mesmo dia. Para começar a pagar fornecedores de verdade, a média é 2 semanas — depende do prazo do seu banco para liberar o acesso.",
+      q: "Como funciona a aprovação humana?",
+      a: "Todo pagamento passa por um estado APROVADO antes de ir ao banco. A aprovação exige 2FA (TOTP ou WebAuthn) e fica registrada com timestamp, IP e agente. Dá para configurar alçadas por valor, beneficiário ou banco.",
     },
     {
-      q: "Funciona no celular?",
-      a: "Sim. O aprovador pode ver os pagamentos do dia e aprovar direto pelo celular, de qualquer lugar. O sistema é 100% web, não precisa instalar nada.",
+      q: "Vocês guardam dados bancários?",
+      a: "Chaves PIX e dados de conta são criptografados no banco (AES-256) com chave por tenant. Certificados mTLS ficam em HSM. LGPD compliance com retenção configurável e direito ao esquecimento.",
     },
     {
-      q: "Como funciona a aprovação?",
-      a: "Cada pessoa tem um nível de acesso. Quem registra pagamentos não pode aprovar. Quem aprova não configura o sistema. Tudo fica registrado — quem fez o quê e quando.",
-    },
-    {
-      q: "Posso cancelar quando quiser?",
-      a: "Sem fidelidade nos planos Grátis e Business: cancele quando desejar. Compromisso anual apenas no plano Enterprise.",
+      q: "Preciso trocar meu ERP?",
+      a: "Não. O PaymentsHub recebe pagamentos via REST e dispara webhooks. Temos templates para SAP, Totvs, Omie, Conta Azul e ContaSimples, ou você usa a API crua.",
     },
   ];
-  const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="border-t border-[var(--border)] bg-[var(--card)] py-24">
-      <div className="mx-auto max-w-3xl px-6">
-        <div className="mb-12 text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#1e4ea8]">FAQ</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-            Perguntas que sempre fazem
-          </h2>
-        </div>
-        <div className="space-y-2">
-          {items.map((it, i) => (
-            <div key={i} className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--background)]">
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-[var(--muted)]"
-              >
-                <span className="text-sm font-semibold text-[var(--foreground)]">{it.q}</span>
-                <ChevronDown
-                  size={16}
-                  className={`shrink-0 text-[var(--muted-foreground)] transition ${open === i ? "rotate-180" : ""}`}
-                />
-              </button>
-              {open === i && (
-                <div className="border-t border-[var(--border)] px-5 py-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
-                  {it.a}
-                </div>
-              )}
-            </div>
+    <section id="faq" className="relative py-24">
+      <div className="mx-auto max-w-4xl px-7">
+        <div className="eyebrow mb-4">FAQ</div>
+        <h2 className="font-display text-[clamp(28px,3.4vw,44px)] font-semibold leading-[1.1] tracking-[-0.03em]">
+          Perguntas que todo financeiro faz.
+        </h2>
+
+        <div className="mt-10 divide-y divide-[var(--border)] rounded-[20px] border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_50%,transparent)]">
+          {faqs.map((f, i) => (
+            <FAQItem key={i} q={f.q} a={f.a} />
           ))}
         </div>
       </div>
     </section>
   );
 }
-
-/* ---------- CTA / Demo form ---------- */
-function CTA() {
-  const [sent, setSent] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setBusy(true); setErr(null);
-    const fd = new FormData(e.currentTarget);
-    try {
-      const res = await fetch("/api/demo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: fd.get("name"),
-          email: fd.get("email"),
-          company: fd.get("company"),
-          volume: fd.get("volume"),
-        }),
-      });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || "Falha ao enviar");
-      }
-      setSent(true);
-    } catch (e2) {
-      setErr(e2 instanceof Error ? e2.message : "Erro desconhecido");
-    } finally { setBusy(false); }
-  }
-
+function FAQItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <section id="demo" className="relative overflow-hidden py-24">
-      <div className="glow-orb left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 bg-[#1e4ea8]" />
-      <div className="relative mx-auto max-w-3xl px-6">
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)]/80 p-8 shadow-2xl shadow-[#1e4ea8]/10 backdrop-blur sm:p-12">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">
-              Veja em <span className="gradient-text">20 minutos</span> se serve para você
-            </h2>
-            <p className="mt-3 text-sm text-[var(--muted-foreground)]">
-              Sem apresentação de vendas. A gente te mostra o sistema funcionando
-              ao vivo com seus dados — você decide se faz sentido.
-            </p>
-          </div>
+    <div className="px-7">
+      <button
+        className="flex w-full items-center justify-between gap-6 py-5 text-left"
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="font-display text-[16px] font-semibold">{q}</span>
+        <ChevronDown
+          size={18}
+          className={`shrink-0 text-[var(--muted-foreground)] transition ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <p className="pb-5 pr-10 text-[14px] leading-[1.7] text-[var(--muted-foreground)]">{a}</p>}
+    </div>
+  );
+}
 
-          {sent ? (
-            <div className="mt-8 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
-              <Check size={24} className="mx-auto text-emerald-500" />
-              <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">Recebido!</p>
-              <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-                Vamos te chamar em até 4 horas úteis no e-mail informado.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={submit} className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <input name="name" required placeholder="Nome completo" className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[#1e4ea8]" />
-              <input name="email" required type="email" placeholder="E-mail corporativo" className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[#1e4ea8]" />
-              <input name="company" required placeholder="Empresa" className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[#1e4ea8]" />
-              <select name="volume" defaultValue="Até 500/mês" className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--foreground)] outline-none focus:border-[#1e4ea8]">
-                <option>Até 500/mês</option>
-                <option>500 a 5.000/mês</option>
-                <option>Mais de 5.000/mês</option>
-              </select>
-              {err && (
-                <div className="sm:col-span-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400">
-                  {err}
-                </div>
-              )}
-              <button
-                type="submit"
-                disabled={busy}
-                className="group sm:col-span-2 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#143573] to-[#1e4ea8] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_32px_-12px_rgba(20,53,115,0.65)] transition hover:shadow-[0_16px_40px_-12px_rgba(20,53,115,0.85)] disabled:opacity-60"
+/* ────────────────────────────── CTA ────────────────────────────── */
+function CTA() {
+  return (
+    <section className="relative py-24">
+      <div className="mx-auto max-w-7xl px-7">
+        <div className="relative overflow-hidden rounded-[28px] border border-[var(--border)] bg-gradient-to-br from-[var(--brand-primary)] via-[var(--brand-deep)] to-[var(--background)] p-14 text-center md:p-20">
+          <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[var(--brand-cyan)] opacity-30 blur-[120px]" />
+          <div className="pointer-events-none absolute -bottom-16 -left-24 h-72 w-72 rounded-full bg-[var(--brand-glow)] opacity-25 blur-[120px]" />
+          <div className="relative">
+            <h3 className="mx-auto max-w-3xl font-display text-[clamp(28px,4vw,54px)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
+              Pronto pra tirar o financeiro da planilha?
+            </h3>
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-[1.6] text-white/70">
+              30 dias grátis. Onboarding em 48h. Primeiro lote no ar em menos de uma semana.
+            </p>
+            <div className="mt-8 inline-flex flex-wrap justify-center gap-3">
+              <Link href="/signup" className="btn-glow inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px]">
+                Começar grátis
+                <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-7 py-4 text-[14px] font-semibold text-white transition hover:border-white/40"
               >
-                {busy ? "Enviando..." : <>Quero agendar <ArrowRight size={14} className="transition group-hover:translate-x-0.5" /></>}
-              </button>
-              <p className="sm:col-span-2 mt-1 text-center text-[10.5px] text-[var(--muted-foreground)]">
-                Ao enviar você concorda com nossa política de privacidade. Sem spam.
-              </p>
-            </form>
-          )}
+                Falar com vendas
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ---------- Footer ---------- */
+/* ────────────────────────────── Footer ────────────────────────────── */
 function Footer() {
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--card)]">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <div className="col-span-2 md:col-span-1">
-            <Logo size="md" />
-            <p className="mt-3 text-xs text-[var(--muted-foreground)]">
-              Orquestração de pagamentos para empresas brasileiras.
-            </p>
-            <address className="mt-4 not-italic text-[11px] leading-relaxed text-[var(--muted-foreground)]">
-              Curitiba, Paraná — Brasil<br />
-              Seg–Sex · 09h às 16h30<br />
-              <a href="mailto:contato@doublethree.com.br" className="hover:text-[var(--foreground)]">contato@doublethree.com.br</a><br />
-              <a href="tel:+5547992770701" className="hover:text-[var(--foreground)]">(47) 99277-0701</a>
-            </address>
+    <footer className="relative border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_60%,transparent)] py-14">
+      <div className="mx-auto grid max-w-7xl gap-10 px-7 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div>
+          <div className="flex items-center gap-2 font-display font-semibold">
+            <BrandMark />
+            <span>
+              Payments<span className="text-[var(--brand-cyan)]">Hub</span>
+            </span>
           </div>
-          <FooterCol title="Produto" links={[["Como funciona", "#features"], ["Preços", "#pricing"], ["Perguntas frequentes", "#faq"]]} />
-          <FooterCol title="Empresa" links={[["Sobre a doublethree", "/about"], ["Blog", "/blog"], ["Contato", "/contact"]]} />
-          <FooterCol title="Legal" links={[["Política de privacidade", "/about#lgpd"], ["Termos de uso", "/about#termos"]]} />
+          <p className="mt-4 max-w-sm text-[13px] leading-[1.65] text-[var(--muted-foreground)]">
+            Orquestração bancária para empresas brasileiras. PIX, TED e CNAB 240 em um só hub, com aprovação humana auditada.
+          </p>
+          <p className="mt-5 font-mono text-[11px] text-[var(--muted-foreground)]">
+            © {new Date().getFullYear()} Double Three Tecnologia · CNPJ 33.720.345/0001-79
+          </p>
         </div>
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--border)] pt-6 text-[11px] text-[var(--muted-foreground)] md:flex-row">
-          <p>© {new Date().getFullYear()} Double Three Tecnologia · CNPJ 33.720.345/0001-79</p>
-          <p>Feito pela doublethree · Curitiba, PR</p>
-        </div>
+        <FooterCol title="Produto">
+          <FooterLink href="#produto">Como funciona</FooterLink>
+          <FooterLink href="#bancos">Bancos</FooterLink>
+          <FooterLink href="#preco">Preços</FooterLink>
+          <FooterLink href="/docs">API</FooterLink>
+          <FooterLink href="/status">Status</FooterLink>
+        </FooterCol>
+        <FooterCol title="Empresa">
+          <FooterLink href="/about">Sobre</FooterLink>
+          <FooterLink href="/careers">Carreiras</FooterLink>
+          <FooterLink href="/contact">Contato</FooterLink>
+          <FooterLink href="/blog">Blog</FooterLink>
+          <FooterLink href="/changelog">Changelog</FooterLink>
+        </FooterCol>
+        <FooterCol title="Legal">
+          <FooterLink href="/legal/terms">Termos</FooterLink>
+          <FooterLink href="/legal/privacy">Privacidade</FooterLink>
+          <FooterLink href="/legal/dpa">DPA</FooterLink>
+          <FooterLink href="/legal/security">Segurança</FooterLink>
+        </FooterCol>
       </div>
     </footer>
   );
 }
-
-function FooterCol({ title, links }: { title: string; links: [string, string][] }) {
+function FooterCol({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-[var(--foreground)]">{title}</p>
-      <ul className="space-y-2">
-        {links.map(([l, h]) => (
-          <li key={l}>
-            <a href={h} className="text-xs text-[var(--muted-foreground)] transition hover:text-[var(--foreground)]">{l}</a>
-          </li>
-        ))}
-      </ul>
+      <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-foreground)]">
+        {title}
+      </div>
+      <div className="flex flex-col gap-2.5 text-[13.5px]">{children}</div>
     </div>
+  );
+}
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} className="text-[var(--foreground)]/80 transition hover:text-[var(--brand-cyan)]">
+      {children}
+    </Link>
   );
 }

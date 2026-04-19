@@ -190,12 +190,91 @@ func (CaixaValidator) Validate(ctx context.Context, creds handlers.BankCredentia
 	return nil
 }
 
+// ─── Santander (033) ───
+type SantanderValidator struct{}
+
+func (SantanderValidator) BankCode() string { return "033" }
+
+func (SantanderValidator) Validate(ctx context.Context, creds handlers.BankCredentials) error {
+	if creds.ClientID == "" || creds.ClientSecret == "" {
+		return fmt.Errorf("client_id e client_secret do Santander são obrigatórios")
+	}
+	if len(creds.CertPEM) == 0 || len(creds.KeyPEM) == 0 {
+		return fmt.Errorf("certificado mTLS é obrigatório para Santander")
+	}
+	if _, err := tls.X509KeyPair(creds.CertPEM, creds.KeyPEM); err != nil {
+		return fmt.Errorf("certificado inválido: %v", err)
+	}
+	return nil
+}
+
+// ─── Banco do Brasil (001) ───
+type BBValidator struct{}
+
+func (BBValidator) BankCode() string { return "001" }
+
+func (BBValidator) Validate(ctx context.Context, creds handlers.BankCredentials) error {
+	if creds.ClientID == "" || creds.ClientSecret == "" {
+		return fmt.Errorf("client_id e client_secret do Banco do Brasil são obrigatórios")
+	}
+	if creds.APIKey == "" {
+		return fmt.Errorf("gw-app-key (APIKey) do Banco do Brasil é obrigatório")
+	}
+	if len(creds.CertPEM) == 0 || len(creds.KeyPEM) == 0 {
+		return fmt.Errorf("certificado mTLS é obrigatório para Banco do Brasil")
+	}
+	if _, err := tls.X509KeyPair(creds.CertPEM, creds.KeyPEM); err != nil {
+		return fmt.Errorf("certificado inválido: %v", err)
+	}
+	return nil
+}
+
+// ─── Sicoob (756) ───
+type SicoobValidator struct{}
+
+func (SicoobValidator) BankCode() string { return "756" }
+
+func (SicoobValidator) Validate(ctx context.Context, creds handlers.BankCredentials) error {
+	if creds.ClientID == "" || creds.ClientSecret == "" {
+		return fmt.Errorf("client_id e client_secret do Sicoob são obrigatórios")
+	}
+	if len(creds.CertPEM) == 0 || len(creds.KeyPEM) == 0 {
+		return fmt.Errorf("certificado mTLS é obrigatório para Sicoob")
+	}
+	if _, err := tls.X509KeyPair(creds.CertPEM, creds.KeyPEM); err != nil {
+		return fmt.Errorf("certificado inválido: %v", err)
+	}
+	return nil
+}
+
+// ─── BTG Pactual (208) ───
+type BTGValidator struct{}
+
+func (BTGValidator) BankCode() string { return "208" }
+
+func (BTGValidator) Validate(ctx context.Context, creds handlers.BankCredentials) error {
+	if creds.ClientID == "" || creds.ClientSecret == "" {
+		return fmt.Errorf("client_id e client_secret do BTG são obrigatórios")
+	}
+	if len(creds.CertPEM) == 0 || len(creds.KeyPEM) == 0 {
+		return fmt.Errorf("certificado mTLS é obrigatório para BTG")
+	}
+	if _, err := tls.X509KeyPair(creds.CertPEM, creds.KeyPEM); err != nil {
+		return fmt.Errorf("certificado inválido: %v", err)
+	}
+	return nil
+}
+
 // AllValidators returns all supported bank validators.
 func AllValidators() []handlers.BankValidator {
 	return []handlers.BankValidator{
 		ItauValidator{},
-		InterValidator{},
 		BradescoValidator{},
+		SantanderValidator{},
+		BBValidator{},
 		CaixaValidator{},
+		InterValidator{},
+		SicoobValidator{},
+		BTGValidator{},
 	}
 }

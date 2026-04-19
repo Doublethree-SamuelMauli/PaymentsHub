@@ -56,7 +56,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--border)] bg-[var(--card)] transition-transform md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_85%,transparent)] backdrop-blur-xl transition-transform md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -77,7 +77,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             if (groupItems.length === 0) return null;
             return (
               <div key={g} className="mb-5 last:mb-0">
-                <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
+                <p className="mb-2 px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--muted-foreground)]/70">
                   {GROUP_LABEL[g]}
                 </p>
                 <div className="space-y-0.5">
@@ -92,19 +92,19 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
                         className={cn(
                           "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
                           active
-                            ? "bg-gradient-to-r from-[#143573] to-[#1e4ea8] text-white shadow-[0_8px_20px_-10px_rgba(20,53,115,0.7)]"
-                            : "text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+                            ? "border border-[color-mix(in_srgb,var(--brand-glow)_28%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,var(--brand-glow)_16%,transparent)] to-transparent text-[var(--foreground)]"
+                            : "border border-transparent text-[var(--muted-foreground)] hover:border-[var(--border)] hover:bg-[color-mix(in_srgb,var(--muted)_60%,transparent)] hover:text-[var(--foreground)]"
                         )}
                       >
                         <Icon
                           size={16}
                           className={cn(
                             "transition",
-                            active ? "text-white" : "text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
+                            active ? "text-[var(--brand-cyan)]" : "text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]"
                           )}
                         />
                         <span className="flex-1">{item.label}</span>
-                        {active && <span className="h-1.5 w-1.5 rounded-full bg-white/80" />}
+                        {active && <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-cyan)] shadow-[0_0_6px_var(--brand-cyan)]" />}
                       </Link>
                     );
                   })}
@@ -114,12 +114,12 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
           })}
         </nav>
 
-        <div className="m-3 rounded-xl border border-[var(--border)] bg-gradient-to-br from-[#143573]/10 via-transparent to-[#1e4ea8]/10 p-3">
+        <div className="m-3 rounded-xl border border-[var(--border)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_12%,transparent)] via-transparent to-[color-mix(in_srgb,var(--brand-cyan)_8%,transparent)] p-3">
           <div className="flex items-center gap-2">
-            <Sparkles size={14} className="text-[var(--brand-primary)]" />
-            <p className="text-[11px] font-bold text-[var(--foreground)]">Plano Business</p>
+            <Sparkles size={14} className="text-[var(--brand-cyan)]" />
+            <p className="text-[11px] font-semibold text-[var(--foreground)]">Plano Business</p>
           </div>
-          <p className="mt-1 text-[10.5px] text-[var(--muted-foreground)]">
+          <p className="mt-1 font-mono text-[10.5px] text-[var(--muted-foreground)]">
             1.000 pagamentos/mês · {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
           </p>
         </div>

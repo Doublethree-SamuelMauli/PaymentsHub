@@ -29,7 +29,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="dark relative min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="backdrop-hero" aria-hidden />
       <Sidebar open={sbOpen} onClose={() => setSbOpen(false)} />
       <div className="md:pl-64">
         <Topbar onOpenSidebar={() => setSbOpen(true)} />

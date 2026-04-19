@@ -40,7 +40,7 @@ export function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void }) {
     : "??";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[var(--border)] bg-[var(--card)]/80 px-3 backdrop-blur sm:gap-3 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_70%,transparent)] px-3 backdrop-blur-xl backdrop-saturate-150 sm:gap-3 sm:px-6">
       <button
         onClick={onOpenSidebar}
         className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] text-[var(--foreground)] transition hover:bg-[var(--muted)] md:hidden"
@@ -58,7 +58,7 @@ export function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           onClick={() => setMenuOpen((v) => !v)}
           className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)] px-1.5 py-1 transition hover:bg-[var(--muted)] sm:gap-2 sm:px-2 sm:py-1.5"
         >
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-accent)] text-[11px] font-bold text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-[var(--brand-glow)] to-[var(--brand-cyan)] font-mono text-[11px] font-bold text-[#05070d]">
             {initials}
           </div>
           <div className="hidden text-left sm:block">

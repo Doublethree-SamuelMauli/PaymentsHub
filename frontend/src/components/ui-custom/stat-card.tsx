@@ -13,11 +13,11 @@ export interface StatCardProps {
 
 export function StatCard({ label, value, subtext, icon, trend, variant = "default", className }: StatCardProps) {
   const variantStyles = {
-    default: "bg-[var(--card)] border-[var(--border)]",
-    primary: "bg-gradient-to-br from-[#143573] via-[#1e4ea8] to-[#0a1d44] text-white border-transparent",
-    success: "bg-gradient-to-br from-emerald-500 to-emerald-700 text-white border-transparent",
-    warn: "bg-gradient-to-br from-amber-500 to-orange-600 text-white border-transparent",
-    danger: "bg-gradient-to-br from-rose-500 to-red-700 text-white border-transparent",
+    default: "bg-[color-mix(in_srgb,var(--card)_60%,transparent)] border-[var(--border)] backdrop-blur-sm",
+    primary: "bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_20%,transparent)] via-[color-mix(in_srgb,var(--card)_70%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_14%,transparent)] border-[color-mix(in_srgb,var(--brand-glow)_30%,transparent)]",
+    success: "bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-emerald)_18%,transparent)] to-[color-mix(in_srgb,var(--card)_70%,transparent)] border-[color-mix(in_srgb,var(--brand-emerald)_30%,transparent)]",
+    warn: "bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-amber)_20%,transparent)] to-[color-mix(in_srgb,var(--card)_70%,transparent)] border-[color-mix(in_srgb,var(--brand-amber)_32%,transparent)]",
+    danger: "bg-gradient-to-br from-red-500/20 to-[color-mix(in_srgb,var(--card)_70%,transparent)] border-red-500/30",
   };
   const isColored = variant !== "default";
   return (
@@ -30,29 +30,26 @@ export function StatCard({ label, value, subtext, icon, trend, variant = "defaul
       )}
     >
       {isColored && (
-        <>
-          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_55%)]" />
-        </>
+        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[var(--brand-cyan)]/15 blur-3xl" />
       )}
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className={cn("text-[10.5px] font-bold uppercase tracking-[0.14em]", isColored ? "text-white/75" : "text-[var(--muted-foreground)]")}>
+          <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
             {label}
           </p>
-          <p className={cn("mt-1.5 text-2xl font-bold tabular-nums tracking-tight sm:mt-2.5 sm:text-3xl", isColored ? "text-white" : "text-[var(--foreground)]")}>
+          <p className="mt-1.5 font-display text-2xl font-semibold tabular-nums tracking-[-0.02em] text-[var(--foreground)] sm:mt-2.5 sm:text-3xl">
             {value}
           </p>
           {subtext && (
-            <p className={cn("mt-1 text-xs", isColored ? "text-white/70" : "text-[var(--muted-foreground)]")}>{subtext}</p>
+            <p className="mt-1 font-mono text-xs text-[var(--muted-foreground)]">{subtext}</p>
           )}
           {trend !== undefined && (
             <div
               className={cn(
-                "mt-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
+                "mt-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[11px] font-semibold",
                 trend.value >= 0
-                  ? isColored ? "bg-white/15 text-emerald-100" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                  : isColored ? "bg-white/15 text-rose-100" : "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400"
+                  ? "bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] text-[var(--brand-emerald)]"
+                  : "bg-red-500/15 text-red-400"
               )}
             >
               {trend.value >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
@@ -61,14 +58,7 @@ export function StatCard({ label, value, subtext, icon, trend, variant = "defaul
           )}
         </div>
         {icon && (
-          <div
-            className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition group-hover:scale-105",
-              isColored
-                ? "border-white/15 bg-white/10 text-white"
-                : "border-[var(--border)] bg-[var(--muted)] text-[var(--brand-primary)]"
-            )}
-          >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[color-mix(in_srgb,var(--brand-glow)_25%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_18%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_12%,transparent)] text-[var(--brand-cyan)] transition group-hover:scale-105">
             {icon}
           </div>
         )}

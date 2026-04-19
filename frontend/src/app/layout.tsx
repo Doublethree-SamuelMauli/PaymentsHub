@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const sans = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
+});
+const display = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 const mono = JetBrains_Mono({
@@ -114,7 +120,7 @@ const JSONLD_STRING = JSON.stringify({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${sans.variable} ${mono.variable} h-full antialiased scroll-smooth`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${sans.variable} ${display.variable} ${mono.variable} h-full antialiased scroll-smooth`} suppressHydrationWarning>
       <head>
         {/* eslint-disable-next-line -- static JSON-LD, no user input */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSONLD_STRING }} />
