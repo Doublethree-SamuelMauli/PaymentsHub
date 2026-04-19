@@ -59,9 +59,9 @@ const RELEASES = [
 ];
 
 const TAG_STYLE: Record<string, string> = {
-  Feature: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  Fix: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  Improvement: "bg-amber-500/10 text-amber-600 dark:text-amber-500",
+  Feature: "bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] text-[var(--brand-emerald)] border border-[color-mix(in_srgb,var(--brand-emerald)_30%,transparent)]",
+  Fix: "bg-red-500/15 text-red-400 border border-red-500/30",
+  Improvement: "bg-[color-mix(in_srgb,var(--brand-amber)_15%,transparent)] text-[var(--brand-amber)] border border-[color-mix(in_srgb,var(--brand-amber)_30%,transparent)]",
 };
 
 export default function ChangelogPage() {
@@ -73,23 +73,23 @@ export default function ChangelogPage() {
         subtitle="Releases públicos. Sem hype, só o que entrou em produção."
       />
 
-      <section className="mx-auto max-w-3xl px-6 py-16">
+      <section className="mx-auto max-w-3xl px-7 py-16">
         <div className="space-y-10">
           {RELEASES.map((r) => (
-            <article key={r.version} className="relative border-l-2 border-[var(--border)] pl-6">
-              <span className="absolute -left-[7px] top-1 h-3 w-3 rounded-full bg-gradient-to-br from-[#143573] to-[#1e4ea8]" />
+            <article key={r.version} className="relative border-l-2 border-[var(--border)] pl-8">
+              <span className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-[var(--background)] bg-gradient-to-br from-[var(--brand-glow)] to-[var(--brand-cyan)] shadow-[0_0_12px_var(--brand-cyan)]" />
               <div className="flex flex-wrap items-baseline gap-3">
-                <h2 className="font-mono text-sm font-bold text-[var(--foreground)]">{r.version}</h2>
-                <span className="text-xs text-[var(--muted-foreground)]">{r.date}</span>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${TAG_STYLE[r.tag]}`}>
+                <h2 className="font-mono text-[13px] font-semibold text-[var(--brand-cyan)]">{r.version}</h2>
+                <span className="font-mono text-[11px] text-[var(--muted-foreground)]">{r.date}</span>
+                <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${TAG_STYLE[r.tag]}`}>
                   {r.tag}
                 </span>
               </div>
-              <h3 className="mt-2 text-lg font-semibold tracking-tight text-[var(--foreground)]">{r.title}</h3>
-              <ul className="mt-3 space-y-1.5 text-sm text-[var(--muted-foreground)]">
+              <h3 className="mt-2 font-display text-[19px] font-semibold tracking-[-0.015em]">{r.title}</h3>
+              <ul className="mt-4 space-y-2 text-[14px] text-[var(--muted-foreground)]">
                 {r.items.map((it, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#1e4ea8]" />
+                  <li key={i} className="flex gap-2.5">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[var(--brand-cyan)]" />
                     <span>{it}</span>
                   </li>
                 ))}

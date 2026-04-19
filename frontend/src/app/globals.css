@@ -350,4 +350,8 @@
     height: 1px;
     background: var(--brand-cyan);
   }
+  .eyebrow.justify-center::before { display: none; }
+  .eyebrow.justify-center {
+    gap: 0;
+  }
 }

@@ -52,26 +52,28 @@ export default function BlogPage() {
         subtitle="Escrevemos para times de financeiro e engenharia que querem entender o que está acontecendo por baixo."
       />
 
-      <section className="mx-auto max-w-4xl px-6 py-16">
+      <section className="mx-auto max-w-4xl px-7 py-16">
         <div className="space-y-4">
           {POSTS.map((p) => (
             <Link
               key={p.slug}
               href={`/blog/${p.slug}`}
-              className="group block rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 transition hover:border-[#1e4ea8]/50 hover:shadow-md"
+              className="group card-topline relative block overflow-hidden rounded-[20px] border border-[var(--border)] bg-gradient-to-b from-[color-mix(in_srgb,var(--card)_60%,transparent)] to-[color-mix(in_srgb,var(--background)_40%,transparent)] p-7 backdrop-blur-md transition hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--foreground)_16%,transparent)]"
             >
-              <div className="flex items-center gap-3 text-[11px] text-[var(--muted-foreground)]">
-                <span className="rounded-full bg-[#143573]/10 px-2 py-0.5 font-semibold text-[#1e4ea8]">{p.tag}</span>
-                <span className="inline-flex items-center gap-1"><Calendar size={11} />{p.date}</span>
-                <span className="inline-flex items-center gap-1"><Clock size={11} />{p.read}</span>
+              <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] text-[var(--muted-foreground)]">
+                <span className="rounded-full border border-[color-mix(in_srgb,var(--brand-cyan)_25%,transparent)] bg-[color-mix(in_srgb,var(--brand-cyan)_8%,transparent)] px-2.5 py-0.5 font-medium text-[var(--brand-cyan)]">
+                  {p.tag}
+                </span>
+                <span className="inline-flex items-center gap-1.5"><Calendar size={11} />{p.date}</span>
+                <span className="inline-flex items-center gap-1.5"><Clock size={11} />{p.read}</span>
               </div>
-              <h2 className="mt-3 text-lg font-bold tracking-tight text-[var(--foreground)] group-hover:text-[#1e4ea8]">
+              <h2 className="mt-4 font-display text-[20px] font-semibold tracking-[-0.015em] text-[var(--foreground)] transition group-hover:text-[var(--brand-cyan)]">
                 {p.title}
               </h2>
-              <p className="mt-2 text-sm text-[var(--muted-foreground)]">{p.excerpt}</p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className="text-[11px] text-[var(--muted-foreground)]">por {p.author}</span>
-                <ArrowRight size={14} className="text-[#1e4ea8] transition group-hover:translate-x-1" />
+              <p className="mt-2 text-[14px] leading-[1.65] text-[var(--muted-foreground)]">{p.excerpt}</p>
+              <div className="mt-4 flex items-center justify-between">
+                <span className="font-mono text-[11px] text-[var(--muted-foreground)]">por {p.author}</span>
+                <ArrowRight size={14} className="text-[var(--brand-cyan)] transition group-hover:translate-x-1" />
               </div>
             </Link>
           ))}

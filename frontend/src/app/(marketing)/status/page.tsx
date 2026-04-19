@@ -1,5 +1,5 @@
 import { CheckCircle2, AlertTriangle, Activity } from "lucide-react";
-import { PageHero } from "@/components/marketing/shell";
+import { PageHero, GlassCard } from "@/components/marketing/shell";
 
 export const metadata = { title: "Status dos serviços PaymentsHub", description: "Status em tempo real dos serviços do PaymentsHub. Uptime, latência e histórico de incidentes." };
 
@@ -27,81 +27,81 @@ export default function StatusPage() {
         subtitle="Status em tempo real dos serviços do PaymentsHub. Atualizado a cada minuto."
       />
 
-      <section className="mx-auto max-w-4xl px-6 py-16">
-        {/* Banner */}
-        <div className="mb-10 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20">
-            <CheckCircle2 size={20} className="text-emerald-600" />
+      <section className="mx-auto max-w-4xl px-7 py-16">
+        <div className="mb-10 flex items-center gap-3 rounded-[18px] border border-[color-mix(in_srgb,var(--brand-emerald)_30%,transparent)] bg-[color-mix(in_srgb,var(--brand-emerald)_10%,transparent)] p-5 backdrop-blur">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--brand-emerald)_20%,transparent)]">
+            <CheckCircle2 size={20} className="text-[var(--brand-emerald)]" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[var(--foreground)]">Todos os sistemas operacionais</p>
-            <p className="text-xs text-[var(--muted-foreground)]">Última verificação: agora · Nenhum incidente nas últimas 72h</p>
+            <p className="font-display text-[15px] font-semibold">Todos os sistemas operacionais</p>
+            <p className="font-mono text-[11px] text-[var(--muted-foreground)]">Última verificação: agora · Nenhum incidente nas últimas 72h</p>
           </div>
         </div>
 
-        {/* Serviços */}
-        <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Serviços</h2>
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] divide-y divide-[var(--border)]">
-          {SERVICES.map((s) => (
-            <div key={s.name} className="flex items-center justify-between px-5 py-4">
+        <h2 className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Serviços</h2>
+        <div className="overflow-hidden rounded-[18px] border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_60%,transparent)] backdrop-blur-md">
+          {SERVICES.map((s, i) => (
+            <div key={s.name} className={`flex items-center justify-between px-5 py-4 ${i > 0 ? "border-t border-[var(--border)]" : ""}`}>
               <div className="flex items-center gap-3">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]" />
-                <span className="text-sm font-medium text-[var(--foreground)]">{s.name}</span>
+                <span className="h-2 w-2 rounded-full bg-[var(--brand-emerald)] shadow-[0_0_12px_var(--brand-emerald)]" />
+                <span className="text-[14px] font-medium">{s.name}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Sparkbar />
-                <span className="text-xs font-mono text-[var(--muted-foreground)]">{s.uptime.toFixed(2)}%</span>
+                <span className="font-mono text-[11px] text-[var(--muted-foreground)]">{s.uptime.toFixed(2)}%</span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Métricas globais */}
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-3">
           {[
-            ["Uptime · 90 dias", "99.96%"],
+            ["Uptime · 90 dias", "99,96%"],
             ["Latência p95 · API", "84ms"],
             ["Pagamentos hoje", "12.847"],
           ].map(([l, v]) => (
-            <div key={l} className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--muted-foreground)]">{l}</p>
-              <p className="mt-2 text-2xl font-bold tracking-tight text-[var(--foreground)]">{v}</p>
-            </div>
+            <GlassCard key={l}>
+              <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--muted-foreground)]">{l}</p>
+              <p className="mt-2 font-display text-[26px] font-semibold tracking-[-0.02em]">{v}</p>
+            </GlassCard>
           ))}
         </div>
 
-        {/* Incidentes */}
-        <h2 className="mt-12 mb-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Histórico recente</h2>
+        <h2 className="mb-3 mt-12 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Histórico recente</h2>
         <div className="space-y-2">
           {INCIDENTS.map((i) => (
-            <div key={i.date} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
+            <div key={i.date} className="rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_55%,transparent)] p-4 backdrop-blur-md">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <AlertTriangle size={16} className="mt-0.5 text-amber-500" />
+                  <AlertTriangle size={16} className="mt-0.5 text-[var(--brand-amber)]" />
                   <div>
-                    <p className="text-sm font-semibold text-[var(--foreground)]">{i.title}</p>
-                    <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">{i.date} · Duração {i.duration} · Impacto {i.impact}</p>
+                    <p className="font-display text-[14px] font-semibold">{i.title}</p>
+                    <p className="mt-0.5 font-mono text-[11px] text-[var(--muted-foreground)]">{i.date} · Duração {i.duration} · Impacto {i.impact}</p>
                   </div>
                 </div>
-                {i.solved && <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-600">RESOLVIDO</span>}
+                {i.solved && (
+                  <span className="rounded-full border border-[color-mix(in_srgb,var(--brand-emerald)_30%,transparent)] bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] px-2 py-0.5 font-mono text-[10px] font-semibold text-[var(--brand-emerald)]">
+                    RESOLVIDO
+                  </span>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-5 text-center">
+        <GlassCard className="mt-12 text-center">
           <Activity size={18} className="mx-auto text-[var(--muted-foreground)]" />
-          <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-            Quer receber alertas? Inscreva-se em <a href="mailto:status@doublethree.com.br" className="text-[#1e4ea8] underline">status@doublethree.com.br</a>
+          <p className="mt-2 text-[13px] text-[var(--muted-foreground)]">
+            Quer receber alertas? Inscreva-se em{" "}
+            <a href="mailto:status@doublethree.com.br" className="text-[var(--brand-cyan)] underline">status@doublethree.com.br</a>
           </p>
-        </div>
+        </GlassCard>
       </section>
     </>
   );
 }
 
 function Sparkbar() {
-  // 30 days, mostly green, occasional warn
   const days = Array.from({ length: 30 }, (_, i) => (i === 8 || i === 22 ? "amber" : "ok"));
   return (
     <div className="hidden items-center gap-[2px] sm:flex">
@@ -109,7 +109,7 @@ function Sparkbar() {
         <span
           key={i}
           className={`h-5 w-1 rounded-sm ${
-            d === "ok" ? "bg-emerald-500/80" : "bg-amber-500/80"
+            d === "ok" ? "bg-[var(--brand-emerald)]/80" : "bg-[var(--brand-amber)]/80"
           }`}
         />
       ))}

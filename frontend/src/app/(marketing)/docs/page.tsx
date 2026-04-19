@@ -108,39 +108,40 @@ export default function DocsPage() {
         title="Documentação da API"
         subtitle="REST · JSON · OpenAPI 3.1. Tudo que você precisa para integrar em uma página."
       />
-      <section className="mx-auto max-w-5xl px-6 py-16">
-        <div className="grid gap-10 lg:grid-cols-[200px_1fr]">
+      <section className="mx-auto max-w-5xl px-7 py-16">
+        <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
           <aside className="hidden lg:block">
             <div className="sticky top-24">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Sumário</p>
+              <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--muted-foreground)]">Sumário</p>
               <nav className="space-y-1">
                 {SECTIONS.map((s) => (
                   <a
                     key={s.id}
                     href={`#${s.id}`}
-                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
+                    className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[12.5px] text-[var(--muted-foreground)] transition hover:bg-[color-mix(in_srgb,var(--muted)_60%,transparent)] hover:text-[var(--brand-cyan)]"
                   >
-                    {s.icon} {s.title}
+                    <span className="text-[var(--brand-cyan)]">{s.icon}</span>
+                    {s.title}
                   </a>
                 ))}
               </nav>
-              <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--card)] p-3">
-                <p className="text-[11px] font-bold text-[var(--foreground)]">Base URL</p>
-                <code className="mt-1 block break-all font-mono text-[10.5px] text-[#1e4ea8]">https://api.paymentshub.app</code>
+              <div className="mt-6 rounded-xl border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_55%,transparent)] p-3 backdrop-blur">
+                <p className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-[var(--muted-foreground)]">Base URL</p>
+                <code className="mt-1 block break-all font-mono text-[11px] text-[var(--brand-cyan)]">https://api.paymentshub.app</code>
               </div>
             </div>
           </aside>
 
-          <div className="min-w-0 space-y-12">
+          <div className="min-w-0 space-y-14">
             {SECTIONS.map((s) => (
               <section key={s.id} id={s.id} className="scroll-mt-24">
-                <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-[var(--foreground)]">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#143573]/10 to-[#1e4ea8]/10 text-[#1e4ea8]">
+                <h2 className="flex items-center gap-2.5 font-display text-[24px] font-semibold tracking-[-0.02em]">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[color-mix(in_srgb,var(--brand-glow)_25%,transparent)] bg-gradient-to-br from-[color-mix(in_srgb,var(--brand-glow)_18%,transparent)] to-[color-mix(in_srgb,var(--brand-cyan)_12%,transparent)] text-[var(--brand-cyan)]">
                     {s.icon}
                   </span>
                   {s.title}
                 </h2>
-                <div className="prose prose-sm dark:prose-invert mt-4 max-w-none text-[var(--foreground)] [&_code]:rounded [&_code]:bg-[var(--muted)] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-[12px] [&_code]:font-mono [&_p]:text-[var(--muted-foreground)]">
+                <div className="mt-5 max-w-none text-[14.5px] leading-[1.7] [&_code]:rounded [&_code]:bg-[var(--secondary)] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[12.5px] [&_code]:text-[var(--brand-cyan)] [&_p]:text-[var(--muted-foreground)] [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:text-[var(--muted-foreground)] [&_li]:mb-1">
                   {s.body}
                 </div>
               </section>
@@ -154,17 +155,17 @@ export default function DocsPage() {
 
 function Endpoint({ method, path, desc }: { method: string; path: string; desc: string }) {
   const colors: Record<string, string> = {
-    GET: "bg-emerald-500/15 text-emerald-600",
-    POST: "bg-blue-500/15 text-blue-600",
-    PATCH: "bg-amber-500/15 text-amber-600",
-    DELETE: "bg-rose-500/15 text-rose-600",
+    GET: "bg-[color-mix(in_srgb,var(--brand-emerald)_15%,transparent)] text-[var(--brand-emerald)] border-[color-mix(in_srgb,var(--brand-emerald)_30%,transparent)]",
+    POST: "bg-[color-mix(in_srgb,var(--brand-cyan)_15%,transparent)] text-[var(--brand-cyan)] border-[color-mix(in_srgb,var(--brand-cyan)_30%,transparent)]",
+    PATCH: "bg-[color-mix(in_srgb,var(--brand-amber)_15%,transparent)] text-[var(--brand-amber)] border-[color-mix(in_srgb,var(--brand-amber)_30%,transparent)]",
+    DELETE: "bg-red-500/15 text-red-400 border-red-500/30",
   };
   return (
-    <div className="my-3 flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[var(--card)] p-3">
-      <span className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-bold ${colors[method] || ""}`}>{method}</span>
+    <div className="my-3 flex items-start gap-3 rounded-lg border border-[var(--border)] bg-[color-mix(in_srgb,var(--card)_55%,transparent)] p-3 backdrop-blur">
+      <span className={`shrink-0 rounded border px-2 py-0.5 font-mono text-[10px] font-semibold ${colors[method] || ""}`}>{method}</span>
       <div className="min-w-0 flex-1">
-        <code className="font-mono text-xs text-[var(--foreground)]">{path}</code>
-        <p className="mt-1 text-xs text-[var(--muted-foreground)]">{desc}</p>
+        <code className="!bg-transparent !p-0 font-mono text-[12.5px] !text-[var(--foreground)]">{path}</code>
+        <p className="mt-1 text-[12.5px] text-[var(--muted-foreground)]">{desc}</p>
       </div>
     </div>
   );
@@ -173,21 +174,25 @@ function Endpoint({ method, path, desc }: { method: string; path: string; desc: 
 function CodeBlock({ title, lang, code }: { title: string; lang: string; code: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="my-4 overflow-hidden rounded-xl border border-[var(--border)] bg-[#0a1d44]">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-2">
+    <div className="my-4 overflow-hidden rounded-xl border border-[var(--border)] bg-[#05070d]">
+      <div className="flex items-center justify-between border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--brand-deep)_40%,transparent)] px-4 py-2">
         <div className="flex items-center gap-2">
-          <Terminal size={12} className="text-white/60" />
-          <span className="text-[11px] font-medium text-white/80">{title}</span>
-          <span className="rounded bg-white/10 px-1.5 py-0.5 text-[9px] uppercase text-white/60">{lang}</span>
+          <Terminal size={12} className="text-[var(--brand-cyan)]" />
+          <span className="font-mono text-[11px] font-medium text-[var(--foreground)]">{title}</span>
+          <span className="rounded bg-[color-mix(in_srgb,var(--brand-cyan)_12%,transparent)] px-1.5 py-0.5 font-mono text-[9px] uppercase text-[var(--brand-cyan)]">
+            {lang}
+          </span>
         </div>
         <button
           onClick={() => { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-          className="rounded p-1 text-white/60 hover:bg-white/10 hover:text-white"
+          className="rounded p-1 text-[var(--muted-foreground)] transition hover:bg-[color-mix(in_srgb,var(--foreground)_8%,transparent)] hover:text-[var(--brand-cyan)]"
         >
           {copied ? <Check size={12} /> : <Copy size={12} />}
         </button>
       </div>
-      <pre className="overflow-x-auto px-4 py-3 text-[12px] leading-relaxed text-white/90"><code>{code}</code></pre>
+      <pre className="overflow-x-auto px-4 py-3.5 font-mono text-[12.5px] leading-[1.65] text-[var(--foreground)]/90">
+        <code className="!bg-transparent !p-0 !text-[var(--foreground)]/90">{code}</code>
+      </pre>
     </div>
   );
 }
