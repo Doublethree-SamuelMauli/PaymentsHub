@@ -120,7 +120,26 @@ class ApiClient {
     }
     return this.get<PaymentDetail>(`/v1/payments/${id}`);
   }
-  createPayment(data: CreatePaymentInput) {
+  async createPayment(data: CreatePaymentInput): Promise<Payment> {
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 300));
+      return {
+        id: `pay-${Date.now()}`,
+        external_id: data.external_id || `NF-${Date.now()}`,
+        type: data.type,
+        status: "RECEIVED",
+        amount_cents: data.amount_cents,
+        currency: "BRL",
+        payee_method: data.payee_method,
+        payee: data.payee,
+        description: data.description || "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        idempotency_key: crypto.randomUUID(),
+        bank_reference: "",
+        payer_account_id: data.payer_account_id,
+      };
+    }
     return this.post<Payment>("/v1/payments", data, { "Idempotency-Key": crypto.randomUUID() });
   }
   holdPayment(id: string, reason?: string) { return this.post(`/v1/payments/${id}/hold`, { reason }); }
@@ -136,11 +155,49 @@ class ApiClient {
     }
     return this.get<Run[]>("/v1/runs");
   }
-  getRun(id: string) { return this.get<Run>(`/v1/runs/${id}`); }
-  listRunPayments(id: string) { return this.get<Payment[]>(`/v1/runs/${id}/payments`); }
-  createRun(run_date: string) { return this.post<Run>("/v1/runs", { run_date }); }
+  async getRun(id: string): Promise<Run> {
+    if (MOCK_MODE) {
+      const { mockRuns } = await import("./mock");
+      return mockRuns().find((r) => r.id === id) || mockRuns()[0];
+    }
+    return this.get<Run>(`/v1/runs/${id}`);
+  }
+  async listRunPayments(id: string): Promise<Payment[]> {
+    if (MOCK_MODE) {
+      const { mockPayments } = await import("./mock");
+      // deterministic slice based on run id so each run shows different items
+      const all = mockPayments();
+      const n = parseInt(id.slice(-2), 36) || 18;
+      const start = (parseInt(id.slice(-4, -2), 36) || 0) % 10;
+      return all.slice(start, start + (n % 18 || 12));
+    }
+    return this.get<Payment[]>(`/v1/runs/${id}/payments`);
+  }
+  async createRun(run_date: string): Promise<Run> {
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 250));
+      return {
+        id: `run-${Date.now()}`,
+        run_date,
+        status: "OPEN",
+        total_items: 0,
+        total_amount_cents: 0,
+        pix_count: 0,
+        ted_count: 0,
+      };
+    }
+    return this.post<Run>("/v1/runs", { run_date });
+  }
   attachPayments(runId: string, ids: string[]) { return this.post(`/v1/runs/${runId}/attach`, { payment_ids: ids }); }
-  approveRun(id: string) { return this.post<Run>(`/v1/runs/${id}/approve`); }
+  async approveRun(id: string): Promise<Run> {
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 300));
+      const { mockRuns } = await import("./mock");
+      const r = mockRuns().find((x) => x.id === id) || mockRuns()[0];
+      return { ...r, status: "APPROVED", approved_by: this.getUser()?.email, approved_at: new Date().toISOString() };
+    }
+    return this.post<Run>(`/v1/runs/${id}/approve`);
+  }
   submitRun(id: string) { return this.post(`/v1/runs/${id}/submit-to-bank`); }
 
   // Admin
@@ -161,7 +218,16 @@ class ApiClient {
   createBeneficiary(data: Record<string, unknown>) { return this.post<{ id: string }>("/v1/admin/beneficiaries", data); }
   addPixKey(benId: string, data: Record<string, unknown>) { return this.post(`/v1/admin/beneficiaries/${benId}/pix-keys`, data); }
   createPayerAccount(data: Record<string, unknown>) { return this.post<{ id: string }>("/v1/admin/payer-accounts", data); }
-  createApiKey(label: string, scopes: string[]) { return this.post<{ id: string; token: string }>("/v1/admin/api-keys", { label, scopes }); }
+  async createApiKey(label: string, scopes: string[]): Promise<{ id: string; token: string }> {
+    if (MOCK_MODE) {
+      await new Promise((r) => setTimeout(r, 300));
+      const token = "phk_" + Array.from({ length: 40 }, () => "abcdef0123456789"[Math.floor(Math.random() * 16)]).join("");
+      void scopes;
+      void label;
+      return { id: `key-${Date.now()}`, token };
+    }
+    return this.post<{ id: string; token: string }>("/v1/admin/api-keys", { label, scopes });
+  }
 
   // Settings — branding
   async getBranding(): Promise<Branding> {
@@ -185,7 +251,18 @@ class ApiClient {
   createBankConnection(data: CreateBankConnectionInput) { return this.post<BankConnection>("/v1/settings/bank-connections", data); }
   getBankConnection(id: string) { return this.get<BankConnection>(`/v1/settings/bank-connections/${id}`); }
   updateBankConnection(id: string, data: CreateBankConnectionInput) { return this.patch(`/v1/settings/bank-connections/${id}`, data); }
-  validateBankConnection(id: string) { return this.post<ValidationResult>(`/v1/settings/bank-connections/${id}/validate`, {}); }
+  async validateBankConnection(id: string): Promise<ValidationResult> {
+    if (MOCK_MODE) {
+      // Simulate live bank handshake: small latency, success with details.
+      await new Promise((r) => setTimeout(r, 1200 + Math.random() * 1200));
+      return {
+        status: "active",
+        message: "Handshake OAuth2 + mTLS concluído. Token válido e conta liberada.",
+        attempts: 1,
+      };
+    }
+    return this.post<ValidationResult>(`/v1/settings/bank-connections/${id}/validate`, {});
+  }
   deleteBankConnection(id: string) { return this.delete(`/v1/settings/bank-connections/${id}`); }
 
   // Users (admin)
